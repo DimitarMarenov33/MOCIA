@@ -20,6 +20,9 @@ class PWAInstaller {
 
     // Check if already installed
     this.checkIfInstalled();
+
+    // Show first-time install popup
+    this.showFirstTimeInstallPopup();
   }
 
   /**
@@ -268,6 +271,136 @@ class PWAInstaller {
    */
   isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  /**
+   * Show first-time install popup
+   */
+  showFirstTimeInstallPopup() {
+    // Check if user has already seen the popup
+    const hasSeenPopup = localStorage.getItem('mocia_has_seen_install_popup');
+
+    // Don't show if already installed
+    if (this.isInstalled) {
+      return;
+    }
+
+    // Don't show if user has already seen it
+    if (hasSeenPopup === 'true') {
+      return;
+    }
+
+    // Wait a bit before showing (better UX)
+    setTimeout(() => {
+      this.displayInstallPopup();
+    }, 1500); // 1.5 seconds after page load
+  }
+
+  /**
+   * Display the install popup
+   */
+  displayInstallPopup() {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-lg);
+      animation: fadeIn 0.3s ease;
+    `;
+
+    // Create popup content
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+      background: white;
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-xl);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    `;
+
+    const isIOS = this.isIOS();
+
+    popup.innerHTML = `
+      <div style="font-size: 64px; margin-bottom: var(--spacing-md);">🧠</div>
+      <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-md); color: var(--color-info);">
+        Installeer MOCIA
+      </h2>
+      <p style="font-size: var(--font-size-lg); line-height: 1.6; margin-bottom: var(--spacing-lg); color: var(--color-text-secondary);">
+        Installeer de app op uw beginscherm voor een betere ervaring en offline toegang.
+      </p>
+      ${isIOS ? `
+        <div style="background: var(--color-background-alt); padding: var(--spacing-md); border-radius: var(--border-radius-md); margin-bottom: var(--spacing-lg); text-align: left;">
+          <p style="font-size: var(--font-size-base); line-height: 1.6; margin-bottom: var(--spacing-sm);">
+            <strong>📱 Op iOS Safari:</strong>
+          </p>
+          <ol style="font-size: var(--font-size-base); line-height: 1.6; margin-left: var(--spacing-lg);">
+            <li style="margin-bottom: var(--spacing-xs);">Klik op het <strong>Deel</strong> icoon (vierkant met pijl) onderaan</li>
+            <li>Kies <strong>"Zet op beginscherm"</strong></li>
+          </ol>
+        </div>
+        <button id="pwa-popup-dismiss" class="btn btn-primary btn-large" style="width: 100%; margin-bottom: var(--spacing-sm);">
+          Begrepen
+        </button>
+      ` : `
+        <button id="pwa-popup-install" class="btn btn-success btn-large" style="width: 100%; margin-bottom: var(--spacing-sm);">
+          📱 Installeer App
+        </button>
+      `}
+      <button id="pwa-popup-later" class="btn btn-secondary" style="width: 100%;">
+        Misschien Later
+      </button>
+    `;
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    // Set up event listeners
+    const installBtn = document.getElementById('pwa-popup-install');
+    const dismissBtn = document.getElementById('pwa-popup-dismiss');
+    const laterBtn = document.getElementById('pwa-popup-later');
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        const installed = await this.promptInstall();
+        if (installed) {
+          overlay.remove();
+          localStorage.setItem('mocia_has_seen_install_popup', 'true');
+        }
+      });
+    }
+
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        overlay.remove();
+        localStorage.setItem('mocia_has_seen_install_popup', 'true');
+      });
+    }
+
+    if (laterBtn) {
+      laterBtn.addEventListener('click', () => {
+        overlay.remove();
+        localStorage.setItem('mocia_has_seen_install_popup', 'true');
+      });
+    }
+
+    // Close on background click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+        localStorage.setItem('mocia_has_seen_install_popup', 'true');
+      }
+    });
   }
 }
 
