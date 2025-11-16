@@ -3,7 +3,7 @@
  * Handles offline functionality and caching
  */
 
-const CACHE_VERSION = 'mocia-v1.2.0';
+const CACHE_VERSION = 'mocia-v1.3.0';
 const CACHE_NAME = `mocia-cache-${CACHE_VERSION}`;
 
 // Files to cache for offline use
@@ -21,6 +21,7 @@ const ASSETS_TO_CACHE = [
   '/MOCIA/shared/styles/mobile-optimizations.css',
 
   // Shared JavaScript
+  '/MOCIA/shared/js/viewport-fix.js',
   '/MOCIA/shared/js/constants.js',
   '/MOCIA/shared/js/audio-manager.js',
   '/MOCIA/shared/js/data-tracker.js',

@@ -303,61 +303,75 @@ class PWAInstaller {
     // Create overlay
     const overlay = document.createElement('div');
     overlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      width: 100dvw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-width: 100vw !important;
+      max-width: 100dvw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      background: rgba(0, 0, 0, 0.85);
       z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--spacing-lg);
+      padding: 16px;
       animation: fadeIn 0.3s ease;
+      overflow: hidden;
     `;
 
     // Create popup content
     const popup = document.createElement('div');
     popup.style.cssText = `
       background: white;
-      border-radius: var(--border-radius-lg);
-      padding: var(--spacing-xl);
-      max-width: 500px;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: min(500px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      max-height: calc(100dvh - 32px);
       width: 100%;
       text-align: center;
       animation: slideUp 0.3s ease;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     `;
 
     const isIOS = this.isIOS();
 
     popup.innerHTML = `
-      <div style="font-size: 64px; margin-bottom: var(--spacing-md);">🧠</div>
-      <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-md); color: var(--color-info);">
+      <div style="font-size: 48px; margin-bottom: 16px;">🧠</div>
+      <h2 style="font-size: 28px; margin-bottom: 12px; color: #1976D2; font-weight: 700;">
         Installeer MOCIA
       </h2>
-      <p style="font-size: var(--font-size-lg); line-height: 1.6; margin-bottom: var(--spacing-lg); color: var(--color-text-secondary);">
-        Installeer de app op uw beginscherm voor een betere ervaring en offline toegang.
+      <p style="font-size: 18px; line-height: 1.5; margin-bottom: 20px; color: #555555;">
+        Installeer de app voor een betere ervaring en offline toegang.
       </p>
       ${isIOS ? `
-        <div style="background: var(--color-background-alt); padding: var(--spacing-md); border-radius: var(--border-radius-md); margin-bottom: var(--spacing-lg); text-align: left;">
-          <p style="font-size: var(--font-size-base); line-height: 1.6; margin-bottom: var(--spacing-sm);">
+        <div style="background: #F5F5F5; padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+          <p style="font-size: 16px; line-height: 1.5; margin-bottom: 8px;">
             <strong>📱 Op iOS Safari:</strong>
           </p>
-          <ol style="font-size: var(--font-size-base); line-height: 1.6; margin-left: var(--spacing-lg);">
-            <li style="margin-bottom: var(--spacing-xs);">Klik op het <strong>Deel</strong> icoon (vierkant met pijl) onderaan</li>
-            <li>Kies <strong>"Zet op beginscherm"</strong></li>
+          <ol style="font-size: 16px; line-height: 1.5; margin-left: 20px; padding-left: 4px;">
+            <li style="margin-bottom: 8px;">Klik op het <strong>Deel</strong> icoon <span style="font-size: 20px;">⎋</span> onderaan</li>
+            <li style="margin-bottom: 0;">Kies <strong>"Zet op beginscherm"</strong></li>
           </ol>
         </div>
-        <button id="pwa-popup-dismiss" class="btn btn-primary btn-large" style="width: 100%; margin-bottom: var(--spacing-sm);">
+        <button id="pwa-popup-dismiss" class="btn btn-primary" style="width: 100%; margin-bottom: 12px; min-height: 56px; font-size: 18px; border-radius: 12px;">
           Begrepen
         </button>
       ` : `
-        <button id="pwa-popup-install" class="btn btn-success btn-large" style="width: 100%; margin-bottom: var(--spacing-sm);">
+        <button id="pwa-popup-install" class="btn btn-success" style="width: 100%; margin-bottom: 12px; min-height: 56px; font-size: 18px; border-radius: 12px;">
           📱 Installeer App
         </button>
       `}
-      <button id="pwa-popup-later" class="btn btn-secondary" style="width: 100%;">
+      <button id="pwa-popup-later" class="btn btn-secondary" style="width: 100%; min-height: 48px; font-size: 16px; border-radius: 12px;">
         Misschien Later
       </button>
     `;
