@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Time Utility</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #1976D2;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background: #1565C0;
+    }
+    .success {
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      display: none;
+    }
+    .info {
+      background: #E3F2FD;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1976D2;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Add 34 Minutes to Training Data</h1>
+
+    <div class="info">
+      <strong>Current Status:</strong>
+      <div id="current-stats" style="margin-top: 10px; font-family: monospace;"></div>
+    </div>
+
+    <button id="add-time-btn" onclick="addTime()">Add 34 Minutes to Data</button>
+
+    <div id="success-message" class="success">
+      ✓ Successfully added 34 minutes to your training data!<br>
+      The home page will now show approximately 45/100 minutes.
+    </div>
+  </div>
+
+  <script src="shared/js/constants.js"></script>
+
+  <script>
+    // Display current stats
+    function displayCurrentStats() {
+      const userData = JSON.parse(localStorage.getItem('mocia_user_data') || '{}');
+
+      if (!userData.exercises) {
+        document.getElementById('current-stats').innerHTML = 'No data found';
+        return;
+      }
+
+      let totalSessions = 0;
+      let totalTime = 0;
+
+      Object.values(userData.exercises).forEach(exercise => {
+        totalSessions += exercise.totalSessions || 0;
+        exercise.sessions.forEach(session => {
+          totalTime += session.duration || 0;
+        });
+      });
+
+      const totalMinutes = Math.round(totalTime / (1000 * 60));
+
+      document.getElementById('current-stats').innerHTML = `
+        Sessions: ${totalSessions}/10<br>
+        Current Time: ${totalMinutes}/100 minutes<br>
+        <br>
+        <strong>After adding:</strong><br>
+        Sessions: ${totalSessions}/10<br>
+        New Time: ${totalMinutes + 34}/100 minutes
+      `;
+    }
+
+    function addTime() {
+      const userData = JSON.parse(localStorage.getItem('mocia_user_data') || '{}');
+
+      if (!userData.exercises) {
+        alert('No exercise data found. Please complete some exercises first.');
+        return;
+      }
+
+      // Add 34 minutes (34 * 60 * 1000 milliseconds) distributed across existing sessions
+      const minutesToAdd = 34;
+      const millisecondsToAdd = minutesToAdd * 60 * 1000;
+
+      // Get all exercises that have sessions
+      const exercisesWithSessions = Object.entries(userData.exercises).filter(
+        ([_, data]) => data.sessions && data.sessions.length > 0
+      );
+
+      if (exercisesWithSessions.length === 0) {
+        alert('No sessions found to modify.');
+        return;
+      }
+
+      // Distribute the additional time across existing sessions
+      const timePerSession = Math.floor(millisecondsToAdd / exercisesWithSessions.reduce(
+        (total, [_, data]) => total + data.sessions.length, 0
+      ));
+
+      exercisesWithSessions.forEach(([exerciseType, data]) => {
+        data.sessions.forEach(session => {
+          // Add time to each session
+          session.duration = (session.duration || 0) + timePerSession;
+
+          // Update end time accordingly
+          if (session.startTime && session.endTime) {
+            const startTime = new Date(session.startTime).getTime();
+            session.endTime = new Date(startTime + session.duration).toISOString();
+          }
+        });
+      });
+
+      // Save updated data
+      localStorage.setItem('mocia_user_data', JSON.stringify(userData));
+
+      // Show success message
+      document.getElementById('success-message').style.display = 'block';
+      document.getElementById('add-time-btn').disabled = true;
+      document.getElementById('add-time-btn').textContent = '✓ Time Added Successfully';
+
+      // Update display
+      displayCurrentStats();
+
+      // Redirect to home after 2 seconds
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 2000);
+    }
+
+    // Display stats on load
+    displayCurrentStats();
+  </script>
+</body>
+</html>

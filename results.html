@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Oefening resultaten - MOCIA">
+  <meta name="theme-color" content="#1976D2">
+  <title>Resultaten - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="shared/styles/design-system.css">
+  <link rel="stylesheet" href="shared/styles/components.css">
+  <link rel="stylesheet" href="shared/styles/animations.css">
+  <link rel="stylesheet" href="shared/styles/mobile-first.css">
+</head>
+<body>
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Main content -->
+  <main id="main-content" class="center-content">
+    <div class="simple-screen">
+      <div class="simple-screen__content" style="text-align: center;">
+        <!-- Success Icon -->
+        <div style="font-size: 80px; margin-bottom: var(--spacing-lg);">🎉</div>
+
+        <h1 class="simple-screen__title">Oefening Voltooid!</h1>
+
+        <!-- Final Score -->
+        <div class="final-score" style="margin: var(--spacing-xl) 0;">
+          <div id="final-score-value" style="font-size: 72px; font-weight: bold; color: var(--color-success);">0</div>
+          <div style="font-size: var(--font-size-xl); color: var(--color-text-secondary); margin-top: var(--spacing-sm);">
+            punten
+          </div>
+        </div>
+
+        <!-- Results Stats -->
+        <div id="results-stats" style="background: var(--color-background-alt); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); margin: var(--spacing-xl) 0; text-align: left;"></div>
+
+        <!-- Encouragement Message -->
+        <div id="encouragement-message" style="font-size: var(--font-size-lg); color: var(--color-success); font-weight: 500; margin: var(--spacing-lg) 0;"></div>
+
+        <!-- Comparison Message -->
+        <div id="comparison-message" style="font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--spacing-md) 0;"></div>
+
+        <!-- Action Buttons -->
+        <div class="simple-screen__actions" style="margin-top: var(--spacing-xxl);">
+          <button id="try-again-btn" class="btn btn-success btn-large">
+            Probeer Opnieuw
+          </button>
+          <button id="back-to-menu-btn" class="btn btn-secondary btn-large">
+            Terug naar Menu
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="shared/js/constants.js"></script>
+  <script src="shared/js/audio-manager.js"></script>
+  <script src="shared/js/data-tracker.js"></script>
+  <script src="shared/js/ui-components.js"></script>
+  <script src="shared/utils/statistics.js"></script>
+
+  <!-- Results page JavaScript -->
+  <script>
+    class ResultsPage {
+      constructor() {
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Load settings
+          this.loadSettings();
+
+          // Parse URL parameters
+          const params = new URLSearchParams(window.location.search);
+
+          this.exercisePath = params.get('exercise') || '';
+          this.exerciseName = params.get('name') || 'Oefening';
+          this.score = parseInt(params.get('score')) || 0;
+
+          // Parse stats from JSON (URLSearchParams already decodes, no need for decodeURIComponent)
+          const statsJson = params.get('stats');
+          this.stats = statsJson ? JSON.parse(statsJson) : {};
+
+          // Update page title
+          document.title = `Resultaten: ${this.exerciseName} - MOCIA`;
+
+          // Display results
+          this.displayResults();
+
+          // Setup event listeners
+          this.setupEventListeners();
+
+          // Speak results
+          if (window.AudioManager && window.AudioManager.isEnabled()) {
+            try {
+              await window.AudioManager.speak(`Oefening voltooid! Je score is ${this.score} punten.`);
+            } catch (error) {
+              console.log('Speech unavailable:', error);
+            }
+          }
+        } catch (error) {
+          console.error('Initialization error:', error);
+          alert('Er is een fout opgetreden bij het laden van de resultaten.');
+        }
+      }
+
+      loadSettings() {
+        try {
+          const settings = localStorage.getItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS);
+          if (settings) {
+            const parsed = JSON.parse(settings);
+            if (parsed.largeText) {
+              document.body.classList.add('large-text');
+            }
+            if (parsed.highContrast) {
+              document.body.classList.add('high-contrast');
+            }
+          }
+        } catch (error) {
+          console.error('Error loading settings:', error);
+        }
+      }
+
+      displayResults() {
+        // Display final score
+        document.getElementById('final-score-value').textContent = this.score;
+
+        // Display stats
+        const statsContainer = document.getElementById('results-stats');
+        if (this.stats && Object.keys(this.stats).length > 0) {
+          const statsArray = [];
+
+          // Common stats
+          if (this.stats.accuracy !== undefined) {
+            statsArray.push({
+              label: 'Nauwkeurigheid',
+              value: Statistics.formatPercentage(this.stats.accuracy)
+            });
+          }
+          if (this.stats.totalTrials !== undefined) {
+            statsArray.push({
+              label: 'Totaal Pogingen',
+              value: this.stats.totalTrials
+            });
+          }
+          if (this.stats.correctTrials !== undefined) {
+            statsArray.push({
+              label: 'Correct',
+              value: this.stats.correctTrials
+            });
+          }
+          if (this.stats.maxSpan !== undefined) {
+            statsArray.push({
+              label: 'Langste Reeks',
+              value: this.stats.maxSpan
+            });
+          }
+          if (this.stats.averageReactionTime !== undefined) {
+            statsArray.push({
+              label: 'Gem. Reactietijd',
+              value: `${Math.round(this.stats.averageReactionTime)}ms`
+            });
+          }
+          if (this.stats.maxGridSize !== undefined) {
+            statsArray.push({
+              label: 'Max. Rastergrootte',
+              value: `${this.stats.maxGridSize}×${this.stats.maxGridSize}`
+            });
+          }
+
+          // Task-switching specific stats
+          if (this.stats.switchAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Nauwkeurigheid Wisseltaken',
+              value: Statistics.formatPercentage(this.stats.switchAccuracy)
+            });
+          }
+          if (this.stats.repeatAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Nauwkeurigheid Herhaaltaken',
+              value: Statistics.formatPercentage(this.stats.repeatAccuracy)
+            });
+          }
+          if (this.stats.switchCost !== undefined) {
+            const costMs = Math.round(this.stats.switchCost);
+            statsArray.push({
+              label: 'Wisselkosten',
+              value: `${costMs > 0 ? '+' : ''}${costMs}ms`
+            });
+          }
+          if (this.stats.finalCTI !== undefined) {
+            statsArray.push({
+              label: 'Finale Voorbereidingstijd',
+              value: `${this.stats.finalCTI}ms`
+            });
+          }
+
+          // Stroop specific stats
+          if (this.stats.congruentAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Nauwkeurigheid Congruent',
+              value: Statistics.formatPercentage(this.stats.congruentAccuracy)
+            });
+          }
+          if (this.stats.incongruentAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Nauwkeurigheid Incongruent',
+              value: Statistics.formatPercentage(this.stats.incongruentAccuracy)
+            });
+          }
+          if (this.stats.finalResponseTime !== undefined) {
+            statsArray.push({
+              label: 'Finale Reactietijd',
+              value: `${this.stats.finalResponseTime.toFixed(1)}s`
+            });
+          }
+
+          // UFOV specific stats
+          if (this.stats.finalDuration !== undefined) {
+            statsArray.push({
+              label: 'Finale Stimulusduur',
+              value: `${this.stats.finalDuration}ms`
+            });
+          }
+          if (this.stats.centralAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Centrale Nauwkeurigheid',
+              value: Statistics.formatPercentage(this.stats.centralAccuracy)
+            });
+          }
+          if (this.stats.peripheralAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Perifere Nauwkeurigheid',
+              value: Statistics.formatPercentage(this.stats.peripheralAccuracy)
+            });
+          }
+
+          // Dual N-Back specific stats
+          if (this.stats.visualAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Visuele Nauwkeurigheid',
+              value: Statistics.formatPercentage(this.stats.visualAccuracy)
+            });
+          }
+          if (this.stats.audioAccuracy !== undefined) {
+            statsArray.push({
+              label: 'Audio Nauwkeurigheid',
+              value: Statistics.formatPercentage(this.stats.audioAccuracy)
+            });
+          }
+          if (this.stats.finalNLevel !== undefined) {
+            statsArray.push({
+              label: 'Finale N-Niveau',
+              value: `${this.stats.finalNLevel}-back`
+            });
+          }
+
+          const statsPanel = UIComponents.createStatsPanel(statsArray);
+          statsContainer.appendChild(statsPanel);
+        }
+
+        // Generate encouragement message
+        this.displayEncouragement();
+
+        // Display comparison with previous attempts
+        this.displayComparison();
+      }
+
+      displayEncouragement() {
+        const messageEl = document.getElementById('encouragement-message');
+
+        const accuracy = this.stats.accuracy || 0;
+        let message = '';
+
+        if (accuracy >= 0.9) {
+          message = '🌟 Uitstekend werk! Je prestaties zijn voortreffelijk!';
+        } else if (accuracy >= 0.75) {
+          message = '👏 Goed gedaan! Je maakt goede vorderingen!';
+        } else if (accuracy >= 0.60) {
+          message = '💪 Blijf oefenen! Je bent op de goede weg!';
+        } else {
+          message = '🎯 Blijf proberen! Elke oefening maakt je beter!';
+        }
+
+        messageEl.textContent = message;
+      }
+
+      displayComparison() {
+        const messageEl = document.getElementById('comparison-message');
+
+        // Get previous sessions for this exercise
+        const exerciseId = this.getExerciseIdFromPath(this.exercisePath);
+        if (!exerciseId) {
+          messageEl.textContent = '';
+          return;
+        }
+
+        const history = window.DataTracker.getExerciseHistory(exerciseId);
+        if (!history || !history.sessions || history.sessions.length < 2) {
+          messageEl.textContent = 'Dit is je eerste voltooide sessie! Blijf oefenen om je voortgang te volgen.';
+          return;
+        }
+
+        // Compare with previous session
+        const previousSession = history.sessions[history.sessions.length - 2];
+        const previousScore = previousSession.results?.score || 0;
+
+        if (this.score > previousScore) {
+          const improvement = this.score - previousScore;
+          messageEl.textContent = `📈 Je score is ${improvement} punten hoger dan je vorige poging!`;
+          messageEl.style.color = 'var(--color-success)';
+        } else if (this.score < previousScore) {
+          messageEl.textContent = `Vorige keer behaalde je ${previousScore} punten. Blijf oefenen!`;
+          messageEl.style.color = 'var(--color-text-secondary)';
+        } else {
+          messageEl.textContent = `Je score is hetzelfde als je vorige poging van ${previousScore} punten.`;
+          messageEl.style.color = 'var(--color-text-secondary)';
+        }
+      }
+
+      getExerciseIdFromPath(path) {
+        // Extract exercise ID from path
+        if (path.includes('digit-span')) return CONSTANTS.EXERCISE_TYPES.DIGIT_SPAN;
+        if (path.includes('dual-n-back')) return CONSTANTS.EXERCISE_TYPES.DUAL_N_BACK;
+        if (path.includes('ufov-basic')) return CONSTANTS.EXERCISE_TYPES.UFOV_BASIC;
+        if (path.includes('ufov-complex')) return CONSTANTS.EXERCISE_TYPES.UFOV_COMPLEX;
+        if (path.includes('visual-search')) return CONSTANTS.EXERCISE_TYPES.VISUAL_SEARCH;
+        if (path.includes('complex-dual-task')) return CONSTANTS.EXERCISE_TYPES.COMPLEX_DUAL_TASK;
+        if (path.includes('stroop')) return CONSTANTS.EXERCISE_TYPES.STROOP;
+        if (path.includes('task-switching')) return CONSTANTS.EXERCISE_TYPES.TASK_SWITCHING;
+        return null;
+      }
+
+      setupEventListeners() {
+        // Try again button - restart the same exercise
+        document.getElementById('try-again-btn').addEventListener('click', () => {
+          if (this.exercisePath) {
+            window.location.href = this.exercisePath;
+          } else {
+            history.back();
+          }
+        });
+
+        // Back to menu button - return to domain selection
+        document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+          window.location.href = 'domains.html';
+        });
+      }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        new ResultsPage();
+      });
+    } else {
+      new ResultsPage();
+    }
+  </script>
+</body>
+</html>

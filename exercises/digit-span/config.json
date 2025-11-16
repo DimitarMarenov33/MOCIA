@@ -1,0 +1,49 @@
+{
+  "exerciseId": "digit_span",
+  "exerciseName": "Cijferreeks Onthouden",
+  "difficulty": "easy",
+  "description": "Onthoud en herhaal cijferreeksen om uw werkgeheugen te trainen",
+
+  "parameters": {
+    "startLength": 2,
+    "minLength": 2,
+    "maxLength": 9,
+    "totalTrials": 10,
+    "digitDisplayTime": 1000,
+    "interDigitInterval": 800,
+    "feedbackDuration": 2000,
+    "consecutiveCorrectToIncrease": 2,
+    "consecutiveIncorrectToDecrease": 2
+  },
+
+  "scoring": {
+    "pointsPerDigit": 10,
+    "bonusForPerfect": 50
+  },
+
+  "instructions": {
+    "title": "Hoe te spelen",
+    "steps": [
+      "Je ziet en hoort een reeks cijfers, één voor één",
+      "Onthoud de cijfers in de juiste volgorde",
+      "Als de reeks compleet is, tik je de cijfers in dezelfde volgorde in",
+      "De reeks wordt langer naarmate je beter wordt",
+      "Probeer zoveel mogelijk cijfers te onthouden!"
+    ]
+  },
+
+  "feedback": {
+    "correct": [
+      "Correct!",
+      "Goed gedaan!",
+      "Uitstekend!",
+      "Perfect!"
+    ],
+    "incorrect": [
+      "Niet helemaal",
+      "Probeer het nog eens!",
+      "Bijna goed!",
+      "Blijf oefenen!"
+    ]
+  }
+}

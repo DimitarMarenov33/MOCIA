@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Stroop Kleur-Woord Taak - Executieve Functies Training">
+  <title>Stroop Taak - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../shared/styles/design-system.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="../../shared/styles/animations.css">
+  <link rel="stylesheet" href="stroop.css">
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation buttons -->
+  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
+    <button id="back-button" class="btn btn-secondary">
+      ← Terug naar Menu
+    </button>
+    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary" title="Terug naar hoofdmenu">🏠</button>
+  </div>
+
+  <!-- Main content -->
+  <main id="main-content" class="stroop-container">
+    <!-- Exercise screen -->
+    <div id="exercise-screen">
+      <!-- Trial info -->
+      <div id="trial-info" class="trial-info">
+        <span id="trial-counter">Poging 1/30</span>
+        <span id="timer-display" class="timer-display">3.0s</span>
+      </div>
+
+      <!-- Instruction prompt -->
+      <div id="instruction-prompt" class="instruction-prompt">
+        Kies de <strong>kleur</strong> van het woord
+      </div>
+
+      <!-- Stimulus display area -->
+      <div id="stimulus-display" class="stimulus-display">
+        <div id="color-word" class="color-word">ROOD</div>
+      </div>
+
+      <!-- Response buttons -->
+      <div id="response-buttons" class="response-buttons">
+        <button id="button-1" class="response-button" data-color="">
+          <span class="button-label">Kleur 1</span>
+        </button>
+        <button id="button-2" class="response-button" data-color="">
+          <span class="button-label">Kleur 2</span>
+        </button>
+        <button id="button-3" class="response-button" data-color="">
+          <span class="button-label">Kleur 3</span>
+        </button>
+      </div>
+
+      <!-- Feedback area -->
+      <div id="feedback-area"></div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="../../shared/js/constants.js"></script>
+  <script src="../../shared/js/audio-manager.js"></script>
+  <script src="../../shared/js/data-tracker.js"></script>
+  <script src="../../shared/js/difficulty-adapter.js"></script>
+  <script src="../../shared/js/ui-components.js"></script>
+  <script src="../../shared/utils/statistics.js"></script>
+  <script src="../../shared/utils/validation.js"></script>
+
+  <!-- Exercise JavaScript -->
+  <script src="stroop.js"></script>
+</body>
+</html>

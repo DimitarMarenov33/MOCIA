@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="UFOV Complex - Geavanceerde Verwerkingssnelheid Training">
+  <title>UFOV Complex Niveau - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../shared/styles/design-system.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="../../shared/styles/animations.css">
+  <link rel="stylesheet" href="ufov-complex.css">
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation buttons -->
+  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
+    <button id="back-button" class="btn btn-secondary">
+      ← Terug naar Menu
+    </button>
+    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary" title="Terug naar hoofdmenu">🏠</button>
+  </div>
+
+  <!-- Main content -->
+  <main id="main-content" class="ufov-complex-container">
+    <!-- Exercise screen -->
+    <div id="exercise-screen">
+      <!-- Phase indicator -->
+      <div id="phase-indicator" class="phase-indicator"></div>
+
+      <!-- Main display area -->
+      <div id="display-area" class="ufov-display-area">
+        <!-- Fixation cross -->
+        <div id="fixation-cross" class="fixation-cross">+</div>
+
+        <!-- Central stimulus -->
+        <div id="central-stimulus" class="central-stimulus">
+          <div id="central-icon" class="central-stimulus-icon"></div>
+        </div>
+
+        <!-- Peripheral items container -->
+        <div id="peripheral-container" class="peripheral-container">
+          <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Peripheral response zones -->
+        <div id="peripheral-response-zones" class="peripheral-response-zones">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Central response buttons (shown after stimulus) -->
+      <div id="central-response" class="hidden">
+        <div class="response-prompt">Wat zag je in het midden?</div>
+        <div class="response-buttons">
+          <button id="response-car" class="response-btn" data-response="car">
+            <div class="response-icon">🚗</div>
+            <div class="response-label">Auto</div>
+          </button>
+          <button id="response-truck" class="response-btn" data-response="truck">
+            <div class="response-icon">🚚</div>
+            <div class="response-label">Vrachtwagen</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="../../shared/js/constants.js"></script>
+  <script src="../../shared/js/audio-manager.js"></script>
+  <script src="../../shared/js/data-tracker.js"></script>
+  <script src="../../shared/js/difficulty-adapter.js"></script>
+  <script src="../../shared/js/ui-components.js"></script>
+  <script src="../../shared/utils/statistics.js"></script>
+  <script src="../../shared/utils/validation.js"></script>
+
+  <!-- Exercise JavaScript -->
+  <script src="ufov-complex.js"></script>
+</body>
+</html>

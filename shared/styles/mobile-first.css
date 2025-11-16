@@ -1,0 +1,547 @@
+/**
+ * MOBILE-FIRST CSS FRAMEWORK
+ * Minimal cognitive load design for older adults
+ * Designed for mobile (portrait) as primary experience
+ */
+
+/* ========================================
+   SCREEN MANAGEMENT
+   ======================================== */
+
+.screen-managed {
+  width: 100%;
+  min-height: 100vh;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.screen-hidden {
+  display: none !important;
+}
+
+.screen-active {
+  display: block;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.screen-entering {
+  display: block;
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.screen-exiting {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* ========================================
+   SIMPLE SCREEN LAYOUT
+   ======================================== */
+
+.simple-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+  background-color: var(--color-background);
+}
+
+/* Back button area */
+.simple-screen__back {
+  position: fixed;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+  z-index: var(--z-elevated);
+}
+
+.simple-screen__back-button {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Content area - centered and spaced */
+.simple-screen__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-md);
+  margin-top: 60px; /* Space for back button */
+}
+
+/* Icon area */
+.simple-screen__icon {
+  font-size: 80px;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1;
+}
+
+/* Title */
+.simple-screen__title {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-primary);
+}
+
+/* Description */
+.simple-screen__description {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-xl) 0;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+/* Actions area - bottom aligned */
+.simple-screen__actions {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) 0;
+}
+
+.simple-screen__primary {
+  order: 1;
+}
+
+.simple-screen__secondary {
+  order: 2;
+}
+
+/* ========================================
+   MOBILE-FIRST BUTTONS
+   ======================================== */
+
+/* All buttons should be large and easy to tap */
+.btn-large {
+  min-height: 64px !important;
+  font-size: var(--font-size-xl) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  width: 100%;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Full-width mobile buttons */
+.btn-mobile-full {
+  width: 100%;
+  min-height: var(--touch-target-min);
+}
+
+/* Bottom action bar */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-border-light);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: var(--z-elevated);
+}
+
+.action-bar__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   SINGLE-COLUMN LAYOUTS
+   ======================================== */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stack-lg {
+  gap: var(--spacing-lg);
+}
+
+.stack-xl {
+  gap: var(--spacing-xl);
+}
+
+/* Center content vertically and horizontally */
+.center-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: var(--spacing-lg);
+}
+
+/* ========================================
+   CARDS (MOBILE-OPTIMIZED)
+   ======================================== */
+
+.card-mobile {
+  background-color: var(--color-background-alt);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.card-mobile__icon {
+  font-size: 64px;
+  margin-bottom: var(--spacing-md);
+}
+
+.card-mobile__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-sm) 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.card-mobile__description {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+  line-height: 1.5;
+}
+
+.card-mobile__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+   CAROUSEL / SWIPEABLE
+   ======================================== */
+
+.carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.carousel__container {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+}
+
+.carousel__item {
+  flex: 0 0 100%;
+  padding: 0 var(--spacing-sm);
+}
+
+.carousel__nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.carousel__button {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  background-color: var(--color-background-alt);
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  font-size: var(--font-size-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.carousel__button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel__button:not(:disabled):hover {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.carousel__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.carousel__dot--active {
+  background-color: var(--color-primary);
+  transform: scale(1.3);
+}
+
+/* ========================================
+   TUTORIAL STEPPER
+   ======================================== */
+
+.tutorial {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+}
+
+.tutorial__header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.tutorial__title {
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tutorial__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.tutorial__visual {
+  text-align: center;
+  font-size: 64px;
+  margin: var(--spacing-xl) 0;
+}
+
+.tutorial__text {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.tutorial__navigation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+.tutorial__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.tutorial__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-border);
+}
+
+.tutorial__dot--active {
+  background-color: var(--color-primary);
+  transform: scale(1.3);
+}
+
+/* ========================================
+   MINIMAL UI PATTERNS
+   ======================================== */
+
+/* Small, unobtrusive progress indicator */
+.minimal-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: var(--color-border-light);
+  z-index: var(--z-elevated);
+}
+
+.minimal-progress__bar {
+  height: 100%;
+  background-color: var(--color-success);
+  transition: width 0.3s ease;
+}
+
+/* Small trial counter */
+.minimal-counter {
+  text-align: center;
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-sm);
+}
+
+/* Large score display */
+.score-display {
+  font-size: 80px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-success);
+  text-align: center;
+  margin: var(--spacing-xl) 0;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-top: var(--spacing-sm);
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+/* Tablet (landscape) - mostly same as mobile */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .simple-screen__content {
+    padding: var(--spacing-xxl) var(--spacing-xl);
+  }
+
+  .card-mobile {
+    max-width: 500px;
+  }
+}
+
+/* Desktop - keep narrow and centered */
+@media (min-width: 1025px) {
+  .simple-screen {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .simple-screen__content {
+    padding: var(--spacing-xxl);
+  }
+
+  .carousel {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Don't make buttons full-width on desktop */
+  .btn-large {
+    min-width: 300px;
+    width: auto;
+  }
+
+  .action-bar__content {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* Very large screens - enforce max width */
+@media (min-width: 1440px) {
+  .simple-screen,
+  .tutorial,
+  .center-content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Ensure focus is always visible */
+.simple-screen__back-button:focus,
+.carousel__button:focus,
+.carousel__dot:focus,
+.btn-large:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ========================================
+   TOUCH FEEDBACK
+   ======================================== */
+
+.touchable {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.touchable:active {
+  transform: scale(0.98);
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+}
+
+.loading-overlay__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-border-light);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-overlay__text {
+  margin-top: var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,66 @@
+{
+  "exerciseId": "ufov_basic",
+  "exerciseName": "Snelle Herkenning (UFOV)",
+  "difficulty": "medium",
+  "description": "Verbeter uw verwerkingssnelheid door snel objecten te herkennen",
+
+  "parameters": {
+    "variant": "basic",
+    "startDuration": 500,
+    "minDuration": 100,
+    "maxDuration": 500,
+    "stepSize": 50,
+    "totalTrials": 15,
+    "fixationTime": 1000,
+    "practiceTrials": 3,
+    "numPeripheralPositions": 8,
+    "numDistractors": 4,
+    "consecutiveCorrectToDecrease": 3,
+    "consecutiveIncorrectToIncrease": 2
+  },
+
+  "stimuli": {
+    "centralTargets": ["car", "truck"],
+    "peripheralTarget": "car",
+    "distractors": ["triangle", "square", "circle"]
+  },
+
+  "instructions": {
+    "title": "Hoe te spelen",
+    "steps": [
+      "Kijk naar het kruisje in het midden van het scherm",
+      "Er verschijnt heel kort een plaatje - een auto of vrachtwagen",
+      "Tegelijk verschijnt een klein auto-icoontje ergens aan de rand",
+      "Identificeer eerst wat je in het midden zag (auto of vrachtwagen)",
+      "Klik dan op de plaats waar je het auto-icoontje zag",
+      "De beelden worden sneller naarmate je beter wordt!"
+    ]
+  },
+
+  "feedback": {
+    "bothCorrect": [
+      "Perfect! Beide correct!",
+      "Uitstekend!",
+      "Geweldig gedaan!",
+      "Precies goed!"
+    ],
+    "centralCorrect": [
+      "Goed! Midden juist, maar rand gemist",
+      "Bijna! Let beter op de randen"
+    ],
+    "peripheralCorrect": [
+      "Bijna! Rand juist, maar midden gemist"
+    ],
+    "bothIncorrect": [
+      "Probeer het nog eens",
+      "Blijf oefenen!",
+      "Let goed op beide taken"
+    ]
+  },
+
+  "scoring": {
+    "pointsForBothCorrect": 20,
+    "pointsForCentralCorrect": 10,
+    "pointsForPeripheralCorrect": 10
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "exerciseId": "dual_n_back",
+  "exerciseName": "Dual N-Back",
+  "difficulty": "hard",
+  "description": "Train uw werkgeheugen door visuele en auditieve informatie tegelijk te volgen",
+
+  "parameters": {
+    "startN": 2,
+    "minN": 2,
+    "maxN": 5,
+    "trialsPerBlock": 25,
+    "blocksPerSession": 15,
+    "stimulusDuration": 500,
+    "interStimulusInterval": 2000,
+    "gridSize": 3,
+    "letters": ["A", "B", "C", "D", "E", "F", "G", "H"],
+    "matchProbability": 0.3
+  },
+
+  "adaptiveDifficulty": {
+    "increaseThreshold": 0.90,
+    "decreaseThreshold": 0.70,
+    "maintainMin": 0.70,
+    "maintainMax": 0.90
+  },
+
+  "scoring": {
+    "pointsPerCorrectResponse": 10,
+    "pointsPerBlock": 50,
+    "bonusForPerfectBlock": 100
+  },
+
+  "instructions": {
+    "title": "Hoe te spelen",
+    "steps": [
+      "Let op het blauwe vierkant dat beweegt over het raster",
+      "Luister naar de letters die worden uitgesproken",
+      "Druk op 'Positie Match' als het vierkant op DEZELFDE plaats verschijnt als N stappen geleden",
+      "Druk op 'Geluid Match' als de letter HETZELFDE is als N stappen geleden",
+      "Beide kunnen tegelijk matchen - druk dan op beide knoppen!",
+      "De eerste N pogingen zijn opwarmers - je hoeft dan niet te reageren"
+    ]
+  },
+
+  "feedback": {
+    "blockExcellent": "Uitstekend! 90%+ correct",
+    "blockGood": "Goed gedaan! 70-90% correct",
+    "blockNeedsImprovement": "Blijf oefenen! <70% correct",
+    "levelIncreased": "Niveau verhoogd! Probeer {n}-back nu",
+    "levelDecreased": "Niveau verlaagd naar {n}-back",
+    "levelMaintained": "Niveau {n}-back behouden"
+  }
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Complexe Dubbeltaak - Dubbele Aandacht Training">
+  <title>Complexe Dubbeltaak - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../shared/styles/design-system.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="../../shared/styles/animations.css">
+  <link rel="stylesheet" href="complex-dual-task.css">
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation buttons -->
+  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
+    <button id="back-button" class="btn btn-secondary">
+      ← Terug naar Menu
+    </button>
+    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary" title="Terug naar hoofdmenu">🏠</button>
+  </div>
+
+  <!-- Main content -->
+  <main id="main-content" class="complex-dual-task-container">
+    <!-- Exercise screen -->
+    <div id="exercise-screen">
+      <!-- Trial info -->
+      <div id="trial-info" class="trial-info">
+        <span id="trial-counter">Poging 1/20</span>
+        <span id="timer-display" class="timer-display">2.0s</span>
+      </div>
+
+      <!-- Sequence preview (shown at start of each trial) -->
+      <div id="sequence-preview" class="sequence-preview">
+        <div class="sequence-preview-label">Onthoud deze volgorde:</div>
+        <div id="sequence-icons" class="sequence-icons">
+          <div id="sequence-icon-1" class="sequence-icon"></div>
+          <div id="sequence-icon-2" class="sequence-icon"></div>
+        </div>
+      </div>
+
+      <!-- Instruction prompt -->
+      <div id="instruction-prompt" class="instruction-prompt hidden">
+        <div id="current-task-label" class="current-task-label">Zoek emoji #1</div>
+      </div>
+
+      <!-- Search display area -->
+      <div id="search-display" class="search-display">
+        <!-- Items will be dynamically generated -->
+      </div>
+
+      <!-- Feedback area -->
+      <div id="feedback-area"></div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="../../shared/js/constants.js"></script>
+  <script src="../../shared/js/audio-manager.js"></script>
+  <script src="../../shared/js/data-tracker.js"></script>
+  <script src="../../shared/js/difficulty-adapter.js"></script>
+  <script src="../../shared/js/ui-components.js"></script>
+  <script src="../../shared/utils/statistics.js"></script>
+  <script src="../../shared/utils/validation.js"></script>
+
+  <!-- Exercise JavaScript -->
+  <script src="complex-dual-task.js"></script>
+</body>
+</html>

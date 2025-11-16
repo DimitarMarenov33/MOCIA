@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Dutch Voices</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #1976D2;
+      margin-bottom: 10px;
+    }
+    .info {
+      background: #E3F2FD;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1976D2;
+    }
+    .voice-item {
+      background: #f9f9f9;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border-left: 4px solid #4CAF50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .voice-item.selected {
+      border-left-color: #1976D2;
+      background: #E3F2FD;
+    }
+    .voice-info {
+      flex: 1;
+    }
+    .voice-name {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    .voice-lang {
+      color: #666;
+      font-size: 14px;
+    }
+    button {
+      background: #1976D2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    button:hover {
+      background: #1565C0;
+    }
+    button.test-btn {
+      background: #4CAF50;
+    }
+    button.test-btn:hover {
+      background: #388E3C;
+    }
+    .no-voices {
+      background: #FFEBEE;
+      padding: 20px;
+      border-radius: 4px;
+      border-left: 4px solid #C62828;
+      color: #C62828;
+    }
+    .sample-text {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+    .test-all {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🇳🇱 Test Nederlandse Stemmen</h1>
+
+    <div class="info">
+      <strong>Doel:</strong> Test welke Nederlandse stemmen beschikbaar zijn op dit apparaat.<br>
+      De app gebruikt automatisch de beste beschikbare stem.<br>
+      <strong>Geselecteerde stem:</strong> <span id="selected-voice">Laden...</span>
+    </div>
+
+    <div class="sample-text">
+      <strong>Test zinnen:</strong><br>
+      • "Welkom bij de cognitieve training"<br>
+      • "Een, twee, drie, vier, vijf"<br>
+      • "Goed gedaan! U heeft het correct beantwoord."
+    </div>
+
+    <button class="test-all" onclick="testAllDutchVoices()">🔊 Test Alle Nederlandse Stemmen</button>
+
+    <h2 style="margin-top: 30px;">Beschikbare Nederlandse Stemmen:</h2>
+    <div id="dutch-voices"></div>
+
+    <h2 style="margin-top: 30px;">Alle Beschikbare Stemmen (alle talen):</h2>
+    <div id="all-voices"></div>
+  </div>
+
+  <script src="shared/js/constants.js"></script>
+
+  <script>
+    let voices = [];
+    let selectedVoice = null;
+
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+      console.log('Total voices available:', voices.length);
+
+      // Find Dutch voices
+      const dutchVoices = voices.filter(v => v.lang.startsWith('nl'));
+
+      // Display selected voice
+      selectedVoice =
+        voices.find(voice => voice.name.includes('Google') && voice.lang === 'nl-NL') ||
+        voices.find(voice => voice.name.includes('Google') && voice.lang.startsWith('nl')) ||
+        voices.find(voice => voice.name.includes('Microsoft') && voice.lang === 'nl-NL') ||
+        voices.find(voice => voice.name.includes('Laura') && voice.lang.startsWith('nl')) ||
+        voices.find(voice => voice.name.includes('Enhanced') && voice.lang.startsWith('nl')) ||
+        voices.find(voice => voice.lang === 'nl-NL') ||
+        voices.find(voice => voice.lang.startsWith('nl'));
+
+      document.getElementById('selected-voice').textContent =
+        selectedVoice ? `${selectedVoice.name} (${selectedVoice.lang})` : 'Geen Nederlandse stem gevonden';
+
+      // Display Dutch voices
+      const dutchContainer = document.getElementById('dutch-voices');
+      if (dutchVoices.length === 0) {
+        dutchContainer.innerHTML = '<div class="no-voices">⚠️ Geen Nederlandse stemmen gevonden op dit apparaat.</div>';
+      } else {
+        dutchContainer.innerHTML = dutchVoices.map((voice, index) => `
+          <div class="voice-item ${voice === selectedVoice ? 'selected' : ''}" id="dutch-voice-${index}">
+            <div class="voice-info">
+              <div class="voice-name">${voice.name} ${voice === selectedVoice ? '✓' : ''}</div>
+              <div class="voice-lang">${voice.lang} • ${voice.localService ? 'Lokaal' : 'Online'}</div>
+            </div>
+            <div>
+              <button class="test-btn" onclick="testVoice(${index}, true)">Test Getallen</button>
+              <button class="test-btn" onclick="testVoice(${index}, false)">Test Zin</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Display all voices
+      const allContainer = document.getElementById('all-voices');
+      allContainer.innerHTML = `<p style="color: #666; margin-bottom: 10px;">Totaal ${voices.length} stemmen beschikbaar (alle talen)</p>` +
+        voices.map((voice, index) => `
+          <div class="voice-item" style="border-left-color: #999;">
+            <div class="voice-info">
+              <div class="voice-name">${voice.name}</div>
+              <div class="voice-lang">${voice.lang} • ${voice.localService ? 'Lokaal' : 'Online'}</div>
+            </div>
+            <button onclick="testVoiceByIndex(${index}, false)">Test</button>
+          </div>
+        `).join('');
+    }
+
+    function testVoice(dutchIndex, testNumbers) {
+      const dutchVoices = voices.filter(v => v.lang.startsWith('nl'));
+      const voice = dutchVoices[dutchIndex];
+
+      let text;
+      if (testNumbers) {
+        text = "Een, twee, drie, vier, vijf, zes, zeven, acht, negen";
+      } else {
+        text = "Welkom bij de cognitieve training. Goed gedaan! U heeft het correct beantwoord.";
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+      utterance.rate = testNumbers ? 0.8 : 0.9; // Slower for numbers
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      // Highlight while speaking
+      const element = document.getElementById(`dutch-voice-${dutchIndex}`);
+      element.style.background = '#FFF9C4';
+
+      utterance.onend = () => {
+        element.style.background = voice === selectedVoice ? '#E3F2FD' : '#f9f9f9';
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function testVoiceByIndex(index, testNumbers) {
+      const voice = voices[index];
+
+      let text = "This is a test of this voice. Welcome to cognitive training.";
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      speechSynthesis.speak(utterance);
+    }
+
+    async function testAllDutchVoices() {
+      const dutchVoices = voices.filter(v => v.lang.startsWith('nl'));
+
+      if (dutchVoices.length === 0) {
+        alert('Geen Nederlandse stemmen gevonden!');
+        return;
+      }
+
+      for (let i = 0; i < dutchVoices.length; i++) {
+        const voice = dutchVoices[i];
+        const text = `Dit is stem ${i + 1}: ${voice.name}. Een, twee, drie, vier, vijf.`;
+
+        await new Promise((resolve) => {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.voice = voice;
+          utterance.lang = voice.lang;
+          utterance.rate = 0.8;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+
+          utterance.onend = resolve;
+          speechSynthesis.speak(utterance);
+        });
+
+        // Pause between voices
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // Load voices
+    if (speechSynthesis.getVoices().length > 0) {
+      loadVoices();
+    } else {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  </script>
+</body>
+</html>

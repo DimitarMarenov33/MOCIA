@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Trainer Pro - Welcome!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #c0c0c0;
+            color: #000000;
+        }
+
+        /* Classic window frame */
+        .window {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        /* Title bar */
+        .title-bar {
+            background: #000080;
+            color: #ffffff;
+            padding: 3px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .title-text {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .window-icon {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border: 1px solid #000000;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .control-btn {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            font-size: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* Menu bar */
+        .menu-bar {
+            background: #c0c0c0;
+            padding: 2px 0;
+            border-bottom: 2px solid;
+            border-color: #000000 #ffffff #ffffff #000000;
+        }
+
+        .menu-bar a {
+            color: #000000;
+            text-decoration: none;
+            padding: 2px 10px;
+            font-size: 14px;
+        }
+
+        .menu-bar a:hover {
+            background: #000080;
+            color: #ffffff;
+        }
+
+        /* Content area */
+        .content {
+            padding: 20px;
+            background: #ffffff;
+            border: 2px solid;
+            border-color: #000000 #ffffff #ffffff #000000;
+            margin: 10px;
+        }
+
+        /* Classic header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-decoration: underline;
+        }
+
+        .header p {
+            font-size: 12px;
+            font-style: italic;
+        }
+
+
+
+        /* Classic buttons */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .classic-button {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            padding: 8px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .classic-button:active {
+            border-color: #000000 #ffffff #ffffff #000000;
+        }
+
+
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #000000;
+        }
+
+        .footer img {
+            margin: 10px 5px;
+        }
+
+        /* Horizontal rule */
+        hr {
+            border: 1px solid #000000;
+            margin: 20px 0;
+        }
+
+        /* Link styles */
+        a {
+            color: #0000ff;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #800080;
+        }
+
+        a:hover {
+            background: #ffff00;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <div class="title-text">
+                <div class="window-icon"></div>
+                Brain Trainer Pro - Netscape Navigator
+            </div>
+            <div class="window-controls">
+                <div class="control-btn">_</div>
+                <div class="control-btn">□</div>
+                <div class="control-btn">X</div>
+            </div>
+        </div>
+
+        <div class="menu-bar">
+            <a href="#">File</a>
+            <a href="#">Edit</a>
+            <a href="#">View</a>
+            <a href="#">Go</a>
+            <a href="#">Bookmarks</a>
+            <a href="#">Help</a>
+        </div>
+
+        <div class="content">
+            <div class="header">
+                <h1>*** WELCOME TO BRAIN TRAINER PRO ***</h1>
+                <p>Your Gateway to Mental Fitness!</p>
+            </div>
+
+            <p style="text-align: center; margin: 30px 0; font-size: 14px; line-height: 1.8;">
+                Welcome to Brain Trainer Pro, your personal cognitive training center.<br>
+                Choose from 12 exercises designed to improve memory, attention, and mental speed.<br>
+                All data stays private on your computer. No downloads required.
+            </p>
+
+            <hr>
+
+            <h3 style="text-align: center; margin: 30px 0;">AVAILABLE EXERCISES</h3>
+
+            <div style="max-width: 500px; margin: 0 auto 40px;">
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin: 15px 0; padding: 12px; background: #e0e0e0; border: 2px solid #000000;">
+                        <a href="#" style="text-decoration: none; color: #000000; font-weight: bold; display: block;">► Memory Training</a>
+                    </li>
+                    <li style="margin: 15px 0; padding: 12px; background: #e0e0e0; border: 2px solid #000000;">
+                        <a href="#" style="text-decoration: none; color: #000000; font-weight: bold; display: block;">► Attention Exercises</a>
+                    </li>
+                    <li style="margin: 15px 0; padding: 12px; background: #e0e0e0; border: 2px solid #000000;">
+                        <a href="#" style="text-decoration: none; color: #000000; font-weight: bold; display: block;">► Pattern Recognition</a>
+                    </li>
+                    <li style="margin: 15px 0; padding: 12px; background: #e0e0e0; border: 2px solid #000000;">
+                        <a href="#" style="text-decoration: none; color: #000000; font-weight: bold; display: block;">► View All Exercises</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="button-container">
+                <button class="classic-button">START TRAINING</button>
+            </div>
+
+            <div class="footer">
+                <hr>
+                <p style="margin: 15px 0;">&copy; 2025 Brain Trainer Pro</p>
+                <p style="font-size: 11px;">
+                    <a href="#">Home</a> | <a href="#">Exercises</a> | <a href="#">Help</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

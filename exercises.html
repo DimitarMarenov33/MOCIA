@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Cognitieve trainingsoefeningen voor ouderen - MOCIA Gezondheidsapp">
+  <meta name="theme-color" content="#1976D2">
+  <title>MOCIA Cognitieve Training</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- iOS Specific Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MOCIA">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="shared/styles/design-system.css">
+  <link rel="stylesheet" href="shared/styles/components.css">
+  <link rel="stylesheet" href="shared/styles/animations.css">
+  <link rel="stylesheet" href="shared/styles/mobile-first.css">
+</head>
+<body>
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Settings button (always visible) -->
+  <button id="settings-button" class="settings-button" aria-label="Settings" style="position: fixed; top: var(--spacing-md); right: var(--spacing-md); width: var(--touch-target-min); height: var(--touch-target-min); border-radius: 50%; background-color: rgba(255, 255, 255, 0.9); color: var(--color-info); font-size: 24px; border: none; box-shadow: var(--shadow-md); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: var(--z-elevated);">
+    ⚙️
+  </button>
+
+  <!-- Main content -->
+  <main id="main-content">
+    <!-- Exercise Selection Screen -->
+    <div id="exercises-screen">
+      <div class="simple-screen__back" style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
+        <button onclick="history.back()" class="btn btn-secondary simple-screen__back-button">← Terug</button>
+        <button onclick="window.location.href='domains.html'" class="btn btn-secondary simple-screen__back-button" title="Terug naar hoofdmenu">🏠</button>
+      </div>
+
+      <div style="padding-top: 80px;">
+        <h2 id="domain-title" style="text-align: center; font-size: var(--font-size-xxl); margin-bottom: var(--spacing-xl);">Kies een Oefening</h2>
+        <div id="exercises-carousel"></div>
+      </div>
+    </div>
+
+    <!-- Exercise Detail Screen -->
+    <div id="exercise-detail-screen" class="simple-screen" style="display: none;">
+      <div class="simple-screen__back" style="display: flex; gap: var(--spacing-sm);">
+        <button id="back-to-exercises" class="btn btn-secondary simple-screen__back-button">← Terug</button>
+        <button onclick="window.location.href='domains.html'" class="btn btn-secondary simple-screen__back-button" title="Terug naar hoofdmenu">🏠</button>
+      </div>
+
+      <div class="simple-screen__content">
+        <div id="exercise-detail-icon" class="simple-screen__icon"></div>
+        <h1 id="exercise-detail-title" class="simple-screen__title"></h1>
+        <p id="exercise-detail-description" class="simple-screen__description"></p>
+        <div id="exercise-detail-meta" style="font-size: var(--font-size-md); color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);"></div>
+
+        <!-- Instructions Section -->
+        <div id="exercise-instructions" style="background: var(--color-background-alt); border-radius: var(--border-radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+          <h3 style="margin-bottom: var(--spacing-md);">📋 Hoe te spelen</h3>
+          <ul id="instructions-list" style="list-style: none; padding: 0; font-size: var(--font-size-lg); line-height: 1.8;">
+            <!-- Instructions will be populated by JavaScript -->
+          </ul>
+        </div>
+
+        <div class="simple-screen__actions">
+          <button id="start-exercise-button" class="btn btn-success btn-large">Start Oefening</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="shared/js/constants.js"></script>
+  <script src="shared/js/audio-manager.js"></script>
+  <script src="shared/js/data-tracker.js"></script>
+  <script src="shared/js/ui-components.js"></script>
+  <script src="shared/utils/statistics.js"></script>
+
+  <!-- Exercise selection JavaScript -->
+  <script>
+    // Exercise selection page - filtered by cognitive domain
+    class ExerciseSelector {
+      constructor() {
+        // All exercises mapped to their cognitive domains
+        this.allExercises = [
+          // Working Memory
+          {
+            id: CONSTANTS.EXERCISE_TYPES.DIGIT_SPAN,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.WORKING_MEMORY,
+            title: 'Cijferreeks Vooruit',
+            icon: '🔢',
+            difficulty: CONSTANTS.DIFFICULTY.EASY,
+            description: 'Onthoud en herhaal cijferreeksen om uw werkgeheugen te trainen.',
+            path: 'exercises/digit-span/index.html',
+            estimatedTime: '3 minuten',
+            instructions: [
+              '✓ Je ziet en hoort een reeks cijfers, één voor één',
+              '✓ Onthoud de cijfers in de juiste volgorde',
+              '✓ Als de reeks compleet is, tik je de cijfers in dezelfde volgorde in',
+              '✓ De reeks wordt langer naarmate je beter wordt',
+              '✓ Probeer zoveel mogelijk cijfers te onthouden!'
+            ],
+          },
+          {
+            id: CONSTANTS.EXERCISE_TYPES.DUAL_N_BACK,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.WORKING_MEMORY,
+            title: 'Dual N-Back',
+            icon: '🎯',
+            difficulty: CONSTANTS.DIFFICULTY.HARD,
+            description: 'Train uw werkgeheugen door visuele en auditieve informatie tegelijk te volgen.',
+            path: 'exercises/dual-n-back/index.html',
+            estimatedTime: '5 minuten',
+            instructions: [
+              '✓ U ziet vierkanten op een 3x3 raster en hoort letters',
+              '✓ Druk op "Positie" als het vierkant op dezelfde plek was als N stappen terug',
+              '✓ Druk op "Geluid" als de letter hetzelfde was als N stappen terug',
+              '✓ U kunt beide knoppen tegelijk indrukken als beide overeenkomen',
+              '✓ Start met 2-back en word beter naarmate u oefent!'
+            ],
+          },
+
+          // Processing Speed
+          {
+            id: CONSTANTS.EXERCISE_TYPES.UFOV_BASIC,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.PROCESSING_SPEED,
+            title: 'UFOV Basis Niveau',
+            icon: '👁️',
+            difficulty: CONSTANTS.DIFFICULTY.MEDIUM,
+            description: 'Verbeter uw verwerkingssnelheid door snel centrale objecten te herkennen.',
+            path: 'exercises/ufov/index.html',
+            estimatedTime: '3 minuten',
+            instructions: [
+              '✓ Een voertuig (auto of vrachtwagen) verschijnt heel kort in het midden',
+              '✓ Identificeer zo snel mogelijk of het een auto of vrachtwagen was',
+              '✓ De snelheid past zich aan uw prestaties aan',
+              '✓ Focus op het midden van het scherm',
+              '✓ Train uw visuele verwerkingssnelheid!'
+            ],
+          },
+          {
+            id: CONSTANTS.EXERCISE_TYPES.UFOV_COMPLEX,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.PROCESSING_SPEED,
+            title: 'UFOV Complex Niveau',
+            icon: '🎯',
+            difficulty: CONSTANTS.DIFFICULTY.HARD,
+            description: 'Train snelle verwerking van centrale en perifere informatie.',
+            path: 'exercises/ufov-complex/index.html',
+            estimatedTime: '4 minuten',
+            instructions: [
+              '✓ Een voertuig verschijnt heel kort in het midden',
+              '✓ Identificeer of het een auto of vrachtwagen is',
+              '✓ Onthoud ook waar een auto-icoontje verschijnt tussen 8-12 afleiders',
+              '✓ Dit is een geavanceerde oefening met zeer snelle presentaties',
+              '✓ Focus op zowel het midden als de randen van het scherm!'
+            ],
+          },
+
+          // Attention
+          {
+            id: CONSTANTS.EXERCISE_TYPES.VISUAL_SEARCH,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.ATTENTION,
+            title: 'Visuele Zoektaak',
+            icon: '🔍',
+            difficulty: CONSTANTS.DIFFICULTY.MEDIUM,
+            description: 'Train uw selectieve aandacht door doelitems te vinden tussen afleiders.',
+            path: 'exercises/visual-search/index.html',
+            estimatedTime: '3 minuten',
+            instructions: [
+              '✓ Onthoud het doeldier dat wordt getoond',
+              '✓ Zoek het dier in een raster van 9 dieren',
+              '✓ Klik op het juiste dier voordat de tijd op is',
+              '✓ Je hebt 3 seconden per poging',
+              '✓ Snellere reacties geven bonuspunten!'
+            ],
+          },
+          {
+            id: CONSTANTS.EXERCISE_TYPES.COMPLEX_DUAL_TASK,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.ATTENTION,
+            title: 'Complexe Dubbeltaak',
+            icon: '🤹',
+            difficulty: CONSTANTS.DIFFICULTY.HARD,
+            description: 'Versterk uw verdeelde aandacht door twee taken tegelijk uit te voeren.',
+            path: 'exercises/complex-dual-task/index.html',
+            estimatedTime: '5 minuten',
+            instructions: [
+              '✓ Onthoud een reeks van 2 emojis die wordt getoond',
+              '✓ Zoek de eerste emoji in het raster',
+              '✓ Zoek dan de tweede emoji in het volgende raster',
+              '✓ Je hebt 2 seconden per emoji',
+              '✓ Dit is een zeer uitdagende taak met hoge cognitieve belasting!'
+            ],
+          },
+
+          // Executive Function
+          {
+            id: CONSTANTS.EXERCISE_TYPES.STROOP,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.EXECUTIVE_FUNCTION,
+            title: 'Stroop Kleur-Woord Taak',
+            icon: '🌈',
+            difficulty: CONSTANTS.DIFFICULTY.MEDIUM,
+            description: 'Train interferentie-controle door conflicterende informatie te verwerken.',
+            path: 'exercises/stroop/index.html',
+            estimatedTime: '4 minuten',
+            instructions: [
+              '✓ Je ziet een woord in een bepaalde kleur',
+              '✓ Kies de kleur van de INKT, niet wat het woord zegt',
+              '✓ Bijvoorbeeld: ROOD in blauwe kleur → kies blauw',
+              '✓ De tijd past zich aan je prestaties aan',
+              '✓ Blijf gefocust en negeer de betekenis van het woord!'
+            ],
+          },
+          {
+            id: CONSTANTS.EXERCISE_TYPES.TASK_SWITCHING,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.EXECUTIVE_FUNCTION,
+            title: 'Taak-Wissel Paradigma',
+            icon: '🔄',
+            difficulty: CONSTANTS.DIFFICULTY.HARD,
+            description: 'Ontwikkel cognitieve flexibiliteit door snel tussen taken te schakelen.',
+            path: 'exercises/task-switching/index.html',
+            estimatedTime: '5 minuten',
+            instructions: [
+              '✓ 3 blokken: ODD/EVEN → HIGH/LOW → GEMENGD',
+              '✓ Kijk naar de aanwijzing bovenaan voor de huidige taak',
+              '✓ Reageer snel en accuraat op de cijfers 1-9 (behalve 5)',
+              '✓ Voorbereidingstijd past zich aan je prestaties aan',
+              '✓ Let op taakwisselingen in het gemengde blok!'
+            ],
+          },
+
+          // Episodic Memory
+          {
+            id: CONSTANTS.EXERCISE_TYPES.WORD_PAIR,
+            domain: CONSTANTS.COGNITIVE_DOMAINS.EPISODIC_MEMORY,
+            title: 'Woord Paar Associatie',
+            icon: '📝',
+            difficulty: CONSTANTS.DIFFICULTY.MEDIUM,
+            description: 'Versterk uw geheugen door woordparen te leren en te herinneren.',
+            path: 'exercises/word-pair/index.html',
+            estimatedTime: 'Variabel (20+ minuten)',
+            instructions: [
+              '✓ Je ziet woordparen die je moet onthouden',
+              '✓ Klik op "Ik heb ze onthouden" wanneer je klaar bent',
+              '✓ Wacht de aangegeven tijd (start 20 minuten)',
+              '✓ Kom terug en vul de woordparen in uit je geheugen',
+              '✓ Perfect score = meer woordparen en langere wachttijd!',
+            ],
+          },
+        ];
+
+        this.selectedDomain = null;
+        this.filteredExercises = [];
+        this.selectedExercise = null;
+
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Load settings
+          this.loadSettings();
+
+          // Get domain from URL parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const domainId = urlParams.get('domain');
+
+          if (!domainId) {
+            // No domain specified, redirect to domains page
+            window.location.href = 'domains.html';
+            return;
+          }
+
+          this.selectedDomain = domainId;
+
+          // Filter exercises by domain
+          this.filteredExercises = this.allExercises.filter(ex => ex.domain === domainId);
+
+          // Update page title
+          this.updateDomainTitle(domainId);
+
+          // Set up event listeners
+          this.setupEventListeners();
+
+          // Render exercise selection
+          this.renderExerciseCarousel();
+
+          // Speak welcome (optional, may fail on page load due to browser restrictions)
+          if (window.AudioManager && window.AudioManager.isEnabled()) {
+            try {
+              await window.AudioManager.speak('Kies een oefening');
+            } catch (speechError) {
+              // Speech may fail on page load - this is expected browser behavior
+              console.log('Speech unavailable on page load:', speechError);
+            }
+          }
+        } catch (error) {
+          console.error('Initialization error:', error);
+          alert('Er is een fout opgetreden bij het laden van de applicatie.');
+        }
+      }
+
+      updateDomainTitle(domainId) {
+        const domainTitles = {
+          [CONSTANTS.COGNITIVE_DOMAINS.WORKING_MEMORY]: 'Werkgeheugen Oefeningen',
+          [CONSTANTS.COGNITIVE_DOMAINS.PROCESSING_SPEED]: 'Verwerkingssnelheid Oefeningen',
+          [CONSTANTS.COGNITIVE_DOMAINS.ATTENTION]: 'Aandacht Oefeningen',
+          [CONSTANTS.COGNITIVE_DOMAINS.EXECUTIVE_FUNCTION]: 'Executieve Functies Oefeningen',
+          [CONSTANTS.COGNITIVE_DOMAINS.EPISODIC_MEMORY]: 'Episodisch Geheugen Oefeningen',
+        };
+
+        const title = domainTitles[domainId] || 'Kies een Oefening';
+        document.getElementById('domain-title').textContent = title;
+        document.title = `${title} - MOCIA`;
+      }
+
+      setupEventListeners() {
+        // Back to exercises list button
+        document.getElementById('back-to-exercises').addEventListener('click', () => {
+          this.showExerciseList();
+        });
+
+        // Exercise detail button
+        document.getElementById('start-exercise-button').addEventListener('click', () => {
+          this.startSelectedExercise();
+        });
+
+        // Settings button
+        document.getElementById('settings-button').addEventListener('click', () => {
+          this.showSettingsModal();
+        });
+      }
+
+      showExerciseList() {
+        document.getElementById('exercises-screen').style.display = 'block';
+        document.getElementById('exercise-detail-screen').style.display = 'none';
+      }
+
+      showExerciseDetail() {
+        document.getElementById('exercises-screen').style.display = 'none';
+        document.getElementById('exercise-detail-screen').style.display = 'flex';
+      }
+
+      renderExerciseCarousel() {
+        const carouselContainer = document.getElementById('exercises-carousel');
+        UIComponents.clearElement(carouselContainer);
+
+        if (this.filteredExercises.length === 0) {
+          carouselContainer.innerHTML = '<p style="text-align: center; font-size: var(--font-size-lg);">Geen oefeningen beschikbaar voor dit domein.</p>';
+          return;
+        }
+
+        const carousel = UIComponents.createCarousel({
+          items: this.filteredExercises,
+          renderItem: (exercise) => {
+            return this.renderExerciseCard(exercise);
+          },
+          onSelect: (exercise) => {
+            if (exercise.status === 'coming_soon') {
+              alert('Deze oefening is binnenkort beschikbaar!');
+            } else {
+              this.selectExercise(exercise);
+            }
+          },
+        });
+
+        carouselContainer.appendChild(carousel.element);
+      }
+
+      renderExerciseCard(exercise) {
+        const card = document.createElement('div');
+        card.className = 'card-mobile';
+
+        // Add "coming soon" overlay if needed
+        const comingSoonOverlay = exercise.status === 'coming_soon'
+          ? '<div style="position: absolute; top: 10px; right: 10px; background: var(--color-warning); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold;">Binnenkort</div>'
+          : '';
+
+        card.innerHTML = `
+          ${comingSoonOverlay}
+          <div class="card-mobile__icon">${exercise.icon}</div>
+          <h3 class="card-mobile__title">${exercise.title}</h3>
+          <div class="card-mobile__meta">
+            <span class="badge badge-${exercise.difficulty === 'easy' ? 'success' : exercise.difficulty === 'medium' ? 'warning' : 'error'}">
+              ${exercise.difficulty === 'easy' ? 'Makkelijk' : exercise.difficulty === 'medium' ? 'Gemiddeld' : 'Moeilijk'}
+            </span>
+          </div>
+          <p class="card-mobile__description">${exercise.description}</p>
+          <div class="card-mobile__meta">
+            <div>⏱️ ${exercise.estimatedTime}</div>
+          </div>
+        `;
+
+        if (exercise.status === 'coming_soon') {
+          card.style.opacity = '0.7';
+          card.style.position = 'relative';
+        }
+
+        return card;
+      }
+
+      selectExercise(exercise) {
+        this.selectedExercise = exercise;
+
+        document.getElementById('exercise-detail-icon').textContent = exercise.icon;
+        document.getElementById('exercise-detail-title').textContent = exercise.title;
+        document.getElementById('exercise-detail-description').textContent = exercise.description;
+        document.getElementById('exercise-detail-meta').innerHTML = `
+          <div>⏱️ Duurt: ${exercise.estimatedTime}</div>
+          <div>📊 Moeilijkheid: ${exercise.difficulty === 'easy' ? 'Laag' : exercise.difficulty === 'medium' ? 'Gemiddeld' : 'Hoog'}</div>
+        `;
+
+        // Populate instructions
+        const instructionsList = document.getElementById('instructions-list');
+        instructionsList.innerHTML = '';
+        if (exercise.instructions && exercise.instructions.length > 0) {
+          exercise.instructions.forEach(instruction => {
+            const li = document.createElement('li');
+            li.style.marginBottom = 'var(--spacing-sm)';
+            li.textContent = instruction;
+            instructionsList.appendChild(li);
+          });
+        }
+
+        this.showExerciseDetail();
+      }
+
+      startSelectedExercise() {
+        if (!this.selectedExercise) return;
+
+        // Haptic feedback
+        if (window.AudioManager) {
+          window.AudioManager.hapticPress();
+        }
+
+        // Speak exercise name
+        if (window.AudioManager && window.AudioManager.isEnabled()) {
+          window.AudioManager.speak(`Start ${this.selectedExercise.title}`);
+        }
+
+        // Navigate to exercise
+        window.location.href = this.selectedExercise.path;
+      }
+
+      showSettingsModal() {
+        const audioEnabled = window.AudioManager.isEnabled();
+
+        const content = document.createElement('div');
+        content.innerHTML = `
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+              <input type="checkbox" id="audio-toggle" ${audioEnabled ? 'checked' : ''}
+                     style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+              <span>Audio-feedback inschakelen</span>
+            </label>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+              <input type="checkbox" id="large-text-toggle" ${document.body.classList.contains('large-text') ? 'checked' : ''}
+                     style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+              <span>Grote tekst modus</span>
+            </label>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+              <input type="checkbox" id="high-contrast-toggle" ${document.body.classList.contains('high-contrast') ? 'checked' : ''}
+                     style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+              <span>Hoog contrast modus</span>
+            </label>
+          </div>
+
+          <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
+
+          <div style="text-align: center;">
+            <p style="margin-bottom: var(--spacing-md);">Gegevensbeheer</p>
+            <button id="export-data-btn" class="btn btn-secondary" style="margin-bottom: var(--spacing-sm); width: 100%;">
+              Exporteer Gegevens
+            </button>
+            <button id="clear-data-btn" class="btn btn-error" style="width: 100%;">
+              Wis Alle Gegevens
+            </button>
+          </div>
+        `;
+
+        const modal = UIComponents.createModal(
+          'Instellingen',
+          content,
+          [
+            {
+              text: 'Sluiten',
+              onClick: (e, modalEl) => modalEl.remove(),
+              options: { variant: 'primary' },
+            },
+          ]
+        );
+
+        // Set up settings event listeners
+        modal.querySelector('#audio-toggle').addEventListener('change', (e) => {
+          if (e.target.checked) {
+            window.AudioManager.enable();
+            window.AudioManager.speak('Audio ingeschakeld');
+          } else {
+            window.AudioManager.disable();
+          }
+        });
+
+        modal.querySelector('#large-text-toggle').addEventListener('change', (e) => {
+          document.body.classList.toggle('large-text', e.target.checked);
+          this.saveSetting('largeText', e.target.checked);
+        });
+
+        modal.querySelector('#high-contrast-toggle').addEventListener('change', (e) => {
+          document.body.classList.toggle('high-contrast', e.target.checked);
+          this.saveSetting('highContrast', e.target.checked);
+        });
+
+        modal.querySelector('#export-data-btn').addEventListener('click', () => {
+          this.exportData();
+        });
+
+        modal.querySelector('#clear-data-btn').addEventListener('click', () => {
+          this.confirmClearData(modal);
+        });
+
+        UIComponents.showModal(modal);
+      }
+
+      saveSetting(key, value) {
+        try {
+          let settings = {};
+          const existing = localStorage.getItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS);
+          if (existing) {
+            settings = JSON.parse(existing);
+          }
+          settings[key] = value;
+          localStorage.setItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS, JSON.stringify(settings));
+        } catch (error) {
+          console.error('Error saving setting:', error);
+        }
+      }
+
+      loadSettings() {
+        try {
+          const settings = localStorage.getItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS);
+          if (settings) {
+            const parsed = JSON.parse(settings);
+            if (parsed.largeText) {
+              document.body.classList.add('large-text');
+            }
+            if (parsed.highContrast) {
+              document.body.classList.add('high-contrast');
+            }
+          }
+        } catch (error) {
+          console.error('Error loading settings:', error);
+        }
+      }
+
+      exportData() {
+        const data = window.DataTracker.exportData();
+        if (!data) {
+          alert('Geen gegevens om te exporteren.');
+          return;
+        }
+
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mocia-cognitive-training-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (window.AudioManager) {
+          window.AudioManager.speak('Gegevens geëxporteerd');
+        }
+      }
+
+      confirmClearData(parentModal) {
+        const confirmModal = UIComponents.createModal(
+          'Wis Alle Gegevens',
+          '<p style="font-size: var(--font-size-lg);">Weet u zeker dat u alle gegevens wilt wissen? Dit kan niet ongedaan worden gemaakt.</p>',
+          [
+            {
+              text: 'Annuleren',
+              onClick: (e, modalEl) => modalEl.remove(),
+              options: { variant: 'secondary' },
+            },
+            {
+              text: 'Ja, Wis Alles',
+              onClick: (e, modalEl) => {
+                window.DataTracker.clearAllData();
+                modalEl.remove();
+                parentModal.remove();
+
+                if (window.AudioManager) {
+                  window.AudioManager.speak('Alle gegevens gewist');
+                }
+
+                alert('Alle gegevens zijn gewist.');
+                window.location.reload();
+              },
+              options: { variant: 'error' },
+            },
+          ]
+        );
+
+        UIComponents.showModal(confirmModal);
+      }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        new ExerciseSelector();
+      });
+    } else {
+      new ExerciseSelector();
+    }
+  </script>
+
+  <!-- PWA Installer -->
+  <script src="shared/js/pwa-installer.js"></script>
+</body>
+</html>

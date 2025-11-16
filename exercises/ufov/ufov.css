@@ -1,0 +1,417 @@
+/* ============================================
+   UFOV EXERCISE - CUSTOM STYLES
+   Useful Field of View training
+   ============================================ */
+
+.ufov-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+/* Display area */
+.ufov-display-area {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  margin: var(--spacing-xl) auto;
+  background-color: var(--color-background);
+  border: 3px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Fixation cross */
+.fixation-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  z-index: 2;
+  opacity: 0;
+  display: none;
+  transition: opacity 0.1s ease;
+}
+
+/* Central stimulus */
+.central-stimulus {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  opacity: 0;
+  display: none;
+  transition: opacity 0.1s ease;
+}
+
+.central-stimulus-icon {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  background-color: white;
+  border: 3px solid var(--color-text-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Peripheral positions */
+.peripheral-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  display: none;
+  transition: opacity 0.1s ease;
+}
+
+.peripheral-item {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.peripheral-target {
+  color: var(--color-error);
+  z-index: 4;
+}
+
+.peripheral-distractor {
+  color: var(--color-text-secondary);
+  z-index: 1;
+}
+
+/* Position peripheral items in a circle */
+.peripheral-item[data-position="0"] { top: 10%; left: 50%; transform: translateX(-50%); } /* Top */
+.peripheral-item[data-position="1"] { top: 20%; right: 20%; } /* Top-right */
+.peripheral-item[data-position="2"] { top: 50%; right: 10%; transform: translateY(-50%); } /* Right */
+.peripheral-item[data-position="3"] { bottom: 20%; right: 20%; } /* Bottom-right */
+.peripheral-item[data-position="4"] { bottom: 10%; left: 50%; transform: translateX(-50%); } /* Bottom */
+.peripheral-item[data-position="5"] { bottom: 20%; left: 20%; } /* Bottom-left */
+.peripheral-item[data-position="6"] { top: 50%; left: 10%; transform: translateY(-50%); } /* Left */
+.peripheral-item[data-position="7"] { top: 20%; left: 20%; } /* Top-left */
+
+/* Response phase - central task buttons */
+.central-response-buttons {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  margin: var(--spacing-xl) 0;
+  flex-wrap: wrap;
+}
+
+.central-choice-button {
+  min-width: 200px;
+  min-height: 120px;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.choice-icon {
+  font-size: 64px;
+}
+
+/* Peripheral response zones */
+.peripheral-response-zones {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-normal) ease, visibility 0s linear var(--transition-normal);
+}
+
+.peripheral-response-zones.active {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--transition-normal) ease, visibility 0s linear;
+}
+
+.response-zone {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 3px dashed transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  color: transparent;
+}
+
+.peripheral-response-zones.active .response-zone {
+  color: var(--color-text-secondary);
+}
+
+.response-zone:hover {
+  border-color: var(--color-info);
+  background-color: rgba(25, 118, 210, 0.1);
+  color: var(--color-info);
+}
+
+.response-zone.selected {
+  border-color: var(--color-success);
+  background-color: rgba(46, 125, 50, 0.2);
+}
+
+/* Position response zones (slightly offset for better clicking) */
+.response-zone[data-position="0"] { top: 5%; left: 50%; transform: translate(-50%, 0); }
+.response-zone[data-position="1"] { top: 15%; right: 15%; }
+.response-zone[data-position="2"] { top: 50%; right: 5%; transform: translate(0, -50%); }
+.response-zone[data-position="3"] { bottom: 15%; right: 15%; }
+.response-zone[data-position="4"] { bottom: 5%; left: 50%; transform: translate(-50%, 0); }
+.response-zone[data-position="5"] { bottom: 15%; left: 15%; }
+.response-zone[data-position="6"] { top: 50%; left: 5%; transform: translate(0, -50%); }
+.response-zone[data-position="7"] { top: 15%; left: 15%; }
+
+/* Instructions overlay */
+.instruction-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  z-index: 20;
+  text-align: center;
+}
+
+.instruction-overlay h3 {
+  color: white;
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.instruction-overlay p {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Duration indicator */
+.duration-info {
+  background-color: var(--color-info);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-lg);
+}
+
+.duration-value {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Trial phase indicator */
+.phase-indicator {
+  text-align: center;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-info);
+  margin: var(--spacing-lg) 0;
+  min-height: 50px;
+}
+
+/* Results specific */
+.threshold-display {
+  font-size: 96px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-success);
+  text-align: center;
+  margin: var(--spacing-xl) 0;
+  animation: scaleIn 0.5s ease;
+}
+
+.threshold-label {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.task-accuracy-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin: var(--spacing-xl) 0;
+}
+
+.accuracy-card {
+  background-color: var(--color-background-alt);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+}
+
+.accuracy-card h4 {
+  color: var(--color-info);
+  margin-bottom: var(--spacing-md);
+}
+
+.accuracy-card-value {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+/* Practice mode indicator */
+.practice-indicator {
+  background-color: var(--color-warning);
+  color: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ufov-display-area {
+    height: 500px;
+  }
+
+  .central-stimulus-icon {
+    width: 100px;
+    height: 100px;
+    font-size: 60px;
+  }
+
+  .peripheral-item {
+    width: 50px;
+    height: 50px;
+    font-size: 32px;
+  }
+
+  .response-zone {
+    width: 80px;
+    height: 80px;
+  }
+
+  .central-choice-button {
+    min-width: 150px;
+    min-height: 100px;
+  }
+
+  .choice-icon {
+    font-size: 48px;
+  }
+
+  .threshold-display {
+    font-size: 72px;
+  }
+
+  .task-accuracy-breakdown {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Feedback overlay animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Animation for stimulus flash */
+@keyframes stimulusFlash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.stimulus-flash {
+  animation: stimulusFlash 0.1s ease;
+}
+
+/* Fade out for stimulus removal */
+.stimulus-fade-out {
+  animation: fadeOut 0.1s ease forwards;
+}
+
+/* Hide elements during stimulus presentation */
+.hidden-during-stimulus {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Show elements after stimulus */
+.show-after-stimulus {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s ease;
+}
+
+/* Icons for central stimuli using text/emoji */
+.icon-car::before {
+  content: '🚗';
+}
+
+.icon-truck::before {
+  content: '🚚';
+}
+
+.icon-triangle::before {
+  content: '▲';
+}
+
+.icon-square::before {
+  content: '■';
+}
+
+.icon-circle::before {
+  content: '●';
+}

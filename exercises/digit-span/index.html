@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Cijferreeks Onthouden - Werkgeheugen Training">
+  <title>Cijferreeks Onthouden - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../shared/styles/design-system.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="../../shared/styles/animations.css">
+  <link rel="stylesheet" href="digit-span.css">
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation buttons -->
+  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
+    <button id="back-button" class="btn btn-secondary">
+      ← Terug naar Menu
+    </button>
+    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary" title="Terug naar hoofdmenu">🏠</button>
+  </div>
+
+  <!-- Main content -->
+  <main id="main-content" class="digit-span-container">
+    <!-- Exercise screen -->
+    <div id="exercise-screen">
+      <!-- Main display area -->
+      <div id="sequence-display" class="sequence-display">
+        <!-- Dynamic content will be inserted here -->
+      </div>
+
+      <!-- User input area (hidden initially) -->
+      <div id="input-area" class="hidden">
+        <div id="user-sequence" class="user-sequence" aria-live="polite" aria-atomic="true"></div>
+
+        <div id="number-pad-container" class="digit-span-number-pad"></div>
+
+        <div class="control-buttons">
+          <button id="clear-btn" class="btn btn-secondary">
+            Wissen
+          </button>
+          <button id="submit-btn" class="btn btn-success btn-large" disabled>
+            Bevestigen
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback area -->
+      <div id="feedback-area"></div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="../../shared/js/constants.js"></script>
+  <script src="../../shared/js/audio-manager.js"></script>
+  <script src="../../shared/js/data-tracker.js"></script>
+  <script src="../../shared/js/difficulty-adapter.js"></script>
+  <script src="../../shared/js/ui-components.js"></script>
+  <script src="../../shared/utils/statistics.js"></script>
+  <script src="../../shared/utils/validation.js"></script>
+
+  <!-- Exercise JavaScript -->
+  <script src="digit-span.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Woord Paar Associatie - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../shared/styles/design-system.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="../../shared/styles/animations.css">
+  <link rel="stylesheet" href="../../shared/styles/mobile-first.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation buttons -->
+  <div class="simple-screen__back" style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
+    <button onclick="handleBack()" class="btn btn-secondary simple-screen__back-button">← Terug</button>
+    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary simple-screen__back-button" title="Terug naar hoofdmenu">🏠</button>
+  </div>
+
+  <!-- Main content -->
+  <main id="main-content" class="simple-screen">
+    <div class="simple-screen__content" style="padding-top: 80px;">
+      <div class="simple-screen__icon">📝</div>
+      <h1 class="simple-screen__title">Woord Paar Associatie</h1>
+
+      <!-- Exercise content will be rendered here -->
+      <div id="exercise-container"></div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="../../shared/js/constants.js"></script>
+  <script src="../../shared/js/audio-manager.js"></script>
+  <script src="../../shared/js/data-tracker.js"></script>
+  <script src="../../shared/js/ui-components.js"></script>
+
+  <!-- Word Pair Exercise JavaScript -->
+  <script src="word-list.js"></script>
+  <script src="word-pair.js"></script>
+</body>
+</html>

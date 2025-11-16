@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Cognitieve trainingsoefeningen voor ouderen - MOCIA Gezondheidsapp">
+  <meta name="theme-color" content="#1976D2">
+  <title>MOCIA Cognitieve Training</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- iOS Specific Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MOCIA">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="shared/styles/design-system.css">
+  <link rel="stylesheet" href="shared/styles/components.css">
+  <link rel="stylesheet" href="shared/styles/animations.css">
+  <link rel="stylesheet" href="shared/styles/mobile-first.css">
+</head>
+<body>
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Settings button (always visible) -->
+  <button id="settings-button" class="settings-button" aria-label="Settings" style="position: fixed; top: var(--spacing-md); right: var(--spacing-md); width: var(--touch-target-min); height: var(--touch-target-min); border-radius: 50%; background-color: rgba(255, 255, 255, 0.9); color: var(--color-info); font-size: 24px; border: none; box-shadow: var(--shadow-md); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: var(--z-elevated);">
+    ⚙️
+  </button>
+
+  <!-- Main content -->
+  <main id="main-content">
+    <!-- Welcome Splash -->
+    <div id="welcome-screen" class="center-content">
+      <div class="simple-screen__icon">🧠</div>
+      <h1 class="simple-screen__title">Cognitieve Training</h1>
+      <p class="simple-screen__description">Houd uw geest scherp met wetenschappelijk onderbouwde oefeningen</p>
+      <div class="simple-screen__actions">
+        <button id="start-button" class="btn btn-success btn-large">Start →</button>
+      </div>
+    </div>
+
+    <!-- Dashboard (for returning users) -->
+    <div id="dashboard-screen" class="simple-screen" style="display: none;">
+      <div class="simple-screen__back" style="display: flex; gap: var(--spacing-sm);">
+        <button id="dashboard-back-button" class="btn btn-secondary simple-screen__back-button">← Terug</button>
+        <button onclick="window.location.href='domains.html'" class="btn btn-secondary simple-screen__back-button" title="Terug naar hoofdmenu">🏠</button>
+      </div>
+
+      <div class="simple-screen__content">
+        <h1 class="simple-screen__title">Uw Voortgang</h1>
+        <div id="dashboard-stats" style="background: var(--color-background-alt); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); margin: var(--spacing-lg) 0;"></div>
+        <div class="simple-screen__actions">
+          <button id="continue-button" class="btn btn-success btn-large">Ga Verder →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load shared JavaScript modules -->
+  <script src="shared/js/constants.js"></script>
+  <script src="shared/js/audio-manager.js"></script>
+  <script src="shared/js/data-tracker.js"></script>
+  <script src="shared/js/ui-components.js"></script>
+  <script src="shared/utils/statistics.js"></script>
+
+  <!-- Main menu JavaScript -->
+  <script>
+    class MainMenu {
+      constructor() {
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Load settings
+          this.loadSettings();
+
+          // Set up event listeners
+          this.setupEventListeners();
+
+          // Check if returning user
+          const aggregateStats = window.DataTracker.getAggregateStats();
+          const isReturningUser = aggregateStats && aggregateStats.totalSessions > 0;
+
+          // Show appropriate screen
+          if (isReturningUser) {
+            this.renderDashboard();
+            this.showDashboard();
+          } else {
+            this.showWelcome();
+          }
+
+          // Speak welcome (optional, may fail on page load due to browser restrictions)
+          if (window.AudioManager && window.AudioManager.isEnabled()) {
+            try {
+              await window.AudioManager.speak('Welkom bij Cognitieve Training');
+            } catch (speechError) {
+              // Speech may fail on page load - this is expected browser behavior
+              console.log('Speech unavailable on page load:', speechError);
+            }
+          }
+        } catch (error) {
+          console.error('Initialization error:', error);
+          alert('Er is een fout opgetreden bij het laden van de applicatie.');
+        }
+      }
+
+      setupEventListeners() {
+        // Welcome screen - start button
+        document.getElementById('start-button').addEventListener('click', () => {
+          this.onStartClick();
+        });
+
+        // Dashboard - back button
+        document.getElementById('dashboard-back-button').addEventListener('click', () => {
+          this.showWelcome();
+        });
+
+        // Dashboard - continue button
+        document.getElementById('continue-button').addEventListener('click', () => {
+          this.navigateToDomains();
+        });
+
+        // Settings button
+        document.getElementById('settings-button').addEventListener('click', () => {
+          this.showSettingsModal();
+        });
+      }
+
+      onStartClick() {
+        // Check if returning user
+        const aggregateStats = window.DataTracker.getAggregateStats();
+        const isReturningUser = aggregateStats && aggregateStats.totalSessions > 0;
+
+        if (isReturningUser) {
+          // Show dashboard for returning users
+          this.renderDashboard();
+          this.showDashboard();
+        } else {
+          // Go directly to domains for new users
+          this.navigateToDomains();
+        }
+      }
+
+      showWelcome() {
+        document.getElementById('welcome-screen').style.display = 'flex';
+        document.getElementById('dashboard-screen').style.display = 'none';
+      }
+
+      showDashboard() {
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('dashboard-screen').style.display = 'flex';
+      }
+
+      renderDashboard() {
+        const aggregateStats = window.DataTracker.getAggregateStats();
+        const dashboardEl = document.getElementById('dashboard-stats');
+
+        if (!aggregateStats || aggregateStats.totalSessions === 0) {
+          dashboardEl.innerHTML = '<p style="text-align: center;">Geen data beschikbaar</p>';
+          return;
+        }
+
+        // Session goal: 10 sessions
+        const sessionGoal = 10;
+        const sessionsValue = `${aggregateStats.totalSessions}/${sessionGoal}`;
+
+        // Time goal: 100 minutes (10 sessions × ~10 minutes each)
+        const timeGoal = 100;
+        const totalMinutes = Math.round(aggregateStats.totalTime / (1000 * 60));
+        const timeValue = `${totalMinutes}/${timeGoal} minuten`;
+
+        const stats = [
+          { label: 'Totaal Sessies', value: sessionsValue },
+          { label: 'Totale Tijd', value: timeValue },
+          { label: 'Dagen Actief', value: aggregateStats.daysSinceStart },
+        ];
+
+        const statsPanel = UIComponents.createStatsPanel(stats);
+        UIComponents.clearElement(dashboardEl);
+        dashboardEl.appendChild(statsPanel);
+      }
+
+      navigateToDomains() {
+        // Haptic feedback
+        if (window.AudioManager) {
+          window.AudioManager.hapticPress();
+        }
+
+        // Navigate to domains page
+        window.location.href = 'domains.html';
+      }
+
+      showSettingsModal() {
+        const audioEnabled = window.AudioManager.isEnabled();
+
+        const content = document.createElement('div');
+        content.innerHTML = `
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+              <input type="checkbox" id="audio-toggle" ${audioEnabled ? 'checked' : ''}
+                     style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+              <span>🔊 Voice-over (gesproken instructies)</span>
+            </label>
+            <p style="margin: var(--spacing-sm) 0 0 calc(30px + var(--spacing-md)); font-size: var(--font-size-md); color: var(--color-text-secondary);">
+              Laat de app instructies en feedback hardop voorlezen
+            </p>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+              <input type="checkbox" id="large-text-toggle" ${document.body.classList.contains('large-text') ? 'checked' : ''}
+                     style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+              <span>Grote tekst modus</span>
+            </label>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+              <input type="checkbox" id="high-contrast-toggle" ${document.body.classList.contains('high-contrast') ? 'checked' : ''}
+                     style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+              <span>Hoog contrast modus</span>
+            </label>
+          </div>
+
+          <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
+
+          <div style="text-align: center;">
+            <p style="margin-bottom: var(--spacing-md);">Gegevensbeheer</p>
+            <button id="export-data-btn" class="btn btn-secondary" style="margin-bottom: var(--spacing-sm); width: 100%;">
+              Exporteer Gegevens
+            </button>
+            <button id="clear-data-btn" class="btn btn-error" style="width: 100%;">
+              Wis Alle Gegevens
+            </button>
+          </div>
+        `;
+
+        const modal = UIComponents.createModal(
+          'Instellingen',
+          content,
+          [
+            {
+              text: 'Sluiten',
+              onClick: (e, modalEl) => modalEl.remove(),
+              options: { variant: 'primary' },
+            },
+          ]
+        );
+
+        // Set up settings event listeners
+        modal.querySelector('#audio-toggle').addEventListener('change', (e) => {
+          if (e.target.checked) {
+            window.AudioManager.enable();
+            window.AudioManager.speak('Voice-over ingeschakeld. Instructies worden nu hardop voorgelezen.');
+          } else {
+            window.AudioManager.speak('Voice-over uitgeschakeld');
+            setTimeout(() => {
+              window.AudioManager.disable();
+            }, 2000); // Wait for speech to finish
+          }
+        });
+
+        modal.querySelector('#large-text-toggle').addEventListener('change', (e) => {
+          document.body.classList.toggle('large-text', e.target.checked);
+          this.saveSetting('largeText', e.target.checked);
+        });
+
+        modal.querySelector('#high-contrast-toggle').addEventListener('change', (e) => {
+          document.body.classList.toggle('high-contrast', e.target.checked);
+          this.saveSetting('highContrast', e.target.checked);
+        });
+
+        modal.querySelector('#export-data-btn').addEventListener('click', () => {
+          this.exportData();
+        });
+
+        modal.querySelector('#clear-data-btn').addEventListener('click', () => {
+          this.confirmClearData(modal);
+        });
+
+        UIComponents.showModal(modal);
+      }
+
+      saveSetting(key, value) {
+        try {
+          let settings = {};
+          const existing = localStorage.getItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS);
+          if (existing) {
+            settings = JSON.parse(existing);
+          }
+          settings[key] = value;
+          localStorage.setItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS, JSON.stringify(settings));
+        } catch (error) {
+          console.error('Error saving setting:', error);
+        }
+      }
+
+      loadSettings() {
+        try {
+          const settings = localStorage.getItem(CONSTANTS.STORAGE_KEYS.APP_SETTINGS);
+          if (settings) {
+            const parsed = JSON.parse(settings);
+            if (parsed.largeText) {
+              document.body.classList.add('large-text');
+            }
+            if (parsed.highContrast) {
+              document.body.classList.add('high-contrast');
+            }
+          }
+        } catch (error) {
+          console.error('Error loading settings:', error);
+        }
+      }
+
+      exportData() {
+        const data = window.DataTracker.exportData();
+        if (!data) {
+          alert('Geen gegevens om te exporteren.');
+          return;
+        }
+
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mocia-cognitive-training-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (window.AudioManager) {
+          window.AudioManager.speak('Gegevens geëxporteerd');
+        }
+      }
+
+      confirmClearData(parentModal) {
+        const confirmModal = UIComponents.createModal(
+          'Wis Alle Gegevens',
+          '<p style="font-size: var(--font-size-lg);">Weet u zeker dat u alle gegevens wilt wissen? Dit kan niet ongedaan worden gemaakt.</p>',
+          [
+            {
+              text: 'Annuleren',
+              onClick: (e, modalEl) => modalEl.remove(),
+              options: { variant: 'secondary' },
+            },
+            {
+              text: 'Ja, Wis Alles',
+              onClick: (e, modalEl) => {
+                window.DataTracker.clearAllData();
+                modalEl.remove();
+                parentModal.remove();
+
+                if (window.AudioManager) {
+                  window.AudioManager.speak('Alle gegevens gewist');
+                }
+
+                alert('Alle gegevens zijn gewist.');
+                window.location.reload();
+              },
+              options: { variant: 'error' },
+            },
+          ]
+        );
+
+        UIComponents.showModal(confirmModal);
+      }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        new MainMenu();
+      });
+    } else {
+      new MainMenu();
+    }
+  </script>
+
+  <!-- PWA Installer -->
+  <script src="shared/js/pwa-installer.js"></script>
+</body>
+</html>

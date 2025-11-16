@@ -1,0 +1,222 @@
+/* ============================================
+   DIGIT SPAN EXERCISE - CUSTOM STYLES
+   ============================================ */
+
+.digit-span-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+/* Sequence display area */
+.sequence-display {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-background-alt);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-xl);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.digit-display {
+  font-size: 120px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-info);
+  animation: digitPulse 0.3s ease;
+}
+
+@keyframes digitPulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* User input display */
+.user-sequence {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: 16px;
+  margin: var(--spacing-lg) 0;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-sequence .digit-entered {
+  display: inline-block;
+  animation: fadeIn 0.2s ease;
+  margin: 0 var(--spacing-xs);
+}
+
+/* Number pad specific styling */
+.digit-span-number-pad {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.digit-span-number-pad .number-pad-button {
+  font-size: 48px;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Control buttons area */
+.control-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+/* Trial info banner */
+.trial-info {
+  background-color: var(--color-info);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.trial-info strong {
+  font-size: var(--font-size-xl);
+}
+
+/* Ready message */
+.ready-message {
+  font-size: var(--font-size-xxl);
+  color: var(--color-info);
+  text-align: center;
+  animation: pulse 1s ease;
+}
+
+/* Your turn message */
+.your-turn-message {
+  font-size: var(--font-size-xl);
+  color: var(--color-success);
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+  animation: slideDown 0.3s ease;
+}
+
+/* Results screen */
+.results-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.results-container h2 {
+  color: var(--color-success);
+  margin-bottom: var(--spacing-xl);
+}
+
+.final-score {
+  font-size: 96px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-info);
+  margin: var(--spacing-xl) 0;
+  animation: scaleIn 0.5s ease;
+}
+
+.results-stats {
+  background-color: var(--color-background-alt);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-xl) 0;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: var(--font-size-lg);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: var(--color-text-secondary);
+}
+
+.stat-value {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.encouragement-message {
+  font-size: var(--font-size-xl);
+  color: var(--color-success);
+  margin: var(--spacing-lg) 0;
+  font-style: italic;
+}
+
+.comparison-message {
+  font-size: var(--font-size-lg);
+  color: var(--color-info);
+  margin: var(--spacing-md) 0;
+}
+
+/* Practice mode banner */
+.practice-banner {
+  background-color: var(--color-warning);
+  color: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .digit-display {
+    font-size: 96px;
+  }
+
+  .user-sequence {
+    font-size: var(--font-size-xl);
+    letter-spacing: 12px;
+  }
+
+  .final-score {
+    font-size: 72px;
+  }
+
+  .digit-span-number-pad .number-pad-button {
+    font-size: 36px;
+  }
+}
+
+/* Loading state */
+.loading-digits {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Disabled state for input */
+.input-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
