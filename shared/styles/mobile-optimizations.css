@@ -1,0 +1,416 @@
+/**
+ * MOBILE OPTIMIZATIONS
+ * Additional mobile-specific fixes for better phone experience
+ */
+
+/* ========================================
+   VIEWPORT & SAFE AREAS
+   ======================================== */
+
+/* Safe area insets for notched phones (iPhone X+, etc.) */
+:root {
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+  --safe-area-left: env(safe-area-inset-left);
+  --safe-area-right: env(safe-area-inset-right);
+}
+
+/* Prevent horizontal scrolling */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Prevent zoom on double-tap for iOS */
+* {
+  touch-action: manipulation;
+}
+
+/* ========================================
+   MOBILE-SPECIFIC TYPOGRAPHY
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Ensure minimum readable text size on mobile */
+  body {
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+  h3 {
+    font-size: 24px;
+  }
+
+  /* Larger buttons for easier tapping */
+  .btn {
+    min-height: 56px;
+    min-width: 120px;
+    font-size: 18px;
+    padding: 16px 24px;
+  }
+
+  .btn-large {
+    min-height: 64px;
+    font-size: 20px;
+  }
+}
+
+/* ========================================
+   FIXED POSITIONING FIXES
+   ======================================== */
+
+/* Settings button - account for safe areas */
+.settings-button {
+  top: calc(var(--spacing-md) + var(--safe-area-top)) !important;
+  right: calc(var(--spacing-md) + var(--safe-area-right)) !important;
+}
+
+/* Back button area - account for safe areas */
+.simple-screen__back {
+  top: calc(var(--spacing-md) + var(--safe-area-top)) !important;
+  left: calc(var(--spacing-md) + var(--safe-area-left)) !important;
+}
+
+/* Ensure fixed elements don't overlap with content */
+@media (max-width: 768px) {
+  main {
+    padding-top: calc(80px + var(--safe-area-top));
+  }
+
+  /* Add bottom padding for safe area */
+  .simple-screen__actions,
+  .action-bar {
+    padding-bottom: calc(var(--spacing-lg) + var(--safe-area-bottom));
+  }
+}
+
+/* ========================================
+   GRID LAYOUTS - MOBILE OPTIMIZED
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Single column on mobile */
+  .grid,
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Ensure cards don't exceed screen width */
+  .card,
+  .card-mobile,
+  .exercise-card {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* Full-width containers on mobile */
+  .container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+    width: 100%;
+  }
+}
+
+/* ========================================
+   TOUCH TARGETS
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Ensure all interactive elements meet minimum touch target size */
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  .touchable {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Increase spacing between clickable elements */
+  .btn-group {
+    gap: var(--spacing-md);
+  }
+
+  /* Make back and home buttons easier to tap */
+  .simple-screen__back button {
+    min-width: 56px;
+    min-height: 56px;
+    padding: 12px 16px;
+    font-size: 18px;
+  }
+}
+
+/* ========================================
+   MODAL & OVERLAY IMPROVEMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: var(--spacing-sm);
+    align-items: flex-end; /* Bottom sheet style on mobile */
+  }
+
+  .modal-content {
+    max-height: 85vh;
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    padding-bottom: calc(var(--spacing-xl) + var(--safe-area-bottom));
+  }
+}
+
+/* ========================================
+   STATS & PROGRESS
+   ======================================== */
+
+@media (max-width: 768px) {
+  .stats-container {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .stat-item {
+    width: 100%;
+    padding: var(--spacing-md);
+    background: var(--color-background);
+    border-radius: var(--border-radius-md);
+  }
+
+  .progress-bar {
+    height: 32px;
+  }
+}
+
+/* ========================================
+   DOMAIN CARDS - MOBILE GRID
+   ======================================== */
+
+@media (max-width: 768px) {
+  #domains-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--spacing-lg) !important;
+    padding: 0 var(--spacing-md) !important;
+  }
+
+  #domains-grid > * {
+    grid-column: auto !important; /* Reset any grid column rules */
+    width: 100% !important;
+  }
+
+  .card-mobile {
+    padding: var(--spacing-xl);
+    min-height: 120px;
+  }
+
+  .card-mobile__icon {
+    font-size: 56px;
+  }
+
+  .card-mobile__title {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* ========================================
+   EXERCISE GRID - MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+  #exercises-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--spacing-lg) !important;
+  }
+
+  #exercises-grid > * {
+    width: 100% !important;
+  }
+}
+
+/* ========================================
+   NUMBER PAD - MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .number-pad {
+    gap: var(--spacing-sm);
+    padding: 0 var(--spacing-md);
+  }
+
+  .number-pad-button {
+    min-height: 64px;
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* ========================================
+   STIMULUS DISPLAY - MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .stimulus-container {
+    min-height: 200px;
+    margin: var(--spacing-lg) 0;
+    padding: 0 var(--spacing-md);
+  }
+
+  .stimulus {
+    font-size: 56px;
+    word-break: break-word;
+  }
+
+  .countdown {
+    font-size: 80px;
+  }
+}
+
+/* ========================================
+   LANDSCAPE ORIENTATION
+   ======================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduce vertical spacing in landscape */
+  .simple-screen__content {
+    padding: var(--spacing-md);
+  }
+
+  .simple-screen__icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .simple-screen__title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .card-mobile__icon {
+    font-size: 40px;
+  }
+
+  /* Smaller buttons in landscape to fit content */
+  .btn-large {
+    min-height: 52px;
+    font-size: var(--font-size-lg);
+  }
+}
+
+/* ========================================
+   PREVENT TEXT SELECTION
+   ======================================== */
+
+/* Prevent text selection on exercise elements (better UX) */
+.stimulus,
+.card-mobile,
+.exercise-card,
+.number-pad-button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ========================================
+   IMPROVE SCROLLING
+   ======================================== */
+
+/* Smooth scrolling on iOS */
+.modal-content,
+.simple-screen {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+@media (max-width: 768px) {
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+  }
+
+  .loading-overlay__text {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY - MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Larger focus outlines on mobile */
+  *:focus-visible {
+    outline: 4px solid var(--color-info);
+    outline-offset: 4px;
+  }
+
+  /* Skip link positioned better for mobile */
+  .skip-link:focus {
+    top: calc(var(--safe-area-top));
+  }
+}
+
+/* ========================================
+   PREVENT ZOOM ON INPUT FOCUS (iOS)
+   ======================================== */
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+select,
+textarea {
+  font-size: 16px; /* Prevents iOS zoom */
+}
+
+/* ========================================
+   FULL VIEWPORT HEIGHT FIX
+   ======================================== */
+
+/* Fix for mobile browsers with dynamic toolbars */
+@media (max-width: 768px) {
+  .center-content,
+  .simple-screen,
+  .tutorial {
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* Safari */
+  }
+
+  html {
+    height: -webkit-fill-available; /* Safari */
+  }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* Hardware acceleration for animations on mobile */
+@media (max-width: 768px) {
+  .card:hover,
+  .btn:active,
+  .modal-content,
+  .stimulus,
+  .feedback-panel {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}

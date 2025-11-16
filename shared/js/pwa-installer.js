@@ -28,8 +28,8 @@ class PWAInstaller {
   async registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/'
+        const registration = await navigator.serviceWorker.register('/MOCIA/sw.js', {
+          scope: '/MOCIA/'
         });
 
         console.log('[PWA] Service Worker registered successfully:', registration.scope);

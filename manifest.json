@@ -2,8 +2,8 @@
   "name": "MOCIA Cognitieve Training",
   "short_name": "MOCIA",
   "description": "Cognitieve trainingsoefeningen voor ouderen",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/MOCIA/",
+  "scope": "/MOCIA/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
@@ -13,49 +13,49 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/icons/icon-72.png",
+      "src": "/MOCIA/icons/icon-72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-96.png",
+      "src": "/MOCIA/icons/icon-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-128.png",
+      "src": "/MOCIA/icons/icon-128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-144.png",
+      "src": "/MOCIA/icons/icon-144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-152.png",
+      "src": "/MOCIA/icons/icon-152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192.png",
+      "src": "/MOCIA/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-384.png",
+      "src": "/MOCIA/icons/icon-384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/MOCIA/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -63,7 +63,7 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/screenshot-1.png",
+      "src": "/MOCIA/screenshots/screenshot-1.png",
       "sizes": "540x720",
       "type": "image/png"
     }
