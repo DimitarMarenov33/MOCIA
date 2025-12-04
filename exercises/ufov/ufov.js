@@ -640,7 +640,7 @@ class UFOVExercise {
       if (!confirmed) return;
     }
 
-    window.location.href = '../../index.html';
+    history.back();
   }
 
   sleep(ms) {

@@ -18,10 +18,25 @@
 
   <!-- Main content -->
   <main id="main-content" class="ufov-container">
+    <!-- Back button -->
+    <button id="back-button" class="btn btn-secondary" style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: 100;">← Terug</button>
+
     <!-- Exercise screen -->
     <div id="exercise-screen" class="hidden">
       <!-- Duration display only (minimal, top right) -->
       <div class="duration-display"><span id="current-duration">500</span>ms</div>
+
+      <!-- Progress and stats (hidden but needed by JS) -->
+      <div id="progress-container" style="display: none;"></div>
+      <div id="current-stats" style="display: none;"></div>
+
+      <!-- Trial counter (hidden) -->
+      <div style="display: none;">
+        <span id="current-trial">0</span>/<span id="total-trials">0</span>
+      </div>
+
+      <!-- Phase indicator -->
+      <div id="phase-indicator" class="phase-indicator"></div>
 
       <!-- Main display area -->
       <div id="display-area" class="ufov-display-area">
