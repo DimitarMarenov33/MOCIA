@@ -381,6 +381,11 @@
           ? '<div style="position: absolute; top: 10px; right: 10px; background: var(--color-warning); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold;">Binnenkort</div>'
           : '';
 
+        // Select button (only if not coming soon)
+        const selectButton = exercise.status !== 'coming_soon'
+          ? '<button class="card-select-btn">Select →</button>'
+          : '';
+
         card.innerHTML = `
           ${comingSoonOverlay}
           <div class="card-mobile__icon">${exercise.icon}</div>
@@ -394,6 +399,7 @@
           <div class="card-mobile__meta">
             <div>⏱️ ${exercise.estimatedTime}</div>
           </div>
+          ${selectButton}
         `;
 
         if (exercise.status === 'coming_soon') {

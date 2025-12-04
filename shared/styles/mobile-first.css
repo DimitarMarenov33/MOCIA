@@ -302,6 +302,80 @@
   transform: scale(1.3);
 }
 
+/* Swipe indicator arrows */
+.carousel__swipe-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 48px;
+  color: var(--color-primary);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.carousel__swipe-indicator--left {
+  left: 8px;
+}
+
+.carousel__swipe-indicator--right {
+  right: 8px;
+}
+
+.carousel__swipe-indicator--visible {
+  opacity: 0.6;
+  animation: swipe-hint 1.5s ease-in-out infinite;
+}
+
+@keyframes swipe-hint {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) translateX(5px);
+  }
+}
+
+.carousel__swipe-indicator--left.carousel__swipe-indicator--visible {
+  animation: swipe-hint-left 1.5s ease-in-out infinite;
+}
+
+@keyframes swipe-hint-left {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) translateX(-5px);
+  }
+}
+
+/* Card select button */
+.card-select-btn {
+  display: block;
+  width: 100%;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.card-select-btn:hover {
+  background-color: var(--color-success-dark, #388e3c);
+  transform: translateY(-1px);
+}
+
+.card-select-btn:active {
+  transform: translateY(0);
+}
+
 /* ========================================
    TUTORIAL STEPPER
    ======================================== */

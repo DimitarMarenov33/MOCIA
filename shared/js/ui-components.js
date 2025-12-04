@@ -588,30 +588,46 @@ const UIComponents = {
       itemWrapper.setAttribute('data-index', index);
 
       const renderedItem = renderItem(item, index);
-      itemWrapper.appendChild(renderedItem);
 
+      // Make the card clickable
+      renderedItem.style.cursor = 'pointer';
+      renderedItem.addEventListener('click', (e) => {
+        // Don't trigger card click if clicking on the select button (it has its own handler)
+        if (e.target.classList.contains('card-select-btn')) return;
+        if (onSelect) {
+          onSelect(item, index);
+        }
+      });
+
+      // Also handle select button click
+      const selectBtn = renderedItem.querySelector('.card-select-btn');
+      if (selectBtn) {
+        selectBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (onSelect) {
+            onSelect(item, index);
+          }
+        });
+      }
+
+      itemWrapper.appendChild(renderedItem);
       container.appendChild(itemWrapper);
     });
 
     carousel.appendChild(container);
 
-    // Navigation
-    const nav = document.createElement('div');
-    nav.className = 'carousel__nav';
+    // Swipe indicator arrows (subtle hints for navigation)
+    const leftIndicator = document.createElement('div');
+    leftIndicator.className = 'carousel__swipe-indicator carousel__swipe-indicator--left';
+    leftIndicator.innerHTML = '‹';
+    leftIndicator.setAttribute('aria-hidden', 'true');
+    carousel.appendChild(leftIndicator);
 
-    const prevButton = document.createElement('button');
-    prevButton.className = 'carousel__button';
-    prevButton.innerHTML = '←';
-    prevButton.setAttribute('aria-label', 'Previous item');
-
-    const nextButton = document.createElement('button');
-    nextButton.className = 'carousel__button';
-    nextButton.innerHTML = '→';
-    nextButton.setAttribute('aria-label', 'Next item');
-
-    nav.appendChild(prevButton);
-    nav.appendChild(nextButton);
-    carousel.appendChild(nav);
+    const rightIndicator = document.createElement('div');
+    rightIndicator.className = 'carousel__swipe-indicator carousel__swipe-indicator--right';
+    rightIndicator.innerHTML = '›';
+    rightIndicator.setAttribute('aria-hidden', 'true');
+    carousel.appendChild(rightIndicator);
 
     // Dots indicator
     const dots = document.createElement('div');
@@ -627,22 +643,6 @@ const UIComponents = {
 
     carousel.appendChild(dots);
 
-    // Selection button
-    const selectButton = this.createButton(
-      'Selecteer →',
-      () => {
-        if (onSelect) {
-          onSelect(items[currentIndex], currentIndex);
-        }
-      },
-      { variant: 'success', className: 'btn-large btn-mobile-full', block: true }
-    );
-
-    const selectWrapper = document.createElement('div');
-    selectWrapper.style.padding = 'var(--spacing-md)';
-    selectWrapper.appendChild(selectButton);
-    carousel.appendChild(selectWrapper);
-
     // State
     let currentIndex = 0;
 
@@ -654,9 +654,9 @@ const UIComponents = {
         dot.classList.toggle('carousel__dot--active', index === currentIndex);
       });
 
-      // Update buttons
-      prevButton.disabled = currentIndex === 0;
-      nextButton.disabled = currentIndex === items.length - 1;
+      // Update swipe indicators
+      leftIndicator.classList.toggle('carousel__swipe-indicator--visible', currentIndex > 0);
+      rightIndicator.classList.toggle('carousel__swipe-indicator--visible', currentIndex < items.length - 1);
     };
 
     const next = () => {
@@ -679,10 +679,6 @@ const UIComponents = {
         updateCarousel();
       }
     };
-
-    // Event listeners
-    prevButton.addEventListener('click', prev);
-    nextButton.addEventListener('click', next);
 
     // Touch gestures
     let touchStartX = 0;
