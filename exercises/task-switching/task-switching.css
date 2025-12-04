@@ -14,68 +14,30 @@
   background: var(--color-background);
 }
 
-/* Trial Info */
-.trial-info {
-  position: fixed;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--spacing-sm);
-  z-index: var(--z-elevated);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
+/* Block label (minimal, top right) */
 .block-label {
-  background: var(--color-primary);
-  color: white;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
-  font-size: var(--font-size-md);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
   text-align: center;
-  min-width: 150px;
+  opacity: 0.8;
 }
 
 .block-label.mixed {
-  background: var(--color-warning);
+  color: var(--color-warning);
 }
 
-/* Cue Display */
+/* Cue Display (hidden) */
 .cue-display {
-  text-align: center;
-  margin-bottom: var(--spacing-lg);
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cue-text {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-primary);
-  background: var(--color-background-alt);
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  border: 3px solid var(--color-primary);
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.cue-text.visible {
-  opacity: 1;
-  animation: pulse-cue 0.8s ease;
-}
-
-@keyframes pulse-cue {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  display: none;
 }
 
 /* Stimulus Display */
@@ -234,13 +196,9 @@
     font-size: var(--font-size-lg);
   }
 
-  .trial-info {
-    font-size: var(--font-size-md);
-  }
-
   .block-label {
-    font-size: var(--font-size-sm);
-    min-width: 120px;
+    font-size: 10px;
+    padding: 3px 6px;
   }
 }
 

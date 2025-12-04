@@ -6,29 +6,28 @@
   max-width: 900px;
   margin: 0 auto;
   padding: var(--spacing-lg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* N-Back level indicator */
-.n-level-banner {
-  background: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-dark) 100%);
-  color: white;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
+/* N-Back level indicator (minimal, top right) */
+.n-level-indicator {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
   text-align: center;
-  margin-bottom: var(--spacing-lg);
-  box-shadow: var(--shadow-md);
-}
-
-.n-level-banner h2 {
-  margin: 0;
-  color: white;
-  font-size: var(--font-size-xxl);
-}
-
-.n-level-banner p {
-  margin: var(--spacing-sm) 0 0;
-  font-size: var(--font-size-lg);
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 /* Grid container */

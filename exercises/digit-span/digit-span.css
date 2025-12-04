@@ -6,6 +6,39 @@
   max-width: 800px;
   margin: 0 auto;
   padding: var(--spacing-lg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Timer Display (minimal) */
+.timer-display {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
+  text-align: center;
+  opacity: 0.8;
+}
+
+.timer-display.warning {
+  background: var(--color-warning);
+  color: white;
+  animation: pulse-warning 0.5s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 /* Sequence display area */

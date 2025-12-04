@@ -14,28 +14,21 @@
   background: var(--color-background);
 }
 
-/* Trial Info */
-.trial-info {
-  position: fixed;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--spacing-sm);
-  z-index: var(--z-elevated);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
+/* Timer Display (minimal) */
 .timer-display {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   background: var(--color-background-alt);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
-  min-width: 80px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
   text-align: center;
+  opacity: 0.8;
 }
 
 .timer-display.warning {
@@ -49,22 +42,9 @@
   50% { transform: scale(1.05); }
 }
 
-/* Instruction Prompt */
+/* Instruction Prompt (minimal) */
 .instruction-prompt {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-  background: var(--color-background-alt);
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.instruction-prompt strong {
-  color: var(--color-primary);
-  font-weight: 700;
+  display: none;
 }
 
 /* Stimulus Display */
@@ -268,13 +248,9 @@
     min-height: 80px;
   }
 
-  .instruction-prompt {
-    font-size: var(--font-size-lg);
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .trial-info {
-    font-size: var(--font-size-md);
+  .timer-display {
+    font-size: 10px;
+    padding: 3px 6px;
   }
 }
 

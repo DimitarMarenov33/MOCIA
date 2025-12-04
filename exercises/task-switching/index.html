@@ -16,28 +16,12 @@
   <!-- Skip to main content -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- Navigation buttons -->
-  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
-    <button id="back-button" class="btn btn-secondary">
-      ← Terug naar Menu
-    </button>
-    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary" title="Terug naar hoofdmenu">🏠</button>
-  </div>
-
   <!-- Main content -->
   <main id="main-content" class="task-switching-container">
     <!-- Exercise screen -->
     <div id="exercise-screen">
-      <!-- Trial info -->
-      <div id="trial-info" class="trial-info">
-        <span id="block-label" class="block-label">Blok: ODD/EVEN</span>
-        <span id="trial-counter">Poging 1/50</span>
-      </div>
-
-      <!-- Cue display -->
-      <div id="cue-display" class="cue-display">
-        <div id="cue-text" class="cue-text">ODD/EVEN?</div>
-      </div>
+      <!-- Block label (minimal, top right) -->
+      <div id="block-label" class="block-label">ODD/EVEN</div>
 
       <!-- Stimulus display -->
       <div id="stimulus-display" class="stimulus-display">

@@ -18,31 +18,13 @@
   <!-- Skip to main content -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- Navigation buttons (always visible) -->
-  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
-    <button id="back-button" class="btn btn-secondary simple-screen__back-button">
-      ← Terug
-    </button>
-    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary simple-screen__back-button" title="Terug naar hoofdmenu">🏠</button>
-  </div>
-
   <!-- Main content -->
   <main id="main-content" class="dual-n-back-container">
 
     <!-- Exercise screen -->
     <div id="exercise-screen" class="screen screen-hidden" style="padding: var(--spacing-lg);">
-      <!-- Minimal progress at top -->
-      <div class="minimal-progress" id="progress-bar-container">
-        <div class="minimal-progress__bar" id="progress-bar"></div>
-      </div>
-
-      <!-- Trial counter -->
-      <div class="minimal-counter" id="trial-counter">Poging 1 van 25</div>
-
-      <!-- N-Back level indicator (small) -->
-      <div style="text-align: center; margin: var(--spacing-md) 0; font-size: var(--font-size-lg); color: var(--color-text-secondary);" id="n-level-indicator">
-        2-Back
-      </div>
+      <!-- N-Back level indicator (minimal, top right) -->
+      <div class="n-level-indicator" id="n-level-indicator">2-Back</div>
 
       <!-- Grid container -->
       <div class="n-back-grid-container" style="margin: var(--spacing-xl) 0;">

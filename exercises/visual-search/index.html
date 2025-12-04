@@ -16,23 +16,12 @@
   <!-- Skip to main content -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- Navigation buttons -->
-  <div style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: var(--z-elevated); display: flex; gap: var(--spacing-sm);">
-    <button id="back-button" class="btn btn-secondary">
-      ← Terug naar Menu
-    </button>
-    <button onclick="window.location.href='../../domains.html'" class="btn btn-secondary" title="Terug naar hoofdmenu">🏠</button>
-  </div>
-
   <!-- Main content -->
   <main id="main-content" class="visual-search-container">
     <!-- Exercise screen -->
     <div id="exercise-screen">
-      <!-- Trial info -->
-      <div id="trial-info" class="trial-info">
-        <span id="trial-counter">Poging 1/20</span>
-        <span id="timer-display" class="timer-display">3.0s</span>
-      </div>
+      <!-- Timer only (minimal, top right) -->
+      <div id="timer-display" class="timer-display">3.0s</div>
 
       <!-- Target preview (shown at start of each trial) -->
       <div id="target-preview" class="target-preview">
