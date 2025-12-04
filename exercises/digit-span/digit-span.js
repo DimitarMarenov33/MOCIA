@@ -15,6 +15,7 @@ class DigitSpanExercise {
     this.currentSequence = [];
     this.userSequence = [];
     this.score = 0;
+    this.isShowingSequence = false; // Flag to block input during sequence display
 
     // Difficulty adapter
     this.difficultyAdapter = new DigitSpanAdapter();
@@ -114,6 +115,7 @@ class DigitSpanExercise {
     // Keyboard support
     document.addEventListener('keydown', (e) => {
       if (this.screens.exercise.classList.contains('hidden')) return;
+      if (this.isShowingSequence) return; // Block input while sequence is being shown
 
       // Number keys (0-9)
       if (e.key >= '0' && e.key <= '9') {
@@ -249,6 +251,9 @@ class DigitSpanExercise {
   }
 
   async presentSequence() {
+    // Block input while showing sequence
+    this.isShowingSequence = true;
+
     UIComponents.clearElement(this.elements.sequenceDisplay);
 
     const displayTime = this.config.parameters.digitDisplayTime || CONSTANTS.DIGIT_SPAN.DIGIT_DISPLAY_TIME;
@@ -284,6 +289,9 @@ class DigitSpanExercise {
   }
 
   showInputArea() {
+    // Allow input now that sequence is done
+    this.isShowingSequence = false;
+
     // Show "Your Turn" message
     UIComponents.clearElement(this.elements.sequenceDisplay);
 
@@ -316,6 +324,9 @@ class DigitSpanExercise {
   }
 
   addDigit(digit) {
+    // Block input while sequence is being shown
+    if (this.isShowingSequence) return;
+
     // Don't allow more digits than the sequence length
     if (this.userSequence.length >= this.currentSequence.length) {
       if (window.AudioManager) {
