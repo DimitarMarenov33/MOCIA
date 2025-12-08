@@ -23,20 +23,16 @@
 
     <!-- Exercise screen -->
     <div id="exercise-screen" class="hidden">
-      <!-- Duration display only (minimal, top right) -->
-      <div class="duration-display"><span id="current-duration">500</span>ms</div>
-
-      <!-- Progress and stats (hidden but needed by JS) -->
-      <div id="progress-container" style="display: none;"></div>
-      <div id="current-stats" style="display: none;"></div>
-
-      <!-- Trial counter (hidden) -->
+      <!-- Hidden elements needed by JS -->
       <div style="display: none;">
-        <span id="current-trial">0</span>/<span id="total-trials">0</span>
+        <span id="current-duration">500</span>
+        <span id="current-trial">0</span>
+        <span id="total-trials">0</span>
+        <div id="progress-container"></div>
+        <div id="current-stats"></div>
+        <div id="phase-indicator"></div>
+        <div id="peripheral-response-instruction"></div>
       </div>
-
-      <!-- Phase indicator -->
-      <div id="phase-indicator" class="phase-indicator"></div>
 
       <!-- Main display area -->
       <div id="display-area" class="ufov-display-area">
@@ -61,26 +57,16 @@
 
       <!-- Central response buttons (shown after stimulus) -->
       <div id="central-response" class="hidden">
-        <p style="text-align: center; font-size: var(--font-size-xl); margin-bottom: var(--spacing-lg); font-weight: var(--font-weight-medium);">
-          Wat zag je in het midden?
-        </p>
-        <div class="central-response-buttons">
-          <button id="car-button" class="btn btn-primary central-choice-button">
-            <span class="choice-icon">🚗</span>
-            <span>Auto</span>
+        <div class="response-buttons">
+          <button id="car-button" class="response-btn">
+            <div class="response-icon">🚗</div>
+            <div class="response-label">Auto</div>
           </button>
-          <button id="truck-button" class="btn btn-primary central-choice-button">
-            <span class="choice-icon">🚚</span>
-            <span>Vrachtwagen</span>
+          <button id="truck-button" class="response-btn">
+            <div class="response-icon">🚚</div>
+            <div class="response-label">Vrachtwagen</div>
           </button>
         </div>
-      </div>
-
-      <!-- Peripheral response instruction (shown after central response) -->
-      <div id="peripheral-response-instruction" class="hidden">
-        <p style="text-align: center; font-size: var(--font-size-xl); margin: var(--spacing-lg) 0; font-weight: var(--font-weight-medium);">
-          Klik op de plaats waar je het auto-icoontje zag 🚗
-        </p>
       </div>
     </div>
   </main>
