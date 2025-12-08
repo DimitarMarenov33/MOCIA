@@ -94,6 +94,8 @@ class UFOVComplexExercise {
 
   cacheElements() {
     this.elements = {
+      // Duration display
+      currentDuration: document.getElementById('current-duration'),
       // Phase indicator
       phaseIndicator: document.getElementById('phase-indicator'),
       // Display area
@@ -106,6 +108,12 @@ class UFOVComplexExercise {
       // Response areas
       centralResponse: document.getElementById('central-response'),
     };
+  }
+
+  updateDurationDisplay() {
+    if (this.elements.currentDuration) {
+      this.elements.currentDuration.textContent = this.currentDuration;
+    }
   }
 
   setupEventListeners() {
@@ -191,6 +199,7 @@ class UFOVComplexExercise {
     // Initialize difficulty adapter for complex variant
     this.difficultyAdapter = new UFOVAdapter('complex');
     this.currentDuration = this.difficultyAdapter.getCurrentDifficulty();
+    this.updateDurationDisplay();
 
     // Start data tracking
     if (!this.isPractice) {
@@ -440,6 +449,7 @@ class UFOVComplexExercise {
     // Update difficulty (based on combined accuracy)
     const difficultyResult = this.difficultyAdapter.processResult(bothCorrect);
     this.currentDuration = difficultyResult.currentDifficulty;
+    this.updateDurationDisplay();
 
     // Show feedback
     await this.showFeedback(centralCorrect, peripheralCorrect, difficultyResult.adjusted, trialScore);

@@ -14,6 +14,21 @@
   background: var(--color-background);
 }
 
+/* Duration Display (top right) */
+.duration-display {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: var(--color-background-alt);
+  padding: 4px 10px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: 100;
+}
+
 /* Phase Indicator (hidden) */
 .phase-indicator {
   display: none;
