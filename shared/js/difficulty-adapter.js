@@ -301,11 +301,11 @@ class DualNBackAdapter extends DifficultyAdapter {
     let adjusted = false;
     const previousDifficulty = this.currentDifficulty;
 
-    // Adjust based on block accuracy
-    if (accuracy >= 0.90 && this.currentDifficulty < this.maxDifficulty) {
+    // Adjust based on block accuracy (target 75-85%)
+    if (accuracy >= CONSTANTS.PERFORMANCE.TARGET_MAX && this.currentDifficulty < this.maxDifficulty) {
       this.currentDifficulty++;
       adjusted = true;
-    } else if (accuracy < 0.70 && this.currentDifficulty > this.minDifficulty) {
+    } else if (accuracy < CONSTANTS.PERFORMANCE.TARGET_MIN && this.currentDifficulty > this.minDifficulty) {
       this.currentDifficulty--;
       adjusted = true;
     }

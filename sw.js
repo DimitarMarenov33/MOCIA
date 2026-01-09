@@ -3,7 +3,7 @@
  * Handles offline functionality and caching
  */
 
-const CACHE_VERSION = 'mocia-v1.3.0';
+const CACHE_VERSION = 'mocia-v1.4.0';
 const CACHE_NAME = `mocia-cache-${CACHE_VERSION}`;
 
 // Files to cache for offline use
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
   '/MOCIA/index.html',
   '/MOCIA/domains.html',
   '/MOCIA/exercises.html',
+  '/MOCIA/results.html',
 
   // Shared styles
   '/MOCIA/shared/styles/design-system.css',
@@ -19,6 +20,8 @@ const ASSETS_TO_CACHE = [
   '/MOCIA/shared/styles/animations.css',
   '/MOCIA/shared/styles/mobile-first.css',
   '/MOCIA/shared/styles/mobile-optimizations.css',
+  '/MOCIA/shared/styles/personalization.css',
+  '/MOCIA/shared/styles/feedback.css',
 
   // Shared JavaScript
   '/MOCIA/shared/js/viewport-fix.js',
@@ -26,6 +29,12 @@ const ASSETS_TO_CACHE = [
   '/MOCIA/shared/js/audio-manager.js',
   '/MOCIA/shared/js/data-tracker.js',
   '/MOCIA/shared/js/ui-components.js',
+  '/MOCIA/shared/js/difficulty-adapter.js',
+  '/MOCIA/shared/js/personalization-service.js',
+  '/MOCIA/shared/js/personalization-counter.js',
+  '/MOCIA/shared/js/personalization-form.js',
+  '/MOCIA/shared/js/settings-modal.js',
+  '/MOCIA/shared/js/feedback-modal.js',
   '/MOCIA/shared/utils/statistics.js',
 
   // Exercise: Word Pair
