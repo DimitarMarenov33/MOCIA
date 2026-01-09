@@ -147,16 +147,43 @@
   opacity: 0.9;
 }
 
-/* Trial counter */
+/* Trial counter (minimal, below n-level indicator) */
 .trial-counter {
+  position: fixed;
+  top: calc(var(--spacing-sm) + 28px);
+  right: var(--spacing-sm);
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
   text-align: center;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-info);
-  margin: var(--spacing-lg) 0;
-  padding: var(--spacing-md);
-  background-color: var(--color-background-alt);
-  border-radius: var(--border-radius-md);
+  opacity: 0.8;
+}
+
+/* Progress bar container */
+.progress-container {
+  position: fixed;
+  top: calc(var(--spacing-sm) + 56px);
+  right: var(--spacing-sm);
+  width: 80px;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  z-index: var(--z-elevated);
+  opacity: 0.8;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--color-info);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.3s ease;
 }
 
 /* Current stimulus display (for debugging/tutorial) */

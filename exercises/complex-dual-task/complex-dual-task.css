@@ -14,6 +14,23 @@
   background: var(--color-background);
 }
 
+/* Trial Counter (minimal, top right) */
+.trial-counter {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: calc(var(--spacing-sm) + 50px);
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
+  text-align: center;
+  opacity: 0.8;
+}
+
 /* Timer Display (minimal) */
 .timer-display {
   position: fixed;
@@ -29,6 +46,22 @@
   z-index: var(--z-elevated);
   text-align: center;
   opacity: 0.8;
+}
+
+/* Current task label */
+.current-task-label {
+  position: fixed;
+  top: calc(var(--spacing-sm) + 28px);
+  right: var(--spacing-sm);
+  background: var(--color-info);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+  font-weight: 600;
+  z-index: var(--z-elevated);
+  text-align: center;
 }
 
 .timer-display.warning {
