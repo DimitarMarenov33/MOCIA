@@ -794,8 +794,6 @@ class DigitSpanExercise {
       // Show formatted sequence in feedback
       const formattedSequence = this.formatSequenceForDisplay(this.currentSequence, this.currentSequenceType);
       detailMessage = `De juiste ${this.getSequenceTypeLabel().toLowerCase()} was: ${formattedSequence}`;
-    } else if (difficultyAdjusted) {
-      detailMessage = 'De oefening wordt moeilijker!';
     }
 
     const feedbackPanel = UIComponents.createFeedbackPanel(

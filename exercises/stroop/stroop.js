@@ -521,11 +521,6 @@ class StroopExercise {
       }
     }
 
-    // Show time adjustment indicator next to timer
-    if (this.timeAdjusted) {
-      this.showTimeAdjustmentIndicator(correct);
-    }
-
     await this.sleep(400);
   }
 
@@ -556,11 +551,6 @@ class StroopExercise {
     // Just audio feedback for timeout
     if (window.AudioManager) {
       window.AudioManager.hapticError();
-    }
-
-    // Show time adjustment indicator if applicable
-    if (this.timeAdjusted) {
-      this.showTimeAdjustmentIndicator(false);
     }
 
     await this.sleep(800);

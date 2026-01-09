@@ -436,31 +436,19 @@ class VisualSearchExercise {
   async showFeedback(correct, responseTime, difficultyAdjusted) {
     UIComponents.clearElement(this.elements.feedbackArea);
 
-    let message, type, detail;
+    let message, type;
 
     if (correct) {
       const messages = this.config.feedback?.correct || ['Correct!'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'success';
-
-      const timeSec = (responseTime / 1000).toFixed(2);
-      detail = `Reactietijd: ${timeSec}s`;
-
-      if (responseTime < this.config.scoring.speedThreshold) {
-        detail += ' • Snelheidsbonus!';
-      }
-
-      if (difficultyAdjusted) {
-        detail += ` • Raster vergroot naar ${this.gridSize}×${this.gridSize}!`;
-      }
     } else {
       const messages = this.config.feedback?.incorrect || ['Niet helemaal'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'error';
-      detail = 'Probeer het dier te vinden voordat de tijd op is';
     }
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, type, { detail });
+    const feedbackPanel = UIComponents.createFeedbackPanel(message, type);
     this.elements.feedbackArea.appendChild(feedbackPanel);
 
     // Audio feedback
@@ -487,9 +475,7 @@ class VisualSearchExercise {
     const messages = this.config.feedback?.timeout || ['Te langzaam!'];
     const message = messages[Math.floor(Math.random() * messages.length)];
 
-    const detail = 'Probeer sneller te reageren';
-
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, 'error', { detail });
+    const feedbackPanel = UIComponents.createFeedbackPanel(message, 'error');
     this.elements.feedbackArea.appendChild(feedbackPanel);
 
     // Audio feedback

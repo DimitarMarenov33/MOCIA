@@ -503,25 +503,19 @@ class ComplexDualTaskExercise {
   async showTrialFeedback(correct, difficultyAdjusted, trialScore) {
     UIComponents.clearElement(this.elements.feedbackArea);
 
-    let message, type, detail;
+    let message, type;
 
     if (correct) {
       const messages = this.config.feedback?.sequenceComplete || ['Hele reeks correct!'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'success';
-      detail = `+${trialScore} punten`;
-
-      if (difficultyAdjusted) {
-        detail += ` • Raster vergroot naar ${this.gridSize}×${this.gridSize}!`;
-      }
     } else {
       const messages = this.config.feedback?.incorrect || ['Niet helemaal'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'error';
-      detail = `Stap ${this.currentStepIndex + 1} gemist`;
     }
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, type, { detail });
+    const feedbackPanel = UIComponents.createFeedbackPanel(message, type);
     this.elements.feedbackArea.appendChild(feedbackPanel);
 
     // Audio feedback

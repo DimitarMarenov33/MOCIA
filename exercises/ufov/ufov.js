@@ -571,7 +571,7 @@ class UFOVExercise {
       const messages = this.config.feedback?.bothCorrect || ['Perfect! Beide correct!'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'success';
-      detail = difficultyAdjusted ? 'De beelden worden nu sneller!' : null;
+      detail = null;
     } else if (centralCorrect) {
       const messages = this.config.feedback?.centralCorrect || ['Midden juist, maar rand gemist'];
       message = messages[Math.floor(Math.random() * messages.length)];
