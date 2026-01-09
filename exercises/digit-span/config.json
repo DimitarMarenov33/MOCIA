@@ -1,12 +1,12 @@
 {
   "exerciseId": "digit_span",
-  "exerciseName": "Cijferreeks Onthouden",
+  "exerciseName": "Reeks Onthouden",
   "difficulty": "easy",
-  "description": "Onthoud en herhaal cijferreeksen om uw werkgeheugen te trainen",
+  "description": "Onthoud telefoonnummers, postcodes en datums om uw werkgeheugen te trainen",
 
   "parameters": {
-    "startLength": 2,
-    "minLength": 2,
+    "startLength": 3,
+    "minLength": 3,
     "maxLength": 9,
     "totalTrials": 10,
     "digitDisplayTime": 1000,
@@ -24,11 +24,11 @@
   "instructions": {
     "title": "Hoe te spelen",
     "steps": [
-      "Je ziet en hoort een reeks cijfers, één voor één",
-      "Onthoud de cijfers in de juiste volgorde",
-      "Als de reeks compleet is, tik je de cijfers in dezelfde volgorde in",
+      "Je ziet en hoort een reeks (telefoonnummer, postcode of datum), één karakter per keer",
+      "Onthoud de karakters in de juiste volgorde",
+      "Als de reeks compleet is, typ je de karakters in dezelfde volgorde in",
       "De reeks wordt langer naarmate je beter wordt",
-      "Probeer zoveel mogelijk cijfers te onthouden!"
+      "Probeer zoveel mogelijk te onthouden!"
     ]
   },
 

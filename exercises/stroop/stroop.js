@@ -1,6 +1,7 @@
 /**
- * STROOP COLOR-WORD TASK EXERCISE
+ * STROOP TASK EXERCISE
  * Executive function training through inhibition control
+ * Uses buildings (emoji + spoken name) and days of the week (written + spoken)
  */
 
 class StroopExercise {
@@ -12,30 +13,54 @@ class StroopExercise {
     this.currentTrial = 0;
     this.totalTrials = 0;
 
-    // Current trial data
-    this.currentWord = null;
-    this.currentInkColor = null;
-    this.currentCondition = null; // 'congruent', 'neutral', 'incongruent'
-    this.correctColor = null;
-    this.buttonColors = [];
-
-    // Colors
-    this.colors = [
-      { name: 'ROOD', value: 'red', cssClass: 'color-red' },
-      { name: 'BLAUW', value: 'blue', cssClass: 'color-blue' },
-      { name: 'GROEN', value: 'green', cssClass: 'color-green' },
-      { name: 'GEEL', value: 'yellow', cssClass: 'color-yellow' },
-      { name: 'ZWART', value: 'black', cssClass: 'color-black' },
-      { name: 'WIT', value: 'white', cssClass: 'color-white' },
-      { name: 'PAARS', value: 'purple', cssClass: 'color-purple' },
-      { name: 'ORANJE', value: 'orange', cssClass: 'color-orange' },
+    // Stimulus sets
+    this.stimulusSets = [
+      {
+        name: 'buildings',
+        type: 'emoji', // Display emoji, speak name
+        items: [
+          { id: 'school', emoji: '🏫', label: 'School' },
+          { id: 'ziekenhuis', emoji: '🏥', label: 'Ziekenhuis' },
+          { id: 'hotel', emoji: '🏨', label: 'Hotel' },
+          { id: 'kerk', emoji: '⛪', label: 'Kerk' },
+          { id: 'bank', emoji: '🏦', label: 'Bank' },
+          { id: 'fabriek', emoji: '🏭', label: 'Fabriek' },
+          { id: 'kantoor', emoji: '🏢', label: 'Kantoor' },
+        ],
+        instruction: 'Welk gebouw ZIE je?'
+      },
+      {
+        name: 'days',
+        type: 'text', // Display text, speak name
+        items: [
+          { id: 'maandag', label: 'Maandag' },
+          { id: 'dinsdag', label: 'Dinsdag' },
+          { id: 'woensdag', label: 'Woensdag' },
+          { id: 'donderdag', label: 'Donderdag' },
+          { id: 'vrijdag', label: 'Vrijdag' },
+          { id: 'zaterdag', label: 'Zaterdag' },
+          { id: 'zondag', label: 'Zondag' },
+        ],
+        instruction: 'Welke dag LEES je?'
+      }
     ];
+    this.currentStimulusSet = null;
 
+    // Current trial data
+    this.currentVisual = null; // What is shown (emoji or text)
+    this.currentSpoken = null; // What is spoken
+    this.currentCondition = null; // 'congruent' or 'incongruent'
+    this.correctAnswer = null; // The correct item ID
+    this.buttonOptions = []; // Available response options
+
+    // Track last items to avoid repetition
+    this.lastStimulusSetName = null;
+    this.lastVisualId = null;
 
     // Adaptive timing
-    this.timeLimit = 3000; // Start at 3 seconds
-    this.minTimeLimit = 1000; // Minimum 1 second
-    this.maxTimeLimit = 5000; // Maximum 5 seconds
+    this.timeLimit = 3000;
+    this.minTimeLimit = 1000;
+    this.maxTimeLimit = 5000;
     this.consecutiveCorrect = 0;
     this.consecutiveIncorrect = 0;
 
@@ -73,21 +98,21 @@ class StroopExercise {
     // Embedded configuration
     this.config = {
       exerciseId: CONSTANTS.EXERCISE_TYPES.STROOP,
-      exerciseName: 'Stroop Kleur-Woord Taak',
+      exerciseName: 'Stroop Taak',
       difficulty: 'easy',
       parameters: {
         totalTrials: 30,
         startTimeLimit: 3000,
         minTimeLimit: 1000,
         maxTimeLimit: 5000,
-        timeAdjustment: 200, // Adjust time by 200ms
+        timeAdjustment: 200,
         congruentProbability: 0.30, // 30% congruent (easier)
-        incongruentProbability: 0.70, // 70% incongruent (harder - the main challenge)
+        incongruentProbability: 0.70, // 70% incongruent (harder)
       },
       scoring: {
         pointsForCorrect: 10,
         bonusForSpeed: 5,
-        speedThreshold: 1500, // milliseconds
+        speedThreshold: 1500,
       },
       feedback: {
         correct: ['Correct!', 'Goed gedaan!', 'Perfect!', 'Uitstekend!'],
@@ -101,10 +126,8 @@ class StroopExercise {
     this.elements = {
       trialCounter: document.getElementById('trial-counter'),
       timerDisplay: document.getElementById('timer-display'),
-      colorWord: document.getElementById('color-word'),
-      button1: document.getElementById('button-1'),
-      button2: document.getElementById('button-2'),
-      button3: document.getElementById('button-3'),
+      stimulusDisplay: document.getElementById('color-word'),
+      responseButtons: document.getElementById('response-buttons'),
       feedbackArea: document.getElementById('feedback-area'),
     };
   }
@@ -115,28 +138,15 @@ class StroopExercise {
       this.confirmExit();
     });
 
-    // Response buttons
-    this.elements.button1.addEventListener('click', () => {
-      this.handleResponse(0);
-    });
-
-    this.elements.button2.addEventListener('click', () => {
-      this.handleResponse(1);
-    });
-
-    this.elements.button3.addEventListener('click', () => {
-      this.handleResponse(2);
-    });
-
-    // Keyboard support (1, 2, 3)
+    // Keyboard support (1-7)
     document.addEventListener('keydown', (e) => {
-      if (this.timerInterval && !this.elements.button1.classList.contains('disabled')) {
-        if (e.key === '1') {
-          this.handleResponse(0);
-        } else if (e.key === '2') {
-          this.handleResponse(1);
-        } else if (e.key === '3') {
-          this.handleResponse(2);
+      if (this.timerInterval) {
+        const buttons = this.elements.responseButtons.querySelectorAll('.response-button');
+        if (buttons.length > 0 && !buttons[0].classList.contains('disabled')) {
+          const keyNum = parseInt(e.key);
+          if (keyNum >= 1 && keyNum <= 7 && keyNum <= buttons.length) {
+            this.handleResponse(keyNum - 1);
+          }
         }
       }
     });
@@ -177,7 +187,7 @@ class StroopExercise {
     // Speak instructions
     if (window.AudioManager && window.AudioManager.isEnabled()) {
       try {
-        await window.AudioManager.speak('Stroop taak. Kies de kleur van het woord, niet wat het woord zegt.');
+        await window.AudioManager.speak('Stroop taak. Kies wat je ZIET, niet wat je HOORT.');
       } catch (error) {
         console.log('Speech unavailable:', error);
       }
@@ -213,67 +223,62 @@ class StroopExercise {
   }
 
   generateTrial() {
-    // Determine condition: only congruent or incongruent
+    // Randomly select a stimulus set, avoiding same set twice in a row if possible
+    let availableSets = this.stimulusSets;
+    if (this.lastStimulusSetName && this.stimulusSets.length > 1) {
+      availableSets = this.stimulusSets.filter(s => s.name !== this.lastStimulusSetName);
+    }
+    this.currentStimulusSet = availableSets[Math.floor(Math.random() * availableSets.length)];
+    this.lastStimulusSetName = this.currentStimulusSet.name;
+
+    // Determine condition: congruent or incongruent
     const rand = Math.random();
     const congruentProb = this.config.parameters.congruentProbability;
 
+    // Pick the visual item, avoiding same item twice in a row within same set
+    let items = this.currentStimulusSet.items;
+    let availableItems = items;
+    if (this.lastVisualId && items.length > 1) {
+      availableItems = items.filter(item => item.id !== this.lastVisualId);
+    }
+    const visualItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+    this.currentVisual = visualItem;
+    this.correctAnswer = visualItem.id;
+    this.lastVisualId = visualItem.id;
+
     if (rand < congruentProb) {
-      // Congruent: word and ink color match
+      // Congruent: visual and spoken match
       this.currentCondition = 'congruent';
-      const color = this.colors[Math.floor(Math.random() * this.colors.length)];
-      this.currentWord = color.name;
-      this.currentInkColor = color.value;
-      this.correctColor = color.value;
+      this.currentSpoken = visualItem;
     } else {
-      // Incongruent: word and ink color differ
+      // Incongruent: visual and spoken differ
       this.currentCondition = 'incongruent';
-      const wordColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-      this.currentWord = wordColor.name;
-
-      // Pick different ink color
-      const availableColors = this.colors.filter(c => c.value !== wordColor.value);
-      const inkColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-      this.currentInkColor = inkColor.value;
-      this.correctColor = inkColor.value;
+      const availableItems = items.filter(item => item.id !== visualItem.id);
+      this.currentSpoken = availableItems[Math.floor(Math.random() * availableItems.length)];
     }
 
-    // Generate 3 button colors based on condition
-    const correctColorObj = this.colors.find(c => c.value === this.correctColor);
-
-    if (this.currentCondition === 'incongruent') {
-      // Incongruent: Include word color, ink color (correct), and 1 random
-      const wordColorObj = this.colors.find(c => c.name === this.currentWord);
-      const otherColors = this.colors.filter(c => c.value !== this.correctColor && c.value !== wordColorObj.value);
-      const randomDistractor = otherColors[Math.floor(Math.random() * otherColors.length)];
-
-      // Randomly position the 3 colors
-      this.buttonColors = [correctColorObj, wordColorObj, randomDistractor].sort(() => Math.random() - 0.5);
-    } else {
-      // Congruent: word and ink match, so add 2 random distractors
-      const otherColors = this.colors.filter(c => c.value !== this.correctColor);
-      const shuffled = [...otherColors].sort(() => Math.random() - 0.5);
-      const distractor1 = shuffled[0];
-      const distractor2 = shuffled[1];
-
-      // Randomly position the correct answer
-      this.buttonColors = [correctColorObj, distractor1, distractor2].sort(() => Math.random() - 0.5);
-    }
+    // All items in the set are available as response options
+    this.buttonOptions = [...items];
   }
 
   async displayStimulus() {
-    // Set word text
-    this.elements.colorWord.textContent = this.currentWord;
-
-    // Set ink color
-    const colorObj = this.colors.find(c => c.value === this.currentInkColor);
-    if (colorObj) {
-      this.elements.colorWord.style.color = colorObj.value;
+    // Display depends on stimulus set type
+    if (this.currentStimulusSet.type === 'emoji') {
+      // Buildings: show emoji
+      this.elements.stimulusDisplay.textContent = this.currentVisual.emoji;
+      this.elements.stimulusDisplay.style.fontSize = '120px';
+      this.elements.stimulusDisplay.style.color = 'inherit';
+    } else {
+      // Days: show text
+      this.elements.stimulusDisplay.textContent = this.currentVisual.label;
+      this.elements.stimulusDisplay.style.fontSize = '';
+      this.elements.stimulusDisplay.style.color = 'inherit';
     }
 
-    // Speak the word aloud
+    // Speak the (possibly different) item
     if (window.AudioManager && window.AudioManager.isEnabled()) {
       try {
-        await window.AudioManager.speak(this.currentWord);
+        await window.AudioManager.speak(this.currentSpoken.label);
       } catch (error) {
         console.log('Speech unavailable:', error);
       }
@@ -281,18 +286,27 @@ class StroopExercise {
   }
 
   displayResponseButtons() {
-    const buttons = [this.elements.button1, this.elements.button2, this.elements.button3];
+    // Clear existing buttons
+    UIComponents.clearElement(this.elements.responseButtons);
 
-    buttons.forEach((btn, index) => {
-      const color = this.buttonColors[index];
-
-      // Reset classes
+    // Create buttons for all options in the current set
+    this.buttonOptions.forEach((item, index) => {
+      const btn = document.createElement('button');
       btn.className = 'response-button';
-      btn.classList.add(color.cssClass);
-      btn.setAttribute('data-color', color.value);
+      btn.setAttribute('data-id', item.id);
 
-      // Enable button
-      btn.classList.remove('disabled');
+      // Create label span
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'button-label';
+      labelSpan.textContent = item.label;
+      btn.appendChild(labelSpan);
+
+      // Add click handler
+      btn.addEventListener('click', () => {
+        this.handleResponse(index);
+      });
+
+      this.elements.responseButtons.appendChild(btn);
     });
   }
 
@@ -336,14 +350,14 @@ class StroopExercise {
     // Calculate response time
     const responseTime = Date.now() - this.trialStartTime;
 
-    // Get selected color
-    const selectedColor = this.buttonColors[buttonIndex].value;
+    // Get selected item
+    const selectedItem = this.buttonOptions[buttonIndex];
 
-    // Check if correct
-    const correct = selectedColor === this.correctColor;
+    // Check if correct (user should select what they SEE, not what they HEAR)
+    const correct = selectedItem.id === this.correctAnswer;
 
-    // Disable all buttons
-    const buttons = [this.elements.button1, this.elements.button2, this.elements.button3];
+    // Get all buttons
+    const buttons = this.elements.responseButtons.querySelectorAll('.response-button');
     buttons.forEach(btn => btn.classList.add('disabled'));
 
     // Visual feedback
@@ -352,7 +366,7 @@ class StroopExercise {
     } else {
       buttons[buttonIndex].classList.add('incorrect');
       // Highlight correct answer
-      const correctIndex = this.buttonColors.findIndex(c => c.value === this.correctColor);
+      const correctIndex = this.buttonOptions.findIndex(item => item.id === this.correctAnswer);
       buttons[correctIndex].classList.add('correct');
     }
 
@@ -369,10 +383,11 @@ class StroopExercise {
 
     // Record trial
     const trialData = {
+      stimulusSet: this.currentStimulusSet.name,
       condition: this.currentCondition,
-      word: this.currentWord,
-      inkColor: this.currentInkColor,
-      selectedColor: selectedColor,
+      visualItem: this.currentVisual.id,
+      spokenItem: this.currentSpoken.id,
+      selectedItem: selectedItem.id,
       correct: correct,
       responseTime: responseTime,
       timeLimit: this.timeLimit,
@@ -416,20 +431,23 @@ class StroopExercise {
     // Stop timer
     this.stopTimer();
 
-    // Disable all buttons
-    const buttons = [this.elements.button1, this.elements.button2, this.elements.button3];
+    // Get all buttons and disable them
+    const buttons = this.elements.responseButtons.querySelectorAll('.response-button');
     buttons.forEach(btn => btn.classList.add('disabled'));
 
     // Highlight correct answer
-    const correctIndex = this.buttonColors.findIndex(c => c.value === this.correctColor);
-    buttons[correctIndex].classList.add('correct');
+    const correctIndex = this.buttonOptions.findIndex(item => item.id === this.correctAnswer);
+    if (correctIndex >= 0 && buttons[correctIndex]) {
+      buttons[correctIndex].classList.add('correct');
+    }
 
     // Record trial
     const trialData = {
+      stimulusSet: this.currentStimulusSet.name,
       condition: this.currentCondition,
-      word: this.currentWord,
-      inkColor: this.currentInkColor,
-      selectedColor: null,
+      visualItem: this.currentVisual.id,
+      spokenItem: this.currentSpoken.id,
+      selectedItem: null,
       correct: false,
       responseTime: this.timeLimit,
       timeLimit: this.timeLimit,
@@ -566,6 +584,17 @@ class StroopExercise {
       ? incongruentTrials.filter(t => t.correct).length / incongruentTrials.length
       : 0;
 
+    // Accuracy by stimulus set
+    const buildingsTrials = this.trials.filter(t => t.stimulusSet === 'buildings');
+    const daysTrials = this.trials.filter(t => t.stimulusSet === 'days');
+
+    const buildingsAccuracy = buildingsTrials.length > 0
+      ? buildingsTrials.filter(t => t.correct).length / buildingsTrials.length
+      : 0;
+    const daysAccuracy = daysTrials.length > 0
+      ? daysTrials.filter(t => t.correct).length / daysTrials.length
+      : 0;
+
     const responseTimes = this.trials.filter(t => t.correct).map(t => t.responseTime);
     const averageResponseTime = responseTimes.length > 0
       ? responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length
@@ -577,6 +606,8 @@ class StroopExercise {
       accuracy: accuracy,
       congruentAccuracy: congruentAccuracy,
       incongruentAccuracy: incongruentAccuracy,
+      buildingsAccuracy: buildingsAccuracy,
+      daysAccuracy: daysAccuracy,
       averageResponseTime: averageResponseTime,
       timeoutTrials: timeoutTrials,
       finalTimeLimit: this.timeLimit,

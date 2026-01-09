@@ -1,140 +1,250 @@
 /**
- * DUTCH WORD LIST
- * Comprehensive list of common Dutch nouns for word pair association
- * Categories ensure semantic variety to avoid confusion
+ * WORD PAIR ASSOCIATION - REAL-WORLD CONTEXTS
+ * Three pair types for practical memory training:
+ * 1. Name - City (Dutch names + Dutch cities)
+ * 2. Building - Time (appointment-style)
+ * 3. Activity - Day (schedule-style)
  */
 
-const WORD_LIST = {
-  // Animals (Dieren)
-  animals: [
-    'hond', 'kat', 'paard', 'koe', 'schaap', 'geit', 'varken', 'kip',
-    'eend', 'gans', 'konijn', 'muis', 'rat', 'hamster', 'vogel', 'vis',
-    'olifant', 'leeuw', 'tijger', 'beer', 'wolf', 'vos', 'hert', 'ree',
-    'aap', 'zebra', 'giraffe', 'krokodil', 'slang', 'schildpad'
+const PAIR_DATA = {
+  // Dutch first names
+  names: [
+    'Jan', 'Piet', 'Klaas', 'Willem', 'Henk', 'Johan', 'Peter', 'Dirk',
+    'Bas', 'Tom', 'Jeroen', 'Mark', 'Erik', 'Frank', 'Martijn', 'Ruben',
+    'Anna', 'Maria', 'Sophie', 'Emma', 'Lisa', 'Linda', 'Sandra', 'Marieke',
+    'Ingrid', 'Els', 'Joke', 'Anja', 'Monique', 'Petra', 'Esther', 'Renate',
+    'Cor', 'Kees', 'Wim', 'Gerard', 'Hans', 'Rob', 'Paul', 'Bert'
   ],
 
-  // Nature (Natuur)
-  nature: [
-    'boom', 'bloem', 'gras', 'blad', 'tak', 'wortel', 'zaad', 'plant',
-    'roos', 'tulp', 'zon', 'maan', 'ster', 'wolk', 'regen', 'sneeuw',
-    'wind', 'bliksem', 'regenboog', 'rivier', 'meer', 'zee', 'oceaan',
-    'berg', 'heuvel', 'dal', 'bos', 'strand', 'woestijn', 'eiland'
+  // Dutch cities
+  cities: [
+    'Amsterdam', 'Rotterdam', 'Utrecht', 'Den Haag', 'Eindhoven', 'Tilburg',
+    'Groningen', 'Almere', 'Breda', 'Nijmegen', 'Enschede', 'Haarlem',
+    'Arnhem', 'Zaanstad', 'Amersfoort', 'Apeldoorn', 'Hoofddorp', 'Maastricht',
+    'Leiden', 'Dordrecht', 'Zoetermeer', 'Zwolle', 'Deventer', 'Delft',
+    'Alkmaar', 'Heerlen', 'Venlo', 'Leeuwarden', 'Hilversum', 'Assen'
   ],
 
-  // Food (Eten)
-  food: [
-    'brood', 'kaas', 'melk', 'boter', 'ei', 'vlees', 'vis', 'kip',
-    'appel', 'peer', 'banaan', 'sinaasappel', 'druif', 'aardbei', 'kers',
-    'aardappel', 'wortel', 'ui', 'tomaat', 'komkommer', 'sla', 'kool',
-    'rijst', 'pasta', 'soep', 'brood', 'koek', 'taart', 'snoep', 'chocola'
+  // Buildings/locations for appointments
+  buildings: [
+    'Apotheek', 'Huisarts', 'Tandarts', 'Ziekenhuis', 'Kapper', 'Bibliotheek',
+    'Gemeentehuis', 'Bank', 'Postkantoor', 'Supermarkt', 'Bakker', 'Slager',
+    'Opticien', 'Fysiotherapeut', 'Sportschool', 'Zwembad', 'Kerk', 'School',
+    'Station', 'Garage', 'Dierenarts', 'Notaris', 'Accountant', 'Bloemenwinkel'
   ],
 
-  // Household (Huishouden)
-  household: [
-    'tafel', 'stoel', 'bed', 'kast', 'lamp', 'klok', 'spiegel', 'deur',
-    'raam', 'muur', 'vloer', 'plafond', 'trap', 'gordijn', 'tapijt',
-    'bord', 'kopje', 'glas', 'vork', 'mes', 'lepel', 'pan', 'kom',
-    'kussen', 'deken', 'laken', 'handdoek', 'zeep', 'borstel', 'kam'
+  // Activities
+  activities: [
+    'Fysiotherapie', 'Zwemmen', 'Yoga', 'Wandelen', 'Fietsen', 'Boodschappen',
+    'Doktersafspraak', 'Koffie', 'Lunch', 'Vergadering', 'Bridgen', 'Biljarten',
+    'Schilderen', 'Tuinieren', 'Koken', 'Lezen', 'Kaarten', 'Handwerken',
+    'Vrijwilligerswerk', 'Oppassen', 'Bezoek', 'Uitje', 'Concert', 'Theater'
   ],
 
-  // Clothing (Kleding)
-  clothing: [
-    'jas', 'broek', 'rok', 'jurk', 'shirt', 'trui', 'vest', 'hoed',
-    'pet', 'sjaal', 'handschoen', 'sok', 'schoen', 'laars', 'sandaal',
-    'riem', 'das', 'muts', 'jas', 'regenjas', 'badpak', 'pyjama'
-  ],
-
-  // Transportation (Vervoer)
-  transport: [
-    'auto', 'fiets', 'motor', 'bus', 'tram', 'trein', 'metro', 'taxi',
-    'boot', 'schip', 'vliegtuig', 'helikopter', 'vrachtwagen', 'ambulance',
-    'brandweerauto', 'politieauto', 'scooter', 'skateboard', 'step'
-  ],
-
-  // Body parts (Lichaam)
-  body: [
-    'hoofd', 'haar', 'oog', 'oor', 'neus', 'mond', 'tand', 'tong',
-    'nek', 'schouder', 'arm', 'elleboog', 'hand', 'vinger', 'duim',
-    'borst', 'buik', 'rug', 'been', 'knie', 'voet', 'teen', 'hart'
-  ],
-
-  // Tools & Objects (Gereedschap)
-  tools: [
-    'hamer', 'zaag', 'schaar', 'mes', 'schroef', 'spijker', 'tang',
-    'boor', 'ladder', 'emmer', 'bezem', 'dweil', 'pen', 'potlood',
-    'papier', 'boek', 'krant', 'brief', 'telefoon', 'computer', 'tv'
-  ],
-
-  // Places (Plaatsen)
-  places: [
-    'huis', 'school', 'kerk', 'winkel', 'ziekenhuis', 'park', 'station',
-    'vliegveld', 'haven', 'brug', 'toren', 'kasteel', 'museum', 'theater',
-    'restaurant', 'cafe', 'hotel', 'bibliotheek', 'bank', 'postkantoor'
-  ],
-
-  // Time (Tijd)
-  time: [
-    'dag', 'nacht', 'morgen', 'middag', 'avond', 'week', 'maand', 'jaar',
-    'seconde', 'minuut', 'uur', 'seizoen', 'lente', 'zomer', 'herfst', 'winter'
-  ],
-
-  // Weather (Weer)
-  weather: [
-    'zon', 'regen', 'wind', 'sneeuw', 'hagel', 'mist', 'vorst', 'donder',
-    'bliksem', 'storm', 'orkaan', 'tornado', 'wolk', 'regenboog'
+  // Days of the week
+  days: [
+    'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'
   ]
 };
 
 /**
- * Get a random word from the word list, avoiding recently used words
- * @param {Array} excludeWords - Words to exclude from selection
- * @returns {string} Random word
+ * Generate a random time in HH:MM format
+ * Times are typically between 8:00 and 18:00 for appointments
+ * @returns {string} Time string like "9:30" or "14:00"
  */
-function getRandomWord(excludeWords = []) {
-  // Flatten all categories into one array
-  const allWords = Object.values(WORD_LIST).flat();
-
-  // Filter out excluded words
-  const availableWords = allWords.filter(word => !excludeWords.includes(word));
-
-  if (availableWords.length === 0) {
-    // If all words are excluded, use the full list
-    return allWords[Math.floor(Math.random() * allWords.length)];
-  }
-
-  return availableWords[Math.floor(Math.random() * availableWords.length)];
+function generateRandomTime() {
+  const hours = Math.floor(Math.random() * 11) + 8; // 8-18
+  const minutes = Math.random() < 0.5 ? '00' : '30'; // Half hours only for simplicity
+  return `${hours}:${minutes}`;
 }
 
 /**
- * Generate N unique word pairs
- * @param {number} numPairs - Number of pairs to generate
- * @param {Array} excludeWords - Words to exclude from selection
- * @returns {Array} Array of word pair objects {word1, word2}
+ * Get a random item from an array, excluding specified items
+ * @param {Array} array - Array to choose from
+ * @param {Array} exclude - Items to exclude
+ * @returns {string} Random item
  */
-function generateWordPairs(numPairs, excludeWords = []) {
+function getRandomItem(array, exclude = []) {
+  const available = array.filter(item => !exclude.includes(item));
+  if (available.length === 0) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  return available[Math.floor(Math.random() * available.length)];
+}
+
+/**
+ * Get the current content mode (generic or personalized)
+ * @returns {string} 'generic' or 'personalized'
+ */
+function getContentMode() {
+  return window.PersonalizationCounter?.getContentMode() || 'generic';
+}
+
+/**
+ * Generate word pairs with 3 specific types:
+ * 1. Name - City
+ * 2. Building - Time
+ * 3. Activity - Day
+ *
+ * The numPairs parameter determines how many of EACH type to generate.
+ * So numPairs=3 means 3 name-city + 3 building-time + 3 activity-day = 9 total pairs
+ *
+ * When in personalized mode, uses user's personal data where available,
+ * falling back to generic data when personal data is insufficient.
+ *
+ * @param {number} numPairs - Number of pairs PER TYPE (total = numPairs * 3)
+ * @returns {Object} { pairs: Array, contentMode: string }
+ */
+function generateWordPairs(numPairs) {
+  const contentMode = getContentMode();
   const pairs = [];
-  const usedWords = [...excludeWords];
+  const usedNames = [];
+  const usedCities = [];
+  const usedBuildings = [];
+  const usedActivities = [];
+  const usedDays = [];
 
-  for (let i = 0; i < numPairs; i++) {
-    const word1 = getRandomWord(usedWords);
-    usedWords.push(word1);
-
-    const word2 = getRandomWord(usedWords);
-    usedWords.push(word2);
-
-    pairs.push({
-      id: i + 1,
-      word1: word1,
-      word2: word2
-    });
+  // Get personalized data if available and in personalized mode
+  let personalData = null;
+  if (contentMode === 'personalized' && window.PersonalizationService) {
+    personalData = {
+      familyMembers: window.PersonalizationService.getFamilyMembers() || [],
+      weeklyActivities: window.PersonalizationService.getWeeklyActivities() || [],
+      regularAppointments: window.PersonalizationService.getRegularAppointments() || []
+    };
   }
 
-  return pairs;
+  // Generate pairs for each type
+  for (let i = 0; i < numPairs; i++) {
+    // 1. Name - City pair
+    let nameCityPair = null;
+    if (personalData && personalData.familyMembers.length > i) {
+      const member = personalData.familyMembers[i];
+      if (member.name && member.city) {
+        nameCityPair = {
+          id: pairs.length + 1,
+          word1: member.name,
+          word2: member.city,
+          type: 'name-city',
+          label: 'Naam - Stad',
+          contentMode: 'personalized'
+        };
+      }
+    }
+
+    if (!nameCityPair) {
+      // Fall back to generic data
+      const name = getRandomItem(PAIR_DATA.names, usedNames);
+      usedNames.push(name);
+      const city = getRandomItem(PAIR_DATA.cities, usedCities);
+      usedCities.push(city);
+
+      nameCityPair = {
+        id: pairs.length + 1,
+        word1: name,
+        word2: city,
+        type: 'name-city',
+        label: 'Naam - Stad',
+        contentMode: 'generic'
+      };
+    }
+    pairs.push(nameCityPair);
+
+    // 2. Building - Time pair
+    let buildingTimePair = null;
+    if (personalData && personalData.regularAppointments.length > i) {
+      const appointment = personalData.regularAppointments[i];
+      if (appointment.location && appointment.time) {
+        buildingTimePair = {
+          id: pairs.length + 1,
+          word1: appointment.location,
+          word2: appointment.time,
+          type: 'building-time',
+          label: 'Gebouw - Tijd',
+          contentMode: 'personalized'
+        };
+      }
+    }
+
+    if (!buildingTimePair) {
+      // Fall back to generic data
+      const building = getRandomItem(PAIR_DATA.buildings, usedBuildings);
+      usedBuildings.push(building);
+      const time = generateRandomTime();
+
+      buildingTimePair = {
+        id: pairs.length + 1,
+        word1: building,
+        word2: time,
+        type: 'building-time',
+        label: 'Gebouw - Tijd',
+        contentMode: 'generic'
+      };
+    }
+    pairs.push(buildingTimePair);
+
+    // 3. Activity - Day pair
+    let activityDayPair = null;
+    if (personalData && personalData.weeklyActivities.length > i) {
+      const weeklyActivity = personalData.weeklyActivities[i];
+      if (weeklyActivity.activity && weeklyActivity.day) {
+        activityDayPair = {
+          id: pairs.length + 1,
+          word1: weeklyActivity.activity,
+          word2: weeklyActivity.day,
+          type: 'activity-day',
+          label: 'Activiteit - Dag',
+          contentMode: 'personalized'
+        };
+      }
+    }
+
+    if (!activityDayPair) {
+      // Fall back to generic data
+      const activity = getRandomItem(PAIR_DATA.activities, usedActivities);
+      usedActivities.push(activity);
+      const day = getRandomItem(PAIR_DATA.days, usedDays);
+      usedDays.push(day);
+
+      activityDayPair = {
+        id: pairs.length + 1,
+        word1: activity,
+        word2: day,
+        type: 'activity-day',
+        label: 'Activiteit - Dag',
+        contentMode: 'generic'
+      };
+    }
+    pairs.push(activityDayPair);
+  }
+
+  // Shuffle the pairs so they're not always in the same type order
+  const shuffledPairs = shuffleArray(pairs);
+
+  // Return both pairs and the overall content mode
+  return {
+    pairs: shuffledPairs,
+    contentMode: contentMode
+  };
+}
+
+/**
+ * Shuffle an array using Fisher-Yates algorithm
+ * @param {Array} array - Array to shuffle
+ * @returns {Array} Shuffled array
+ */
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
 }
 
 // Make functions available globally
 if (typeof window !== 'undefined') {
-  window.WORD_LIST = WORD_LIST;
-  window.getRandomWord = getRandomWord;
+  window.PAIR_DATA = PAIR_DATA;
   window.generateWordPairs = generateWordPairs;
+  window.generateRandomTime = generateRandomTime;
 }

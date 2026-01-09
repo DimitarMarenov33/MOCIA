@@ -1,0 +1,469 @@
+/**
+ * PERSONALIZATION MODULE STYLES
+ * Styles for the personalization form, preference popup, and related UI
+ */
+
+/* ================================
+   PERSONALIZATION SECTION IN SETTINGS
+   ================================ */
+
+.personalization-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.personalization-section h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.personalization-description {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+}
+
+.personalization-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.status-badge.status-not-configured {
+  background-color: var(--color-background-alt);
+  color: var(--color-text-secondary);
+}
+
+.status-badge.status-configured {
+  background-color: var(--color-success-light, #d4edda);
+  color: var(--color-success-dark, #155724);
+}
+
+/* ================================
+   PERSONALIZATION FORM WIZARD
+   ================================ */
+
+.personalization-wizard {
+  max-width: 100%;
+}
+
+.wizard-progress {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+}
+
+.wizard-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-border-light);
+  transition: background-color 0.3s ease;
+}
+
+.wizard-dot.active {
+  background-color: var(--color-primary);
+}
+
+.wizard-dot.completed {
+  background-color: var(--color-success);
+}
+
+.wizard-step {
+  display: none;
+}
+
+.wizard-step.active {
+  display: block;
+}
+
+.wizard-step-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+}
+
+.wizard-step-description {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+}
+
+/* Form Fields */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-primary);
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light, rgba(25, 118, 210, 0.2));
+}
+
+.form-input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.form-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+/* Entry Cards */
+.entry-card {
+  background-color: var(--color-background-alt);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.entry-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.entry-card-number {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.entry-card-remove {
+  background: none;
+  border: none;
+  color: var(--color-error);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.entry-card-remove:hover {
+  opacity: 1;
+}
+
+.entry-card-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.entry-row {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.entry-row .form-input {
+  flex: 1;
+}
+
+.entry-row .form-input.short {
+  flex: 0.4;
+  min-width: 100px;
+}
+
+/* Add Entry Button */
+.add-entry-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: transparent;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.add-entry-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light, rgba(25, 118, 210, 0.05));
+}
+
+.add-entry-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Select Dropdown */
+.form-select {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  padding-right: calc(var(--spacing-md) * 2 + 12px);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light, rgba(25, 118, 210, 0.2));
+}
+
+/* Wizard Navigation */
+.wizard-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.wizard-navigation .btn {
+  flex: 1;
+  min-height: var(--touch-target-min);
+}
+
+/* Skip Step Link */
+.skip-step {
+  display: block;
+  text-align: center;
+  margin-top: var(--spacing-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.skip-step:hover {
+  color: var(--color-primary);
+}
+
+/* ================================
+   PREFERENCE POPUP
+   ================================ */
+
+.preference-popup {
+  text-align: center;
+}
+
+.preference-intro {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xl);
+}
+
+.preference-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.preference-option {
+  padding: var(--spacing-lg);
+  background-color: var(--color-background-alt);
+  border: 3px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preference-option:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.preference-option:active {
+  transform: translateY(0);
+}
+
+.preference-option .option-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.preference-option .option-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.preference-option .option-description {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Selected state */
+.preference-option.selected {
+  border-color: var(--color-success);
+  background-color: var(--color-success-light, #d4edda);
+}
+
+/* ================================
+   CONFIRMATION STEP
+   ================================ */
+
+.confirmation-summary {
+  text-align: left;
+}
+
+.confirmation-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.confirmation-section-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confirmation-items {
+  background-color: var(--color-background-alt);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+.confirmation-item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.confirmation-item:last-child {
+  border-bottom: none;
+}
+
+.confirmation-item-label {
+  color: var(--color-text-secondary);
+}
+
+.confirmation-item-value {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.confirmation-empty {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-sm);
+}
+
+/* ================================
+   RESPONSIVE ADJUSTMENTS
+   ================================ */
+
+@media (max-width: 480px) {
+  .entry-row {
+    flex-direction: column;
+  }
+
+  .entry-row .form-input.short {
+    flex: 1;
+    width: 100%;
+  }
+
+  .wizard-navigation {
+    flex-direction: column;
+  }
+
+  .wizard-navigation .btn {
+    width: 100%;
+  }
+
+  .preference-options {
+    gap: var(--spacing-sm);
+  }
+
+  .preference-option {
+    padding: var(--spacing-md);
+  }
+
+  .preference-option .option-icon {
+    font-size: 2.5rem;
+  }
+}
+
+/* Large text mode adjustments */
+.large-text .form-input,
+.large-text .form-select {
+  font-size: var(--font-size-xl);
+  padding: var(--spacing-lg);
+}
+
+.large-text .wizard-step-title {
+  font-size: calc(var(--font-size-xl) * 1.2);
+}
+
+.large-text .wizard-step-description {
+  font-size: var(--font-size-lg);
+}
+
+/* High contrast mode adjustments */
+.high-contrast .form-input,
+.high-contrast .form-select {
+  border-width: 3px;
+}
+
+.high-contrast .entry-card {
+  border-width: 2px;
+}
+
+.high-contrast .preference-option {
+  border-width: 4px;
+}

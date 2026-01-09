@@ -13,6 +13,8 @@ const CONSTANTS = {
     USER_DATA: 'mocia_user_data',
     APP_SETTINGS: 'mocia_settings',
     SESSION_DATA: 'mocia_session_',
+    PERSONALIZATION_DATA: 'mocia_personalization',
+    PERSONALIZATION_COUNTER: 'mocia_personalization_counter',
   },
 
   // Cognitive domains

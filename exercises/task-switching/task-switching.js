@@ -1,6 +1,7 @@
 /**
  * TASK-SWITCHING PARADIGM EXERCISE
  * Executive function training through cognitive flexibility
+ * Uses day + time stimuli with TIME (before/after 12:00) and DAY (weekday/weekend) tasks
  */
 
 class TaskSwitchingExercise {
@@ -15,18 +16,32 @@ class TaskSwitchingExercise {
 
     // Task types
     this.TASKS = {
-      ODD_EVEN: 'odd_even',
-      HIGH_LOW: 'high_low',
+      TIME: 'time',       // Is the time before or after 12:00?
+      DAY_TYPE: 'day_type', // Is it a weekday or weekend?
     };
 
     // Current trial data
     this.currentTask = null;
     this.previousTask = null;
-    this.currentNumber = null;
+    this.currentDay = null;
+    this.currentHour = null;
+    this.currentMinute = null;
     this.isSwitch = false;
 
-    // Available numbers (excluding 5 to avoid ambiguity)
-    this.numbers = [1, 2, 3, 4, 6, 7, 8, 9];
+    // Days of the week (Dutch)
+    this.days = [
+      { name: 'Maandag', isWeekend: false },
+      { name: 'Dinsdag', isWeekend: false },
+      { name: 'Woensdag', isWeekend: false },
+      { name: 'Donderdag', isWeekend: false },
+      { name: 'Vrijdag', isWeekend: false },
+      { name: 'Zaterdag', isWeekend: true },
+      { name: 'Zondag', isWeekend: true },
+    ];
+
+    // Track last stimulus to avoid repetition
+    this.lastDayIndex = null;
+    this.lastTimeCategory = null; // 'before' or 'after'
 
     // Adaptive CTI (Cue-Target Interval)
     this.cti = 800; // Start at 800ms
@@ -64,7 +79,7 @@ class TaskSwitchingExercise {
     // Embedded configuration
     this.config = {
       exerciseId: CONSTANTS.EXERCISE_TYPES.TASK_SWITCHING,
-      exerciseName: 'Taak-Wissel Paradigma',
+      exerciseName: 'Taak-Wissel Oefening',
       difficulty: 'hard',
       parameters: {
         singleTaskBlockSize: 10, // 10 trials per single-task block
@@ -72,12 +87,12 @@ class TaskSwitchingExercise {
         startCTI: 800,
         minCTI: 150,
         maxCTI: 1000,
-        ctiAdjustment: 100, // Adjust CTI by 100ms
-        responseTimeLimit: 3000, // 3 seconds to respond
+        ctiAdjustment: 100,
+        responseTimeLimit: 3000,
       },
       scoring: {
         pointsForCorrect: 10,
-        bonusForSwitch: 5, // Extra points for correct switch trial
+        bonusForSwitch: 5,
         bonusForSpeed: 3,
         speedThreshold: 800,
       },
@@ -167,7 +182,7 @@ class TaskSwitchingExercise {
     // Speak instructions
     if (window.AudioManager && window.AudioManager.isEnabled()) {
       try {
-        await window.AudioManager.speak('Taak-wissel oefening. Wissel tussen taken gebaseerd op de aanwijzing.');
+        await window.AudioManager.speak('Taak-wissel oefening. Let op de dag en tijd. Wissel tussen taken.');
       } catch (error) {
         console.log('Speech unavailable:', error);
       }
@@ -191,8 +206,8 @@ class TaskSwitchingExercise {
     // Update block label
     this.updateBlockLabel();
 
-    // Generate number
-    this.generateNumber();
+    // Generate day + time stimulus
+    this.generateStimulus();
 
     // Hide number and buttons initially
     this.elements.numberDisplay.classList.remove('visible');
@@ -214,24 +229,23 @@ class TaskSwitchingExercise {
 
   determineBlockAndTask() {
     const singleTaskSize = this.config.parameters.singleTaskBlockSize;
-    const mixedTaskSize = this.config.parameters.mixedTaskTrials;
 
     if (this.currentTrial <= singleTaskSize) {
-      // Block 1: ODD/EVEN only
+      // Block 1: TIME task only (before/after 12:00)
       this.currentBlock = 1;
-      this.currentTask = this.TASKS.ODD_EVEN;
-      this.isSwitch = false; // No switches in single-task block
+      this.currentTask = this.TASKS.TIME;
+      this.isSwitch = false;
     } else if (this.currentTrial <= singleTaskSize * 2) {
-      // Block 2: HIGH/LOW only
+      // Block 2: DAY_TYPE task only (weekday/weekend)
       this.currentBlock = 2;
-      this.currentTask = this.TASKS.HIGH_LOW;
-      this.isSwitch = false; // No switches in single-task block
+      this.currentTask = this.TASKS.DAY_TYPE;
+      this.isSwitch = false;
     } else {
       // Block 3: Mixed tasks
       this.currentBlock = 3;
 
       // Randomly select task
-      this.currentTask = Math.random() < 0.5 ? this.TASKS.ODD_EVEN : this.TASKS.HIGH_LOW;
+      this.currentTask = Math.random() < 0.5 ? this.TASKS.TIME : this.TASKS.DAY_TYPE;
 
       // Determine if this is a switch trial
       this.isSwitch = this.previousTask !== null && this.currentTask !== this.previousTask;
@@ -243,10 +257,10 @@ class TaskSwitchingExercise {
 
   updateBlockLabel() {
     if (this.currentBlock === 1) {
-      this.elements.blockLabel.textContent = 'Blok: ODD/EVEN';
+      this.elements.blockLabel.textContent = 'Blok: TIJD';
       this.elements.blockLabel.classList.remove('mixed');
     } else if (this.currentBlock === 2) {
-      this.elements.blockLabel.textContent = 'Blok: < 5 of > 5';
+      this.elements.blockLabel.textContent = 'Blok: DAG';
       this.elements.blockLabel.classList.remove('mixed');
     } else {
       this.elements.blockLabel.textContent = 'Blok: GEMENGD';
@@ -254,16 +268,42 @@ class TaskSwitchingExercise {
     }
   }
 
-  generateNumber() {
-    this.currentNumber = this.numbers[Math.floor(Math.random() * this.numbers.length)];
+  generateStimulus() {
+    // Generate a random day, avoiding immediate repetition
+    let availableDays = this.days.map((d, i) => i);
+    if (this.lastDayIndex !== null) {
+      availableDays = availableDays.filter(i => i !== this.lastDayIndex);
+    }
+    const dayIndex = availableDays[Math.floor(Math.random() * availableDays.length)];
+    this.currentDay = this.days[dayIndex];
+    this.lastDayIndex = dayIndex;
+
+    // Generate a random time, avoiding same category (before/after 12)
+    // Hours: 0-23, but we'll use 6-22 for realistic times
+    let hour;
+    const targetCategory = this.lastTimeCategory === 'before' ? 'after' :
+                          this.lastTimeCategory === 'after' ? 'before' :
+                          (Math.random() < 0.5 ? 'before' : 'after');
+
+    if (targetCategory === 'before') {
+      // 6:00 - 11:59
+      hour = Math.floor(Math.random() * 6) + 6; // 6-11
+    } else {
+      // 12:00 - 22:59
+      hour = Math.floor(Math.random() * 11) + 12; // 12-22
+    }
+
+    this.currentHour = hour;
+    this.currentMinute = Math.floor(Math.random() * 60);
+    this.lastTimeCategory = hour < 12 ? 'before' : 'after';
   }
 
   async showCue() {
     // Set cue text based on task
-    if (this.currentTask === this.TASKS.ODD_EVEN) {
-      this.elements.cueText.textContent = 'ODD/EVEN?';
+    if (this.currentTask === this.TASKS.TIME) {
+      this.elements.cueText.textContent = 'VOOR of NA 12:00?';
     } else {
-      this.elements.cueText.textContent = '< 5 of > 5?';
+      this.elements.cueText.textContent = 'WEEKDAG of WEEKEND?';
     }
 
     // Show cue with animation
@@ -271,17 +311,20 @@ class TaskSwitchingExercise {
   }
 
   showStimulus() {
-    // Show number
-    this.elements.numberDisplay.textContent = this.currentNumber;
+    // Format the time as HH:MM
+    const timeStr = `${this.currentHour.toString().padStart(2, '0')}:${this.currentMinute.toString().padStart(2, '0')}`;
+
+    // Show day + time
+    this.elements.numberDisplay.textContent = `${this.currentDay.name} ${timeStr}`;
     this.elements.numberDisplay.classList.add('visible');
 
     // Set button labels based on task
-    if (this.currentTask === this.TASKS.ODD_EVEN) {
-      this.elements.buttonLeft.querySelector('.button-text').textContent = 'ODD';
-      this.elements.buttonRight.querySelector('.button-text').textContent = 'EVEN';
+    if (this.currentTask === this.TASKS.TIME) {
+      this.elements.buttonLeft.querySelector('.button-text').textContent = '< 12:00';
+      this.elements.buttonRight.querySelector('.button-text').textContent = '> 12:00';
     } else {
-      this.elements.buttonLeft.querySelector('.button-text').textContent = '< 5';
-      this.elements.buttonRight.querySelector('.button-text').textContent = '> 5';
+      this.elements.buttonLeft.querySelector('.button-text').textContent = 'Weekdag';
+      this.elements.buttonRight.querySelector('.button-text').textContent = 'Weekend';
     }
 
     // Show buttons
@@ -329,7 +372,10 @@ class TaskSwitchingExercise {
     const trialData = {
       block: this.currentBlock,
       task: this.currentTask,
-      number: this.currentNumber,
+      day: this.currentDay.name,
+      time: `${this.currentHour.toString().padStart(2, '0')}:${this.currentMinute.toString().padStart(2, '0')}`,
+      isWeekend: this.currentDay.isWeekend,
+      isBefore12: this.currentHour < 12,
       isSwitch: this.isSwitch,
       response: side,
       correct: correct,
@@ -375,12 +421,16 @@ class TaskSwitchingExercise {
   }
 
   isResponseCorrect(side) {
-    if (this.currentTask === this.TASKS.ODD_EVEN) {
-      const isOdd = this.currentNumber % 2 === 1;
-      return (side === 'left' && isOdd) || (side === 'right' && !isOdd);
+    if (this.currentTask === this.TASKS.TIME) {
+      // TIME task: Is the time before 12:00?
+      const isBefore12 = this.currentHour < 12;
+      // Left = < 12:00 (before), Right = > 12:00 (after)
+      return (side === 'left' && isBefore12) || (side === 'right' && !isBefore12);
     } else {
-      const isLessThan5 = this.currentNumber < 5;
-      return (side === 'left' && isLessThan5) || (side === 'right' && !isLessThan5);
+      // DAY_TYPE task: Is it a weekday?
+      const isWeekday = !this.currentDay.isWeekend;
+      // Left = Weekdag, Right = Weekend
+      return (side === 'left' && isWeekday) || (side === 'right' && !isWeekday);
     }
   }
 

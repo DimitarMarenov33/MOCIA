@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Woord Zoektaak - Statische Preview">
+  <title>Woord Zoektaak - MOCIA</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../shared/styles/design-system.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="../../shared/styles/animations.css">
+  <link rel="stylesheet" href="visual-search.css">
+
+  <style>
+    /* Word-specific overrides */
+    .search-item {
+      font-size: 18px;
+      font-weight: 600;
+      text-transform: lowercase;
+      color: var(--color-text-primary);
+      padding: var(--spacing-xs);
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .search-item.target {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    .target-preview-icon {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--color-primary);
+      animation: pulse-preview 1s infinite;
+    }
+
+    /* 4x4 grid */
+    .search-display {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      .search-item {
+        font-size: 14px;
+      }
+
+      .target-preview-icon {
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-item {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Main content -->
+  <main id="main-content" class="visual-search-container">
+    <!-- Back button -->
+    <button id="back-button" class="btn btn-secondary" onclick="history.back()" style="position: fixed; top: var(--spacing-md); left: var(--spacing-md); z-index: 100;">← Terug</button>
+
+    <!-- Exercise screen -->
+    <div id="exercise-screen">
+      <!-- Timer (static) -->
+      <div id="timer-display" class="timer-display">5.0s</div>
+
+      <!-- Target preview -->
+      <div id="target-preview" class="target-preview">
+        <div class="target-preview-label">Zoek dit woord:</div>
+        <div id="target-preview-icon" class="target-preview-icon">school</div>
+      </div>
+
+      <!-- Search display area with word grid -->
+      <div id="search-display" class="search-display">
+        <div class="search-item">hond</div>
+        <div class="search-item">kat</div>
+        <div class="search-item">boom</div>
+        <div class="search-item">huis</div>
+        <div class="search-item">tafel</div>
+        <div class="search-item">stoel</div>
+        <div class="search-item target">school</div>
+        <div class="search-item">boek</div>
+        <div class="search-item">auto</div>
+        <div class="search-item">fiets</div>
+        <div class="search-item">lamp</div>
+        <div class="search-item">deur</div>
+        <div class="search-item">raam</div>
+        <div class="search-item">klok</div>
+        <div class="search-item">bed</div>
+        <div class="search-item">appel</div>
+      </div>
+
+      <!-- Feedback area -->
+      <div id="feedback-area"></div>
+    </div>
+  </main>
+
+  <!-- Load viewport fix only -->
+  <script src="../../shared/js/viewport-fix.js"></script>
+</body>
+</html>

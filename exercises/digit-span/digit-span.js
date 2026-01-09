@@ -12,10 +12,30 @@ class DigitSpanExercise {
     // Exercise state
     this.currentTrial = 0;
     this.totalTrials = 0;
-    this.currentSequence = [];
+    this.currentSequence = []; // Array of characters (digits and letters)
     this.userSequence = [];
     this.score = 0;
     this.isShowingSequence = false; // Flag to block input during sequence display
+
+    // Real-world sequence types
+    this.sequenceTypes = ['phone', 'postcode', 'date'];
+    this.currentSequenceType = null;
+    this.currentSequenceFormatted = ''; // For display purposes
+    this.currentContentMode = 'generic'; // 'generic' or 'personalized'
+
+    // Phone number prefixes (Dutch and common country codes)
+    this.phonePrefixes = [
+      { prefix: '06', name: 'NL Mobile' },
+      { prefix: '+31', name: 'Netherlands' },
+      { prefix: '+32', name: 'Belgium' },
+      { prefix: '+49', name: 'Germany' },
+      { prefix: '+359', name: 'Bulgaria' },
+      { prefix: '+33', name: 'France' },
+      { prefix: '+44', name: 'UK' },
+    ];
+
+    // Valid postcode letters (Dutch postcodes don't use SA, SD, SS)
+    this.postcodeLetters = 'ABCDEFGHJKLMNPRSTUVWXYZ'.split('');
 
     // Difficulty adapter
     this.difficultyAdapter = new DigitSpanAdapter();
@@ -59,11 +79,11 @@ class DigitSpanExercise {
     // Embedded configuration (no external file needed)
     this.config = {
       exerciseId: CONSTANTS.EXERCISE_TYPES.DIGIT_SPAN,
-      exerciseName: 'Cijferreeks Onthouden',
+      exerciseName: 'Reeks Onthouden',
       difficulty: 'easy',
       parameters: {
-        startLength: 2,
-        minLength: 2,
+        startLength: 3,
+        minLength: 3,
         maxLength: 9,
         totalTrials: 10,
         digitDisplayTime: 1000,
@@ -112,23 +132,15 @@ class DigitSpanExercise {
       this.submitResponse();
     });
 
-    // Keyboard support
+    // Keyboard support for global shortcuts only
+    // Note: Main input is handled by the text input field
     document.addEventListener('keydown', (e) => {
       if (this.screens.exercise.classList.contains('hidden')) return;
-      if (this.isShowingSequence) return; // Block input while sequence is being shown
+      if (this.isShowingSequence) return;
 
-      // Number keys (0-9)
-      if (e.key >= '0' && e.key <= '9') {
-        this.addDigit(parseInt(e.key));
-      }
-      // Backspace
-      else if (e.key === 'Backspace') {
-        e.preventDefault();
-        this.removeLastDigit();
-      }
-      // Enter
-      else if (e.key === 'Enter' && !this.elements.submitBtn.disabled) {
-        this.submitResponse();
+      // Escape to clear
+      if (e.key === 'Escape') {
+        this.clearInput();
       }
     });
   }
@@ -185,12 +197,12 @@ class DigitSpanExercise {
       });
     }
 
-    // Create number pad
-    this.createNumberPad();
+    // Create input field (keyboard-based)
+    this.createInputField();
 
     // Speak instructions
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak('We gaan beginnen. Let goed op de cijfers.');
+      await window.AudioManager.speak('We gaan beginnen. Let goed op de telefoonnummers, postcodes en datums.');
     }
 
     // Start first trial
@@ -205,6 +217,11 @@ class DigitSpanExercise {
 
     // Hide input area from previous trial to prevent cognitive load
     this.elements.inputArea.classList.add('hidden');
+
+    // Disable text input while sequence is being shown
+    if (this.elements.textInput) {
+      this.elements.textInput.disabled = true;
+    }
 
     // Clear previous user input display
     UIComponents.clearElement(this.elements.userSequence);
@@ -228,23 +245,293 @@ class DigitSpanExercise {
   }
 
   generateSequence(length) {
+    // Get current content mode from PersonalizationCounter
+    this.currentContentMode = window.PersonalizationCounter?.getContentMode() || 'generic';
+
+    // Randomly select a sequence type
+    this.currentSequenceType = this.sequenceTypes[Math.floor(Math.random() * this.sequenceTypes.length)];
+
+    let sequence;
+
+    // Try personalized data if in personalized mode
+    if (this.currentContentMode === 'personalized') {
+      sequence = this.generatePersonalizedSequence(length);
+      if (sequence) {
+        return sequence;
+      }
+      // Fall back to generic if no personalized data available for this type
+    }
+
+    // Generate generic/random sequence
+    switch (this.currentSequenceType) {
+      case 'phone':
+        sequence = this.generatePhoneSequence(length);
+        break;
+      case 'postcode':
+        sequence = this.generatePostcodeSequence(length);
+        break;
+      case 'date':
+        sequence = this.generateDateSequence(length);
+        break;
+      default:
+        sequence = this.generateRandomDigits(length);
+    }
+
+    return sequence;
+  }
+
+  // Generate personalized sequence based on user's stored data
+  generatePersonalizedSequence(length) {
+    const service = window.PersonalizationService;
+    if (!service) return null;
+
+    switch (this.currentSequenceType) {
+      case 'phone': {
+        const phones = service.getPhoneNumbers();
+        if (phones.length > 0) {
+          const phone = service.getRandomItem(phones);
+          if (phone?.number) {
+            const parsed = service.parsePhoneToSequence(phone.number);
+            // Adjust to requested length
+            if (parsed.length >= length) {
+              return parsed.slice(0, length);
+            }
+            // If too short, pad with random digits
+            while (parsed.length < length) {
+              parsed.push(Math.floor(Math.random() * 10).toString());
+            }
+            return parsed;
+          }
+        }
+        return null;
+      }
+
+      case 'postcode': {
+        const postcodes = service.getPostcodes();
+        if (postcodes.length > 0) {
+          const postcode = service.getRandomItem(postcodes);
+          if (postcode?.code) {
+            const parsed = service.parsePostcodeToSequence(postcode.code);
+            // Adjust to requested length
+            if (parsed.length >= length) {
+              return parsed.slice(0, length);
+            }
+            // If too short, add more characters
+            while (parsed.length < length) {
+              if (parsed.length % 2 === 0) {
+                parsed.push(Math.floor(Math.random() * 10).toString());
+              } else {
+                parsed.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
+              }
+            }
+            return parsed;
+          }
+        }
+        return null;
+      }
+
+      case 'date': {
+        const dates = service.getImportantDates();
+        if (dates.length > 0) {
+          const date = service.getRandomItem(dates);
+          if (date?.date) {
+            const parsed = service.parseDateToSequence(date.date);
+            // Adjust to requested length
+            if (parsed.length >= length) {
+              return parsed.slice(0, length);
+            }
+            // If too short, add time component
+            const hour = Math.floor(Math.random() * 24);
+            const minute = Math.floor(Math.random() * 60);
+            const timeStr = ' ' + hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
+            for (let i = 0; i < timeStr.length && parsed.length < length; i++) {
+              parsed.push(timeStr[i]);
+            }
+            return parsed;
+          }
+        }
+        return null;
+      }
+
+      default:
+        return null;
+    }
+  }
+
+  // Generate random digits (fallback)
+  generateRandomDigits(length) {
     const sequence = [];
     for (let i = 0; i < length; i++) {
-      sequence.push(Math.floor(Math.random() * 10));
+      sequence.push(Math.floor(Math.random() * 10).toString());
     }
     return sequence;
+  }
+
+  // Generate phone number sequence with country code prefix
+  generatePhoneSequence(length) {
+    const sequence = [];
+
+    // Select a prefix that fits within the length
+    const validPrefixes = this.phonePrefixes.filter(p => p.prefix.length <= length);
+    if (validPrefixes.length === 0) {
+      // If no prefix fits, just use digits
+      return this.generateRandomDigits(length);
+    }
+
+    const selectedPrefix = validPrefixes[Math.floor(Math.random() * validPrefixes.length)];
+
+    // Add prefix digits
+    for (const digit of selectedPrefix.prefix) {
+      sequence.push(digit);
+    }
+
+    // Fill remaining with random digits
+    while (sequence.length < length) {
+      sequence.push(Math.floor(Math.random() * 10).toString());
+    }
+
+    return sequence;
+  }
+
+  // Generate Dutch postcode sequence (4 digits + 2 letters)
+  generatePostcodeSequence(length) {
+    const sequence = [];
+
+    // Dutch postcodes: 4 digits (1000-9999) + 2 letters
+    // We build progressively based on length
+
+    // First digit: 1-9 (no 0 prefix in Dutch postcodes)
+    if (length >= 1) {
+      sequence.push((Math.floor(Math.random() * 9) + 1).toString());
+    }
+
+    // Next 3 digits: 0-9
+    for (let i = 1; i < Math.min(length, 4); i++) {
+      sequence.push(Math.floor(Math.random() * 10).toString());
+    }
+
+    // Letters (positions 5 and 6)
+    if (length >= 5) {
+      sequence.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
+    }
+    if (length >= 6) {
+      sequence.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
+    }
+
+    // If length > 6, we're doing a "longer postcode" scenario - add more digits/letters
+    // This could represent multiple postcodes or extended codes
+    for (let i = 6; i < length; i++) {
+      if (i % 2 === 0) {
+        sequence.push(Math.floor(Math.random() * 10).toString());
+      } else {
+        sequence.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
+      }
+    }
+
+    return sequence;
+  }
+
+  // Generate date sequence (DD-MM-YY format with dashes included)
+  generateDateSequence(length) {
+    const sequence = [];
+
+    // Generate a realistic date
+    const day = Math.floor(Math.random() * 28) + 1; // 1-28 to be safe
+    const month = Math.floor(Math.random() * 12) + 1; // 1-12
+    const year = Math.floor(Math.random() * 30) + 95; // 95-124 (1995-2024, showing as 95-24)
+
+    // Format as DD-MM-YY with dashes included in sequence
+    const dayStr = day.toString().padStart(2, '0');
+    const monthStr = month.toString().padStart(2, '0');
+    const yearStr = (year % 100).toString().padStart(2, '0');
+
+    // Build full date with dashes: DD-MM-YY = 8 characters
+    const fullDate = dayStr + '-' + monthStr + '-' + yearStr;
+
+    for (let i = 0; i < Math.min(length, fullDate.length); i++) {
+      sequence.push(fullDate[i]);
+    }
+
+    // If length > 8, generate additional time content (HH:MM)
+    if (length > 8) {
+      const hour = Math.floor(Math.random() * 24);
+      const minute = Math.floor(Math.random() * 60);
+      const timeStr = ' ' + hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
+
+      for (let i = 8; i < length && (i - 8) < timeStr.length; i++) {
+        sequence.push(timeStr[i - 8]);
+      }
+    }
+
+    return sequence;
+  }
+
+  // Format sequence for display
+  formatSequenceForDisplay(sequence, type) {
+    const chars = sequence.join('');
+
+    switch (type) {
+      case 'phone':
+        // Phone numbers already include + in sequence, just add spacing for readability
+        if (chars.startsWith('+')) {
+          // Find where the country code ends (after +XX or +XXX)
+          const countryCodeEnd = chars.startsWith('+3') && chars.length > 3 && chars[2] === '5' ? 4 : 3;
+          if (chars.length <= countryCodeEnd) return chars;
+          return chars.slice(0, countryCodeEnd) + ' ' + chars.slice(countryCodeEnd);
+        }
+        // Regular 06 format - add space after 06
+        if (chars.length <= 2) return chars;
+        return chars.slice(0, 2) + ' ' + chars.slice(2);
+
+      case 'postcode':
+        // Format as Dutch postcode: 4 digits + space + 2 letters
+        if (chars.length <= 4) return chars;
+        return chars.slice(0, 4) + ' ' + chars.slice(4);
+
+      case 'date':
+        // Dates already include dashes in sequence, display as-is
+        return chars;
+
+      default:
+        return chars;
+    }
+  }
+
+  // Get type label for display
+  getSequenceTypeLabel() {
+    switch (this.currentSequenceType) {
+      case 'phone':
+        return 'Telefoonnummer';
+      case 'postcode':
+        return 'Postcode';
+      case 'date':
+        return 'Datum';
+      default:
+        return 'Reeks';
+    }
   }
 
   async showReadyMessage() {
     UIComponents.clearElement(this.elements.sequenceDisplay);
 
+    // Show sequence type before "Ready"
+    const container = document.createElement('div');
+    container.className = 'ready-container';
+
+    const typeLabel = document.createElement('div');
+    typeLabel.className = 'sequence-type-label';
+    typeLabel.textContent = this.getSequenceTypeLabel();
+    container.appendChild(typeLabel);
+
     const message = document.createElement('div');
     message.className = 'ready-message';
     message.textContent = 'Klaar?';
-    this.elements.sequenceDisplay.appendChild(message);
+    container.appendChild(message);
+
+    this.elements.sequenceDisplay.appendChild(container);
 
     if (window.AudioManager) {
-      await window.AudioManager.speak('Klaar');
+      await window.AudioManager.speak(`${this.getSequenceTypeLabel()}. Klaar?`);
     }
 
     await this.sleep(1000);
@@ -260,28 +547,41 @@ class DigitSpanExercise {
     const interDigitInterval = this.config.parameters.interDigitInterval || CONSTANTS.DIGIT_SPAN.INTER_DIGIT_INTERVAL;
 
     for (let i = 0; i < this.currentSequence.length; i++) {
-      const digit = this.currentSequence[i];
+      const char = this.currentSequence[i];
 
-      // Create digit display
-      const digitEl = document.createElement('div');
-      digitEl.className = 'digit-display';
-      digitEl.textContent = digit;
+      // Create character display
+      const charEl = document.createElement('div');
+      charEl.className = 'digit-display';
+      charEl.textContent = char;
 
       UIComponents.clearElement(this.elements.sequenceDisplay);
-      this.elements.sequenceDisplay.appendChild(digitEl);
+      this.elements.sequenceDisplay.appendChild(charEl);
 
-      // Speak digit (slower and clearer for numbers)
+      // Speak character (slower and clearer)
       if (window.AudioManager) {
-        window.AudioManager.speak(digit.toString(), { rate: 0.8 });
+        // Handle special characters and letters
+        let spokenText;
+        if (char === '+') {
+          spokenText = 'plus';
+        } else if (char === '-') {
+          spokenText = 'streepje';
+        } else if (char === ':') {
+          spokenText = 'dubbele punt';
+        } else if (/[A-Za-z]/.test(char)) {
+          spokenText = char.toUpperCase();
+        } else {
+          spokenText = char.toString();
+        }
+        window.AudioManager.speak(spokenText, { rate: 0.8 });
       }
 
-      // Display digit for specified time
+      // Display character for specified time
       await this.sleep(displayTime);
 
-      // Clear digit
+      // Clear character
       UIComponents.clearElement(this.elements.sequenceDisplay);
 
-      // Inter-digit interval (except after last digit)
+      // Inter-character interval (except after last character)
       if (i < this.currentSequence.length - 1) {
         await this.sleep(interDigitInterval);
       }
@@ -292,81 +592,106 @@ class DigitSpanExercise {
     // Allow input now that sequence is done
     this.isShowingSequence = false;
 
-    // Show "Your Turn" message
+    // Show "Your Turn" message with sequence type hint
     UIComponents.clearElement(this.elements.sequenceDisplay);
+
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'your-turn-container';
+
+    const typeLabel = document.createElement('div');
+    typeLabel.className = 'sequence-type-label';
+    typeLabel.textContent = this.getSequenceTypeLabel();
+    messageContainer.appendChild(typeLabel);
 
     const message = document.createElement('div');
     message.className = 'your-turn-message';
     message.textContent = 'Uw beurt!';
-    this.elements.sequenceDisplay.appendChild(message);
+    messageContainer.appendChild(message);
 
+    this.elements.sequenceDisplay.appendChild(messageContainer);
+
+    const typeHint = this.getSequenceTypeLabel().toLowerCase();
     if (window.AudioManager) {
-      window.AudioManager.speak('Uw beurt. Tik de cijfers in');
+      window.AudioManager.speak(`Uw beurt. Typ de ${typeHint} in`);
     }
 
     // Show input area
     this.elements.inputArea.classList.remove('hidden');
 
-    // Clear user sequence display
+    // Clear user sequence display and input field
     UIComponents.clearElement(this.elements.userSequence);
+    if (this.elements.textInput) {
+      this.elements.textInput.value = '';
+      this.elements.textInput.disabled = false; // Enable input now that it's user's turn
+      this.elements.textInput.focus();
+    }
 
-    // Enable submit button (initially disabled until digits entered)
+    // Enable submit button (initially disabled until sequence entered)
     this.elements.submitBtn.disabled = true;
   }
 
-  createNumberPad() {
-    const numberPad = UIComponents.createNumberPad((digit) => {
-      this.addDigit(digit);
-    });
-
+  createInputField() {
     UIComponents.clearElement(this.elements.numberPadContainer);
-    this.elements.numberPadContainer.appendChild(numberPad);
-  }
 
-  addDigit(digit) {
-    // Block input while sequence is being shown
-    if (this.isShowingSequence) return;
+    // Create text input container
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'keyboard-input-container';
 
-    // Don't allow more digits than the sequence length
-    if (this.userSequence.length >= this.currentSequence.length) {
-      if (window.AudioManager) {
-        window.AudioManager.hapticError();
-      }
-      return;
-    }
+    // Create the text input field
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.id = 'sequence-input';
+    textInput.className = 'sequence-input-field';
+    textInput.placeholder = 'Typ hier...';
+    textInput.autocomplete = 'off';
+    textInput.autocapitalize = 'characters';
+    textInput.spellcheck = false;
+    textInput.disabled = true; // Start disabled, enable when it's user's turn
 
-    this.userSequence.push(digit);
-    this.updateUserSequenceDisplay();
+    // Handle input changes
+    textInput.addEventListener('input', (e) => {
+      // Convert to uppercase for letters
+      const value = e.target.value.toUpperCase();
+      e.target.value = value;
 
-    // Enable submit button when sequence is complete
-    if (this.userSequence.length === this.currentSequence.length) {
-      this.elements.submitBtn.disabled = false;
-    }
-
-    // Haptic feedback
-    if (window.AudioManager) {
-      window.AudioManager.hapticPress();
-    }
-  }
-
-  removeLastDigit() {
-    if (this.userSequence.length > 0) {
-      this.userSequence.pop();
+      // Update user sequence
+      this.userSequence = value.split('');
       this.updateUserSequenceDisplay();
 
-      // Disable submit button if sequence incomplete
+      // Enable submit button when sequence is complete
       this.elements.submitBtn.disabled = this.userSequence.length !== this.currentSequence.length;
 
+      // Haptic feedback
       if (window.AudioManager) {
         window.AudioManager.hapticPress();
       }
-    }
+    });
+
+    // Handle enter key
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !this.elements.submitBtn.disabled) {
+        e.preventDefault();
+        this.submitResponse();
+      }
+    });
+
+    inputContainer.appendChild(textInput);
+    this.elements.numberPadContainer.appendChild(inputContainer);
+
+    // Store reference to input field
+    this.elements.textInput = textInput;
   }
 
   clearInput() {
     this.userSequence = [];
     this.updateUserSequenceDisplay();
     this.elements.submitBtn.disabled = true;
+
+    // Clear text input field
+    if (this.elements.textInput) {
+      this.elements.textInput.value = '';
+      this.elements.textInput.focus();
+    }
 
     if (window.AudioManager) {
       window.AudioManager.hapticPress();
@@ -382,12 +707,9 @@ class DigitSpanExercise {
       return;
     }
 
-    this.userSequence.forEach(digit => {
-      const span = document.createElement('span');
-      span.className = 'digit-entered';
-      span.textContent = digit;
-      this.elements.userSequence.appendChild(span);
-    });
+    // Display with formatting based on sequence type
+    const formatted = this.formatSequenceForDisplay(this.userSequence, this.currentSequenceType);
+    this.elements.userSequence.textContent = formatted;
   }
 
   async submitResponse() {
@@ -415,6 +737,8 @@ class DigitSpanExercise {
         correct: correct,
         responseTime: responseTime,
         score: trialScore,
+        contentMode: this.currentContentMode,
+        sequenceType: this.currentSequenceType,
       });
     }
 
@@ -445,7 +769,10 @@ class DigitSpanExercise {
     }
 
     for (let i = 0; i < this.currentSequence.length; i++) {
-      if (this.userSequence[i] !== this.currentSequence[i]) {
+      // Compare as uppercase strings to handle case differences
+      const userChar = String(this.userSequence[i]).toUpperCase();
+      const correctChar = String(this.currentSequence[i]).toUpperCase();
+      if (userChar !== correctChar) {
         return false;
       }
     }
@@ -464,7 +791,9 @@ class DigitSpanExercise {
 
     let detailMessage = '';
     if (!correct) {
-      detailMessage = `De juiste reeks was: ${this.currentSequence.join(' ')}`;
+      // Show formatted sequence in feedback
+      const formattedSequence = this.formatSequenceForDisplay(this.currentSequence, this.currentSequenceType);
+      detailMessage = `De juiste ${this.getSequenceTypeLabel().toLowerCase()} was: ${formattedSequence}`;
     } else if (difficultyAdjusted) {
       detailMessage = 'De oefening wordt moeilijker!';
     }
@@ -522,7 +851,7 @@ class DigitSpanExercise {
   }
 
   showResults(stats) {
-    // Navigate to results page with stats as URL parameters
+    // Build results page URL
     const params = new URLSearchParams({
       exercise: 'exercises/digit-span/index.html',
       name: this.config.exerciseName,
@@ -536,7 +865,23 @@ class DigitSpanExercise {
       })
     });
 
-    window.location.href = `../../results.html?${params.toString()}`;
+    const resultsUrl = `../../results.html?${params.toString()}`;
+
+    // Show feedback modal before navigating to results
+    if (window.FeedbackModal && !this.isPractice) {
+      const sessionId = window.DataTracker?.getLastSessionId(CONSTANTS.EXERCISE_TYPES.DIGIT_SPAN);
+
+      window.FeedbackModal.show({
+        exerciseType: CONSTANTS.EXERCISE_TYPES.DIGIT_SPAN,
+        sessionId: sessionId,
+        onComplete: () => {
+          window.location.href = resultsUrl;
+        }
+      });
+    } else {
+      // No feedback modal or practice mode - navigate directly
+      window.location.href = resultsUrl;
+    }
   }
 
   resetExercise() {

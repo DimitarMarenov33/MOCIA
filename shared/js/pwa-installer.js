@@ -29,6 +29,12 @@ class PWAInstaller {
    * Register the service worker
    */
   async registerServiceWorker() {
+    // Skip service worker registration for file:// protocol (local development)
+    if (window.location.protocol === 'file:') {
+      console.log('[PWA] Skipping Service Worker registration (file:// protocol not supported)');
+      return;
+    }
+
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('/MOCIA/sw.js', {

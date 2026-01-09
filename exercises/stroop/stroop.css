@@ -14,11 +14,18 @@
   background: var(--color-background);
 }
 
-/* Timer Display (minimal) */
-.timer-display {
+/* Top info (trial counter + timer) */
+.top-info {
   position: fixed;
   top: var(--spacing-sm);
   right: var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  z-index: var(--z-elevated);
+}
+
+#trial-counter {
   background: var(--color-background-alt);
   padding: 4px 8px;
   border-radius: var(--border-radius-sm);
@@ -26,7 +33,18 @@
   font-size: 11px;
   font-weight: 500;
   color: var(--color-text-secondary);
-  z-index: var(--z-elevated);
+  opacity: 0.8;
+}
+
+/* Timer Display (minimal) */
+.timer-display {
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
   text-align: center;
   opacity: 0.8;
 }
@@ -72,41 +90,42 @@
   animation: fade-in 0.3s ease;
 }
 
-/* Response Buttons */
+/* Response Buttons - Grid layout for 7 buttons */
 .response-buttons {
-  display: flex;
-  gap: var(--spacing-lg);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
   justify-content: center;
-  flex-wrap: wrap;
-  max-width: 700px;
+  max-width: 800px;
+  width: 100%;
 }
 
 .response-button {
-  flex: 1;
-  min-width: 180px;
-  min-height: 100px;
-  border: 4px solid var(--color-border);
+  min-height: 70px;
+  border: 3px solid var(--color-border);
   border-radius: var(--border-radius-lg);
-  background: white;
+  background: var(--color-background-alt);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: var(--font-size-lg);
-  font-weight: 700;
+  font-size: var(--font-size-md);
+  font-weight: 600;
   box-shadow: var(--shadow-md);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--spacing-sm);
 }
 
 .response-button:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
-  border-width: 5px;
+  border-color: var(--color-info);
+  background: white;
 }
 
 .response-button:active {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .response-button.disabled {
@@ -116,45 +135,20 @@
 
 .button-label {
   font-size: var(--font-size-md);
-  color: var(--color-text-secondary);
-  position: absolute;
-  top: var(--spacing-xs);
-  left: var(--spacing-sm);
+  color: var(--color-text-primary);
   font-weight: 600;
+  text-align: center;
 }
 
-/* Color classes for buttons */
-.response-button.color-red {
-  background-color: #EF5350;
+/* Centering the last row when there are 7 buttons (4+3 layout) */
+.response-buttons .response-button:nth-child(5) {
+  grid-column-start: 1;
 }
 
-.response-button.color-blue {
-  background-color: #42A5F5;
-}
-
-.response-button.color-green {
-  background-color: #66BB6A;
-}
-
-.response-button.color-yellow {
-  background-color: #FFEB3B;
-}
-
-.response-button.color-black {
-  background-color: #424242;
-}
-
-.response-button.color-white {
-  background-color: #FAFAFA;
-  border-color: #BDBDBD;
-}
-
-.response-button.color-purple {
-  background-color: #AB47BC;
-}
-
-.response-button.color-orange {
-  background-color: #FF9800;
+@supports (grid-template-columns: subgrid) {
+  .response-buttons {
+    justify-items: center;
+  }
 }
 
 /* Feedback states */
@@ -229,7 +223,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .stimulus-display {
-    min-height: 250px;
+    min-height: 200px;
     padding: var(--spacing-lg);
   }
 
@@ -238,19 +232,34 @@
   }
 
   .response-buttons {
-    flex-direction: column;
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
     width: 100%;
   }
 
   .response-button {
-    min-width: 100%;
-    min-height: 80px;
+    min-height: 60px;
+    font-size: var(--font-size-sm);
+  }
+
+  .button-label {
+    font-size: var(--font-size-sm);
   }
 
   .timer-display {
     font-size: 10px;
     padding: 3px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .response-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .response-button {
+    min-height: 55px;
+    padding: var(--spacing-xs);
   }
 }
 

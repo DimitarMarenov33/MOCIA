@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="description" content="Stroop Kleur-Woord Taak - Executieve Functies Training">
+  <meta name="description" content="Stroop Taak - Executieve Functies Training met gebouwen en dagen">
   <title>Stroop Taak - MOCIA</title>
 
   <!-- Stylesheets -->
@@ -23,25 +23,20 @@
 
     <!-- Exercise screen -->
     <div id="exercise-screen">
-      <!-- Timer only (minimal, top right) -->
-      <div id="timer-display" class="timer-display">3.0s</div>
+      <!-- Trial counter and timer (top right) -->
+      <div class="top-info">
+        <span id="trial-counter">Poging 0/30</span>
+        <span id="timer-display" class="timer-display">3.0s</span>
+      </div>
 
       <!-- Stimulus display area -->
       <div id="stimulus-display" class="stimulus-display">
         <div id="color-word" class="color-word">ROOD</div>
       </div>
 
-      <!-- Response buttons -->
+      <!-- Response buttons (dynamically generated) -->
       <div id="response-buttons" class="response-buttons">
-        <button id="button-1" class="response-button" data-color="">
-          <span class="button-label">Kleur 1</span>
-        </button>
-        <button id="button-2" class="response-button" data-color="">
-          <span class="button-label">Kleur 2</span>
-        </button>
-        <button id="button-3" class="response-button" data-color="">
-          <span class="button-label">Kleur 3</span>
-        </button>
+        <!-- Will be populated by JavaScript based on current stimulus set -->
       </div>
 
       <!-- Feedback area -->

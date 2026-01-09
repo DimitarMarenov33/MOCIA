@@ -12,6 +12,29 @@ class UFOVComplexExercise {
     this.currentTrial = 0;
     this.totalTrials = 0;
 
+    // Stimulus sets - randomly alternates between these
+    this.stimulusSets = [
+      {
+        name: 'vehicles',
+        targets: [
+          { id: 'car', emoji: '🚗', label: 'Auto' },
+          { id: 'bicycle', emoji: '🚲', label: 'Fiets' }
+        ],
+        peripheralEmoji: '🚗',
+        peripheralLabel: 'auto-icoontje'
+      },
+      {
+        name: 'traffic',
+        targets: [
+          { id: 'stop', emoji: '🛑', label: 'Stop' },
+          { id: 'warning', emoji: '⚠️', label: 'Waarschuwing' }
+        ],
+        peripheralEmoji: '🛑',
+        peripheralLabel: 'stopbord'
+      }
+    ];
+    this.currentStimulusSet = null;
+
     // Current trial data
     this.currentCentralTarget = null;
     this.currentPeripheralPosition = null;
@@ -107,6 +130,13 @@ class UFOVComplexExercise {
       peripheralResponseZones: document.getElementById('peripheral-response-zones'),
       // Response areas
       centralResponse: document.getElementById('central-response'),
+      // Response buttons
+      firstButton: document.getElementById('response-car'),
+      secondButton: document.getElementById('response-truck'),
+      firstButtonIcon: document.querySelector('#response-car .response-icon'),
+      firstButtonLabel: document.querySelector('#response-car .response-label'),
+      secondButtonIcon: document.querySelector('#response-truck .response-icon'),
+      secondButtonLabel: document.querySelector('#response-truck .response-label'),
     };
   }
 
@@ -122,22 +152,26 @@ class UFOVComplexExercise {
       this.confirmExit();
     });
 
-    // Central response buttons
-    document.getElementById('response-car').addEventListener('click', () => {
-      this.handleCentralResponse('car');
+    // Central response buttons - use dynamic target IDs
+    this.elements.firstButton.addEventListener('click', () => {
+      if (this.currentStimulusSet) {
+        this.handleCentralResponse(this.currentStimulusSet.targets[0].id);
+      }
     });
 
-    document.getElementById('response-truck').addEventListener('click', () => {
-      this.handleCentralResponse('truck');
+    this.elements.secondButton.addEventListener('click', () => {
+      if (this.currentStimulusSet) {
+        this.handleCentralResponse(this.currentStimulusSet.targets[1].id);
+      }
     });
 
     // Keyboard support for central response
     document.addEventListener('keydown', (e) => {
-      if (!this.elements.centralResponse.classList.contains('hidden')) {
+      if (!this.elements.centralResponse.classList.contains('hidden') && this.currentStimulusSet) {
         if (e.key === '1' || e.key === 'a' || e.key === 'A') {
-          this.handleCentralResponse('car');
+          this.handleCentralResponse(this.currentStimulusSet.targets[0].id);
         } else if (e.key === '2' || e.key === 'b' || e.key === 'B') {
-          this.handleCentralResponse('truck');
+          this.handleCentralResponse(this.currentStimulusSet.targets[1].id);
         }
       }
     });
@@ -257,9 +291,15 @@ class UFOVComplexExercise {
   }
 
   generateStimulus() {
-    // Central target
-    const centralTargets = this.config.stimuli.centralTargets || ['🚗', '🚚'];
-    this.currentCentralTarget = centralTargets[Math.floor(Math.random() * centralTargets.length)];
+    // Randomly select a stimulus set for this trial
+    this.currentStimulusSet = this.stimulusSets[Math.floor(Math.random() * this.stimulusSets.length)];
+
+    // Update response buttons with current set's options
+    this.updateResponseButtons();
+
+    // Central target - randomly pick one of the two targets in the set
+    const targetIndex = Math.floor(Math.random() * this.currentStimulusSet.targets.length);
+    this.currentCentralTarget = this.currentStimulusSet.targets[targetIndex].id;
 
     // Peripheral position
     const numPositions = this.config.parameters.numPeripheralPositions || 8;
@@ -287,6 +327,16 @@ class UFOVComplexExercise {
     }
   }
 
+  updateResponseButtons() {
+    // Update first button
+    this.elements.firstButtonIcon.textContent = this.currentStimulusSet.targets[0].emoji;
+    this.elements.firstButtonLabel.textContent = this.currentStimulusSet.targets[0].label;
+
+    // Update second button
+    this.elements.secondButtonIcon.textContent = this.currentStimulusSet.targets[1].emoji;
+    this.elements.secondButtonLabel.textContent = this.currentStimulusSet.targets[1].label;
+  }
+
   async showFixation() {
     // Show fixation cross
     this.elements.fixationCross.style.display = 'block';
@@ -303,18 +353,19 @@ class UFOVComplexExercise {
     const centerY = displayArea.offsetHeight / 2;
     const radius = Math.min(centerX, centerY) * 0.75;
 
-    // Prepare central stimulus
-    this.elements.centralIcon.textContent = this.currentCentralTarget;
+    // Prepare central stimulus - find the target object for the current target ID
+    const centralTargetObj = this.currentStimulusSet.targets.find(t => t.id === this.currentCentralTarget);
+    this.elements.centralIcon.textContent = centralTargetObj.emoji;
     this.elements.centralStimulus.classList.add('active');
 
     // Prepare peripheral items
     UIComponents.clearElement(this.elements.peripheralContainer);
 
-    // Add target
+    // Add target - use the current set's peripheral emoji
     const target = document.createElement('div');
     target.className = 'peripheral-item target visible';
     target.setAttribute('data-position', this.currentPeripheralPosition);
-    target.textContent = this.config.stimuli.peripheralTarget || '🚗';
+    target.textContent = this.currentStimulusSet.peripheralEmoji;
 
     const targetAngle = (this.currentPeripheralPosition / this.config.parameters.numPeripheralPositions) * 2 * Math.PI - Math.PI / 2;
     const targetX = centerX + radius * Math.cos(targetAngle);
@@ -363,9 +414,9 @@ class UFOVComplexExercise {
       window.AudioManager.hapticPress();
     }
 
-    // Hide central response, show peripheral instruction
+    // Hide central response, show peripheral instruction with dynamic label
     this.elements.centralResponse.classList.add('hidden');
-    this.elements.phaseIndicator.textContent = 'Waar was het auto-icoontje?';
+    this.elements.phaseIndicator.textContent = `Waar was het ${this.currentStimulusSet.peripheralLabel}?`;
     this.elements.peripheralResponseZones.classList.add('active');
   }
 
@@ -394,9 +445,8 @@ class UFOVComplexExercise {
   async processTrial() {
     const responseTime = Date.now() - this.trialStartTime;
 
-    // Check correctness
-    const centralCorrect = (this.centralResponse === 'car' && this.currentCentralTarget === '🚗') ||
-                          (this.centralResponse === 'truck' && this.currentCentralTarget === '🚚');
+    // Check correctness - compare response ID with target ID
+    const centralCorrect = this.centralResponse === this.currentCentralTarget;
     const peripheralCorrect = this.peripheralResponse === this.currentPeripheralPosition;
     const bothCorrect = centralCorrect && peripheralCorrect;
 
@@ -523,6 +573,10 @@ class UFOVComplexExercise {
   }
 
   async showFeedback(centralCorrect, peripheralCorrect, difficultyAdjusted, trialScore) {
+    // Get the label for the current central target
+    const centralTargetObj = this.currentStimulusSet.targets.find(t => t.id === this.currentCentralTarget);
+    const centralTargetLabel = centralTargetObj ? centralTargetObj.label.toLowerCase() : this.currentCentralTarget;
+
     let message, type, detail;
 
     if (centralCorrect && peripheralCorrect) {
@@ -537,17 +591,17 @@ class UFOVComplexExercise {
       const messages = this.config.feedback?.centralCorrect || ['Midden juist, maar rand gemist'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'info';
-      detail = `Het auto-icoontje was op positie ${this.currentPeripheralPosition + 1}`;
+      detail = `Het ${this.currentStimulusSet.peripheralLabel} was op positie ${this.currentPeripheralPosition + 1}`;
     } else if (peripheralCorrect) {
       const messages = this.config.feedback?.peripheralCorrect || ['Rand juist, maar midden gemist'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'info';
-      detail = `Het was een ${this.currentCentralTarget === '🚗' ? 'auto' : 'vrachtwagen'} in het midden`;
+      detail = `Het was een ${centralTargetLabel} in het midden`;
     } else {
       const messages = this.config.feedback?.bothIncorrect || ['Probeer het nog eens'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'error';
-      detail = `Midden: ${this.currentCentralTarget === '🚗' ? 'auto' : 'vrachtwagen'}, Rand: positie ${this.currentPeripheralPosition + 1}`;
+      detail = `Midden: ${centralTargetLabel}, Rand: positie ${this.currentPeripheralPosition + 1}`;
     }
 
     // Create centered overlay feedback

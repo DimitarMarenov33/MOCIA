@@ -168,6 +168,73 @@ class DataTracker {
   }
 
   /**
+   * Record post-exercise feedback
+   * Attaches feedback to the most recent session for the exercise type
+   * @param {Object} feedbackData - Feedback data including ratings and comments
+   */
+  recordFeedback(feedbackData) {
+    if (!this.storageAvailable) return;
+
+    const userData = this.getUserData();
+    if (!userData) return;
+
+    const exerciseType = feedbackData.exerciseType;
+    const sessionId = feedbackData.sessionId;
+
+    // Find the exercise data
+    if (!userData.exercises[exerciseType]) {
+      console.warn(`Exercise type '${exerciseType}' not found for feedback`);
+      return;
+    }
+
+    const exerciseData = userData.exercises[exerciseType];
+
+    // Find the session to attach feedback to
+    let targetSession = null;
+
+    if (sessionId) {
+      // Find by session ID
+      targetSession = exerciseData.sessions.find(s => s.id === sessionId);
+    }
+
+    if (!targetSession && exerciseData.sessions.length > 0) {
+      // Fall back to most recent session
+      targetSession = exerciseData.sessions[exerciseData.sessions.length - 1];
+    }
+
+    if (targetSession) {
+      // Attach feedback to session
+      targetSession.feedback = {
+        timestamp: feedbackData.timestamp,
+        contentMode: feedbackData.contentMode,
+        ratings: feedbackData.ratings,
+        comments: feedbackData.comments,
+        skipped: feedbackData.skipped
+      };
+
+      // Save updated data
+      this.saveUserData(userData);
+    } else {
+      console.warn('No session found to attach feedback to');
+    }
+  }
+
+  /**
+   * Get the last completed session ID for an exercise type
+   * @param {string} exerciseType - Type of exercise
+   * @returns {string|null} Session ID or null
+   */
+  getLastSessionId(exerciseType) {
+    const userData = this.getUserData();
+    if (!userData || !userData.exercises[exerciseType]) return null;
+
+    const sessions = userData.exercises[exerciseType].sessions;
+    if (sessions.length === 0) return null;
+
+    return sessions[sessions.length - 1].id;
+  }
+
+  /**
    * End current session and save to history
    * @param {Object} finalStats - Final session statistics
    * @param {string} status - Session end status ('completed' or 'abandoned')
@@ -386,13 +453,52 @@ class DataTracker {
 
   /**
    * Export all user data as JSON
+   * Includes:
+   * - Session timestamps (start/end)
+   * - Exercise type per session
+   * - Per-trial accuracy (%)
+   * - Per-trial response time (ms)
+   * - Difficulty level per trial
+   * - Content mode (generic/personalized)
+   * - Quit points (abandoned sessions)
+   * - Phase C choices (personalization preference)
    * @returns {string} JSON string of all data
    */
   exportData() {
     const userData = this.getUserData();
     if (!userData) return null;
 
-    return JSON.stringify(userData, null, 2);
+    // Get personalization preference data (Phase C choice)
+    let personalizationData = null;
+    if (window.PersonalizationCounter) {
+      personalizationData = window.PersonalizationCounter.getExportData();
+    }
+
+    // Get feedback history
+    let feedbackHistory = [];
+    if (window.FeedbackModal) {
+      feedbackHistory = window.FeedbackModal.getAllFeedback();
+    }
+
+    // Build export object with all required data points
+    const exportObject = {
+      version: userData.version,
+      exportedAt: new Date().toISOString(),
+      userId: userData.userId,
+      createdAt: userData.createdAt,
+      lastAccessedAt: userData.lastAccessedAt,
+
+      // Phase C choices (personalization preference - generic vs personalized)
+      personalizationPreference: personalizationData,
+
+      // All exercise data with sessions, trials, feedback, and content modes
+      exercises: userData.exercises,
+
+      // Dedicated feedback history for easy analysis
+      feedbackHistory: feedbackHistory
+    };
+
+    return JSON.stringify(exportObject, null, 2);
   }
 
   /**

@@ -130,6 +130,28 @@
   font-size: var(--font-size-xl);
 }
 
+/* Ready message container */
+.ready-container,
+.your-turn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* Sequence type label (phone, postcode, date) */
+.sequence-type-label {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background-color: var(--color-background);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-pill);
+  border: 2px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 /* Ready message */
 .ready-message {
   font-size: var(--font-size-xxl);
@@ -145,6 +167,44 @@
   text-align: center;
   font-weight: var(--font-weight-bold);
   animation: slideDown 0.3s ease;
+}
+
+/* Keyboard input container */
+.keyboard-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Text input field for sequence entry */
+.sequence-input-field {
+  width: 100%;
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  border: 3px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sequence-input-field:focus {
+  border-color: var(--color-info);
+  box-shadow: 0 0 0 4px rgba(var(--color-info-rgb, 59, 130, 246), 0.2);
+}
+
+.sequence-input-field::placeholder {
+  color: var(--color-text-tertiary);
+  letter-spacing: 2px;
+  font-weight: var(--font-weight-normal);
 }
 
 /* Results screen */
@@ -239,6 +299,16 @@
 
   .digit-span-number-pad .number-pad-button {
     font-size: 36px;
+  }
+
+  .sequence-input-field {
+    font-size: var(--font-size-xl);
+    padding: var(--spacing-md);
+    letter-spacing: 6px;
+  }
+
+  .sequence-type-label {
+    font-size: var(--font-size-md);
   }
 }
 

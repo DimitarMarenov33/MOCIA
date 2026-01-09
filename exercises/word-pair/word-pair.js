@@ -16,7 +16,8 @@ class WordPairExercise {
     // Exercise state
     this.phase = null; // 'encoding', 'locked', 'recall', 'results'
     this.currentPairs = [];
-    this.numPairs = 3; // Starting number of pairs
+    this.currentContentMode = 'generic'; // 'generic' or 'personalized'
+    this.numPairs = 1; // Starting number of pair sets (each set = 3 pairs: name-city, building-time, activity-day)
     this.delayMinutes = 20; // Starting delay in minutes
     this.lockedUntil = null; // Timestamp when exercise unlocks
     this.trialNumber = 0;
@@ -63,10 +64,11 @@ class WordPairExercise {
         const state = JSON.parse(savedState);
 
         // Validate and sanitize loaded values
-        this.numPairs = Math.max(1, Math.min(state.numPairs || 3, 30)); // Clamp between 1-30
+        this.numPairs = Math.max(1, Math.min(state.numPairs || 1, 10)); // Clamp between 1-10 sets
         this.delayMinutes = Math.max(10, Math.min(state.delayMinutes || 20, 480)); // Clamp between 10-480 (8 hours max)
         this.lockedUntil = state.lockedUntil || null;
         this.currentPairs = state.currentPairs || [];
+        this.currentContentMode = state.currentContentMode || 'generic';
         this.trialNumber = state.trialNumber || 0;
         this.consecutiveSuccesses = state.consecutiveSuccesses || 0;
 
@@ -79,10 +81,11 @@ class WordPairExercise {
     } catch (error) {
       console.error('Error loading state:', error);
       // Reset to defaults on error
-      this.numPairs = 3;
+      this.numPairs = 1;
       this.delayMinutes = 20;
       this.lockedUntil = null;
       this.currentPairs = [];
+      this.currentContentMode = 'generic';
       this.trialNumber = 0;
       this.consecutiveSuccesses = 0;
     }
@@ -98,6 +101,7 @@ class WordPairExercise {
         delayMinutes: this.delayMinutes,
         lockedUntil: this.lockedUntil,
         currentPairs: this.currentPairs,
+        currentContentMode: this.currentContentMode,
         trialNumber: this.trialNumber,
         consecutiveSuccesses: this.consecutiveSuccesses,
         lastUpdated: new Date().toISOString()
@@ -165,17 +169,21 @@ class WordPairExercise {
    */
   renderEncodingPhase() {
     // Generate new word pairs
-    this.currentPairs = generateWordPairs(this.numPairs);
+    const result = generateWordPairs(this.numPairs);
+    this.currentPairs = result.pairs;
+    this.currentContentMode = result.contentMode;
     this.saveState();
+
+    const totalPairs = this.currentPairs.length;
 
     this.container.innerHTML = `
       <div class="phase-container">
         <div style="background: var(--color-info-light); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
           <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-md);">
-            📚 Onthoud deze woordparen
+            Onthoud deze woordparen
           </h2>
           <p style="font-size: var(--font-size-lg); line-height: 1.6;">
-            Bestudeer de ${this.numPairs} woordparen hieronder. Als je ze onthouden hebt, klik dan op de knop.
+            Bestudeer de ${totalPairs} woordparen hieronder. Als je ze onthouden hebt, klik dan op de knop.
             Je krijgt dan ${this.delayMinutes} minuten de tijd voordat je ze moet herinneren.
           </p>
         </div>
@@ -193,7 +201,7 @@ class WordPairExercise {
         </div>
 
         <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--color-background-alt); border-radius: var(--border-radius-md); font-size: var(--font-size-md); color: var(--color-text-secondary);">
-          <strong>Huidige niveau:</strong> ${this.numPairs} woordparen |
+          <strong>Huidige niveau:</strong> ${totalPairs} woordparen |
           <strong>Wachttijd:</strong> ${this.delayMinutes} minuten
         </div>
       </div>
@@ -211,27 +219,47 @@ class WordPairExercise {
   }
 
   /**
-   * Render word pairs as cards
+   * Render word pairs as cards with type labels
    */
   renderWordPairsDisplay() {
-    return this.currentPairs.map((pair, index) => `
-      <div style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md); border-left: 4px solid var(--color-info);">
-        <div style="flex-shrink: 0; width: 40px; height: 40px; background: var(--color-info); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: var(--font-size-xl);">
-          ${index + 1}
+    // Get color based on pair type
+    const getTypeColor = (type) => {
+      switch (type) {
+        case 'name-city': return 'var(--color-info)';
+        case 'building-time': return 'var(--color-success)';
+        case 'activity-day': return 'var(--color-warning)';
+        default: return 'var(--color-info)';
+      }
+    };
+
+    return this.currentPairs.map((pair, index) => {
+      const color = getTypeColor(pair.type);
+      const label = pair.label || 'Woordpaar';
+
+      return `
+        <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md); border-left: 4px solid ${color};">
+          <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-xs);">
+            <div style="flex-shrink: 0; width: 32px; height: 32px; background: ${color}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: var(--font-size-md);">
+              ${index + 1}
+            </div>
+            <span style="font-size: var(--font-size-sm); color: ${color}; font-weight: 600; text-transform: uppercase;">
+              ${label}
+            </span>
+          </div>
+          <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+            <div style="flex: 1; padding: var(--spacing-md); background: white; border-radius: var(--border-radius-md); font-size: var(--font-size-xxl); font-weight: bold; text-align: center;">
+              ${pair.word1}
+            </div>
+            <div style="font-size: var(--font-size-xl); color: ${color};">
+              -
+            </div>
+            <div style="flex: 1; padding: var(--spacing-md); background: white; border-radius: var(--border-radius-md); font-size: var(--font-size-xxl); font-weight: bold; text-align: center;">
+              ${pair.word2}
+            </div>
+          </div>
         </div>
-        <div style="flex: 1; display: flex; gap: var(--spacing-md); align-items: center;">
-          <div style="flex: 1; padding: var(--spacing-md); background: white; border-radius: var(--border-radius-md); font-size: var(--font-size-xxl); font-weight: bold; text-align: center;">
-            ${pair.word1}
-          </div>
-          <div style="font-size: var(--font-size-xl); color: var(--color-info);">
-            ↔️
-          </div>
-          <div style="flex: 1; padding: var(--spacing-md); background: white; border-radius: var(--border-radius-md); font-size: var(--font-size-xxl); font-weight: bold; text-align: center;">
-            ${pair.word2}
-          </div>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   /**
@@ -375,14 +403,16 @@ class WordPairExercise {
       return;
     }
 
+    const totalPairs = this.currentPairs.length;
+
     this.container.innerHTML = `
       <div class="phase-container">
         <div style="background: var(--color-success-light); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
           <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-md);">
-            ✏️ Herinner de woordparen
+            Herinner de woordparen
           </h2>
           <p style="font-size: var(--font-size-lg); line-height: 1.6;">
-            Vul de ${this.numPairs} woordparen in die je eerder hebt onthouden.
+            Vul de ${totalPairs} woordparen in die je eerder hebt onthouden.
             De volgorde maakt niet uit.
           </p>
         </div>
@@ -412,43 +442,78 @@ class WordPairExercise {
   }
 
   /**
-   * Render input fields for recall
+   * Render input fields for recall with type-specific placeholders
    */
   renderRecallInputs() {
-    return this.currentPairs.map((pair, index) => `
-      <div style="margin-bottom: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md);">
-        <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
-          <div style="flex-shrink: 0; width: 40px; height: 40px; background: var(--color-success); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: var(--font-size-xl);">
-            ${index + 1}
-          </div>
-          <div style="font-size: var(--font-size-lg); font-weight: bold; color: var(--color-text-secondary);">
-            Woordpaar ${index + 1}
-          </div>
-        </div>
+    // Get color and placeholders based on pair type
+    const getTypeInfo = (type) => {
+      switch (type) {
+        case 'name-city':
+          return {
+            color: 'var(--color-info)',
+            placeholder1: 'Naam',
+            placeholder2: 'Stad'
+          };
+        case 'building-time':
+          return {
+            color: 'var(--color-success)',
+            placeholder1: 'Gebouw',
+            placeholder2: 'Tijd (bijv. 9:30)'
+          };
+        case 'activity-day':
+          return {
+            color: 'var(--color-warning)',
+            placeholder1: 'Activiteit',
+            placeholder2: 'Dag'
+          };
+        default:
+          return {
+            color: 'var(--color-info)',
+            placeholder1: 'Eerste woord',
+            placeholder2: 'Tweede woord'
+          };
+      }
+    };
 
-        <div style="display: flex; gap: var(--spacing-md); align-items: center;">
-          <input
-            type="text"
-            id="word1-${index}"
-            placeholder="Eerste woord"
-            class="input-field"
-            style="flex: 1; padding: var(--spacing-md); font-size: var(--font-size-xl); border: 2px solid var(--color-border); border-radius: var(--border-radius-md); text-align: center;"
-            autocomplete="off"
-          >
-          <div style="font-size: var(--font-size-xl); color: var(--color-text-secondary);">
-            ↔️
+    return this.currentPairs.map((pair, index) => {
+      const typeInfo = getTypeInfo(pair.type);
+      const label = pair.label || 'Woordpaar';
+
+      return `
+        <div style="margin-bottom: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md); border-left: 4px solid ${typeInfo.color};">
+          <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+            <div style="flex-shrink: 0; width: 32px; height: 32px; background: ${typeInfo.color}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: var(--font-size-md);">
+              ${index + 1}
+            </div>
+            <span style="font-size: var(--font-size-sm); color: ${typeInfo.color}; font-weight: 600; text-transform: uppercase;">
+              ${label}
+            </span>
           </div>
-          <input
-            type="text"
-            id="word2-${index}"
-            placeholder="Tweede woord"
-            class="input-field"
-            style="flex: 1; padding: var(--spacing-md); font-size: var(--font-size-xl); border: 2px solid var(--color-border); border-radius: var(--border-radius-md); text-align: center;"
-            autocomplete="off"
-          >
+
+          <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+            <input
+              type="text"
+              id="word1-${index}"
+              placeholder="${typeInfo.placeholder1}"
+              class="input-field"
+              style="flex: 1; padding: var(--spacing-md); font-size: var(--font-size-xl); border: 2px solid var(--color-border); border-radius: var(--border-radius-md); text-align: center;"
+              autocomplete="off"
+            >
+            <div style="font-size: var(--font-size-xl); color: ${typeInfo.color};">
+              -
+            </div>
+            <input
+              type="text"
+              id="word2-${index}"
+              placeholder="${typeInfo.placeholder2}"
+              class="input-field"
+              style="flex: 1; padding: var(--spacing-md); font-size: var(--font-size-xl); border: 2px solid var(--color-border); border-radius: var(--border-radius-md); text-align: center;"
+              autocomplete="off"
+            >
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   /**
@@ -592,10 +657,13 @@ class WordPairExercise {
       totalPairs: results.totalPairs,
       accuracy: results.accuracy,
       isPerfect: results.isPerfect,
-      // Save actual word pairs for review
+      contentMode: this.currentContentMode,
+      // Save actual word pairs for review (including per-pair content mode)
       wordPairs: this.currentPairs.map(p => ({
         word1: p.word1,
-        word2: p.word2
+        word2: p.word2,
+        type: p.type,
+        contentMode: p.contentMode || this.currentContentMode
       })),
       // Save user answers
       userAnswers: results.pairResults.map(r => ({
@@ -672,16 +740,32 @@ class WordPairExercise {
       </div>
     `;
 
-    // Event listener
+    // Event listener - show feedback modal before continuing
     document.getElementById('continue-btn').addEventListener('click', () => {
-      this.phase = 'encoding';
-      this.render();
+      // Show feedback modal
+      if (window.FeedbackModal) {
+        const sessionId = window.DataTracker?.getLastSessionId(CONSTANTS.EXERCISE_TYPES.WORD_PAIR);
+
+        window.FeedbackModal.show({
+          exerciseType: CONSTANTS.EXERCISE_TYPES.WORD_PAIR,
+          sessionId: sessionId,
+          onComplete: () => {
+            this.phase = 'encoding';
+            this.render();
+          }
+        });
+      } else {
+        // No feedback modal available - continue directly
+        this.phase = 'encoding';
+        this.render();
+      }
     });
 
     // Speak result
     if (window.AudioManager && window.AudioManager.isEnabled()) {
+      const nextTotalPairs = this.numPairs * 3;
       const message = isSuccess
-        ? `Perfect! Je gaat naar het volgende niveau met ${this.numPairs} woordparen en ${this.delayMinutes} minuten wachttijd.`
+        ? `Perfect! Je gaat naar het volgende niveau met ${nextTotalPairs} woordparen en ${this.delayMinutes} minuten wachttijd.`
         : `Je hebt ${results.correctPairs} van de ${results.totalPairs} woordparen correct. Probeer het opnieuw!`;
       window.AudioManager.speak(message);
     }
@@ -719,14 +803,17 @@ class WordPairExercise {
    * Render difficulty update message
    */
   renderDifficultyUpdate(isSuccess) {
+    // Calculate total pairs for next round (numPairs * 3 types)
+    const nextTotalPairs = this.numPairs * 3;
+
     if (isSuccess) {
       return `
         <div style="background: var(--color-success-light); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
           <div style="font-size: var(--font-size-xl); font-weight: bold; margin-bottom: var(--spacing-sm); color: var(--color-success);">
-            📈 Niveau Verhoogd!
+            Niveau Verhoogd!
           </div>
           <p style="font-size: var(--font-size-lg);">
-            <strong>Nieuw niveau:</strong> ${this.numPairs} woordparen<br>
+            <strong>Nieuw niveau:</strong> ${nextTotalPairs} woordparen<br>
             <strong>Nieuwe wachttijd:</strong> ${this.delayMinutes} minuten
           </p>
         </div>
@@ -735,10 +822,10 @@ class WordPairExercise {
       return `
         <div style="background: var(--color-warning-light); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
           <div style="font-size: var(--font-size-xl); font-weight: bold; margin-bottom: var(--spacing-sm); color: var(--color-warning);">
-            💪 Blijf Oefenen!
+            Blijf Oefenen!
           </div>
           <p style="font-size: var(--font-size-lg);">
-            <strong>Nieuw niveau:</strong> ${this.numPairs} woordparen<br>
+            <strong>Nieuw niveau:</strong> ${nextTotalPairs} woordparen<br>
             <strong>Nieuwe wachttijd:</strong> ${this.delayMinutes} minuten<br><br>
             Het niveau is verlaagd om je te helpen succesvol te zijn. Probeer de woordparen te onthouden door ze te herhalen of een verhaal te maken.
           </p>
