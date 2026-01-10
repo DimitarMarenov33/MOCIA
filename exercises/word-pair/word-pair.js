@@ -178,31 +178,29 @@ class WordPairExercise {
 
     this.container.innerHTML = `
       <div class="phase-container">
-        <div style="background: var(--color-info-light); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
-          <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-md);">
-            Onthoud deze woordparen
-          </h2>
-          <p style="font-size: var(--font-size-lg); line-height: 1.6;">
+        <div class="info-box" style="background: var(--color-info-light);">
+          <h2>Onthoud deze woordparen</h2>
+          <p>
             Bestudeer de ${totalPairs} woordparen hieronder. Als je ze onthouden hebt, klik dan op de knop.
             Je krijgt dan ${this.delayMinutes} minuten de tijd voordat je ze moet herinneren.
           </p>
         </div>
 
-        <div style="background: white; padding: var(--spacing-xl); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl); box-shadow: var(--shadow-md);">
-          <div id="word-pairs-display" style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+        <div class="recall-form">
+          <div id="word-pairs-display">
             ${this.renderWordPairsDisplay()}
           </div>
         </div>
 
         <div class="simple-screen__actions">
-          <button id="remembered-btn" class="btn btn-success btn-large">
-            ✓ Ik heb ze onthouden
+          <button id="remembered-btn" class="btn btn-success btn-large" style="width: 100%;">
+            Ik heb ze onthouden
           </button>
         </div>
 
-        <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--color-background-alt); border-radius: var(--border-radius-md); font-size: var(--font-size-md); color: var(--color-text-secondary);">
-          <strong>Huidige niveau:</strong> ${totalPairs} woordparen |
-          <strong>Wachttijd:</strong> ${this.delayMinutes} minuten
+        <div class="level-indicator">
+          <strong>Niveau:</strong> ${totalPairs} woordparen |
+          <strong>Wachttijd:</strong> ${this.delayMinutes} min
         </div>
       </div>
     `;
@@ -237,23 +235,23 @@ class WordPairExercise {
       const label = pair.label || 'Woordpaar';
 
       return `
-        <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md); border-left: 4px solid ${color};">
-          <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-xs);">
-            <div style="flex-shrink: 0; width: 32px; height: 32px; background: ${color}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: var(--font-size-md);">
+        <div class="word-pair-card" style="border-left: 4px solid ${color};">
+          <div class="word-pair-card__header">
+            <div class="word-pair-card__number" style="background: ${color};">
               ${index + 1}
             </div>
-            <span style="font-size: var(--font-size-sm); color: ${color}; font-weight: 600; text-transform: uppercase;">
+            <span class="word-pair-card__label" style="color: ${color};">
               ${label}
             </span>
           </div>
-          <div style="display: flex; gap: var(--spacing-md); align-items: center;">
-            <div style="flex: 1; padding: var(--spacing-md); background: white; border-radius: var(--border-radius-md); font-size: var(--font-size-xxl); font-weight: bold; text-align: center;">
+          <div class="word-pair-display">
+            <div class="word-pair-display__word">
               ${pair.word1}
             </div>
-            <div style="font-size: var(--font-size-xl); color: ${color};">
+            <div class="word-pair-display__separator" style="color: ${color};">
               -
             </div>
-            <div style="flex: 1; padding: var(--spacing-md); background: white; border-radius: var(--border-radius-md); font-size: var(--font-size-xxl); font-weight: bold; text-align: center;">
+            <div class="word-pair-display__word">
               ${pair.word2}
             </div>
           </div>
@@ -301,29 +299,27 @@ class WordPairExercise {
    */
   renderLockedPhase() {
     this.container.innerHTML = `
-      <div class="phase-container">
-        <div style="text-align: center; padding: var(--spacing-xl);">
-          <div style="font-size: 80px; margin-bottom: var(--spacing-lg);">⏳</div>
-          <h2 style="font-size: var(--font-size-xxl); margin-bottom: var(--spacing-md);">
-            Oefening Vergrendeld
-          </h2>
-          <p style="font-size: var(--font-size-xl); color: var(--color-text-secondary); margin-bottom: var(--spacing-xl); line-height: 1.6;">
-            Je hebt de woordparen onthouden! <br>
-            Kom terug wanneer de tijd voorbij is om ze te herinneren.
-          </p>
+      <div class="phase-container" style="text-align: center;">
+        <div style="font-size: 60px; margin-bottom: var(--spacing-md);">&#9203;</div>
+        <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm);">
+          Oefening Vergrendeld
+        </h2>
+        <p style="font-size: var(--font-size-md); color: var(--color-text-secondary); margin-bottom: var(--spacing-lg); line-height: 1.5;">
+          Je hebt de woordparen onthouden!<br>
+          Kom terug wanneer de tijd voorbij is.
+        </p>
 
-          <div id="countdown-display" style="background: var(--color-info-light); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
-            <div style="font-size: var(--font-size-lg); color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">
-              Tijd tot ontgrendeling:
-            </div>
-            <div id="countdown-timer" style="font-size: 48px; font-weight: bold; color: var(--color-info); font-family: monospace;">
-              --:--:--
-            </div>
+        <div class="countdown-container">
+          <div style="font-size: var(--font-size-md); color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">
+            Tijd tot ontgrendeling:
           </div>
+          <div id="countdown-timer" class="countdown-timer">
+            --:--:--
+          </div>
+        </div>
 
-          <div style="padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md); font-size: var(--font-size-lg);">
-            <strong>💡 Tip:</strong> Probeer de woordparen in gedachten te herhalen terwijl je wacht. Dit helpt bij het onthouden!
-          </div>
+        <div class="info-box" style="background: var(--color-background-alt); text-align: left;">
+          <p><strong>Tip:</strong> Probeer de woordparen in gedachten te herhalen terwijl je wacht.</p>
         </div>
       </div>
     `;
@@ -407,23 +403,21 @@ class WordPairExercise {
 
     this.container.innerHTML = `
       <div class="phase-container">
-        <div style="background: var(--color-success-light); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl);">
-          <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-md);">
-            Herinner de woordparen
-          </h2>
-          <p style="font-size: var(--font-size-lg); line-height: 1.6;">
+        <div class="info-box" style="background: var(--color-success-light);">
+          <h2>Herinner de woordparen</h2>
+          <p>
             Vul de ${totalPairs} woordparen in die je eerder hebt onthouden.
             De volgorde maakt niet uit.
           </p>
         </div>
 
-        <form id="recall-form" style="background: white; padding: var(--spacing-xl); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-xl); box-shadow: var(--shadow-md);">
+        <form id="recall-form" class="recall-form">
           ${this.renderRecallInputs()}
         </form>
 
         <div class="simple-screen__actions">
-          <button id="submit-recall-btn" class="btn btn-success btn-large">
-            ✓ Controleer Antwoorden
+          <button id="submit-recall-btn" class="btn btn-success btn-large" style="width: 100%;">
+            Controleer Antwoorden
           </button>
         </div>
       </div>
@@ -480,34 +474,32 @@ class WordPairExercise {
       const label = pair.label || 'Woordpaar';
 
       return `
-        <div style="margin-bottom: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-background-alt); border-radius: var(--border-radius-md); border-left: 4px solid ${typeInfo.color};">
-          <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
-            <div style="flex-shrink: 0; width: 32px; height: 32px; background: ${typeInfo.color}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: var(--font-size-md);">
+        <div class="word-pair-card" style="border-left: 4px solid ${typeInfo.color};">
+          <div class="word-pair-card__header">
+            <div class="word-pair-card__number" style="background: ${typeInfo.color};">
               ${index + 1}
             </div>
-            <span style="font-size: var(--font-size-sm); color: ${typeInfo.color}; font-weight: 600; text-transform: uppercase;">
+            <span class="word-pair-card__label" style="color: ${typeInfo.color};">
               ${label}
             </span>
           </div>
 
-          <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+          <div class="word-pair-display">
             <input
               type="text"
               id="word1-${index}"
               placeholder="${typeInfo.placeholder1}"
-              class="input-field"
-              style="flex: 1; padding: var(--spacing-md); font-size: var(--font-size-xl); border: 2px solid var(--color-border); border-radius: var(--border-radius-md); text-align: center;"
+              class="word-pair-input"
               autocomplete="off"
             >
-            <div style="font-size: var(--font-size-xl); color: ${typeInfo.color};">
+            <div class="word-pair-display__separator" style="color: ${typeInfo.color};">
               -
             </div>
             <input
               type="text"
               id="word2-${index}"
               placeholder="${typeInfo.placeholder2}"
-              class="input-field"
-              style="flex: 1; padding: var(--spacing-md); font-size: var(--font-size-xl); border: 2px solid var(--color-border); border-radius: var(--border-radius-md); text-align: center;"
+              class="word-pair-input"
               autocomplete="off"
             >
           </div>

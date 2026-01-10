@@ -3,7 +3,7 @@
  * Handles offline functionality and caching
  */
 
-const CACHE_VERSION = 'mocia-v1.13.0';
+const CACHE_VERSION = 'mocia-v1.14.0';
 const CACHE_NAME = `mocia-cache-${CACHE_VERSION}`;
 
 // Files to cache for offline use
@@ -43,6 +43,7 @@ const ASSETS_TO_CACHE = [
   '/MOCIA/exercises/word-pair/index.html',
   '/MOCIA/exercises/word-pair/word-list.js',
   '/MOCIA/exercises/word-pair/word-pair.js',
+  '/MOCIA/exercises/word-pair/word-pair.css',
 
   // Exercise: Digit Span
   '/MOCIA/exercises/digit-span/index.html',
