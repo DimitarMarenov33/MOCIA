@@ -82,6 +82,19 @@ const SettingsModal = {
           Vernieuw de app om de nieuwste versie te laden
         </p>
       </div>
+
+      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
+
+      <div style="margin-bottom: var(--spacing-lg);">
+        <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+          <input type="checkbox" id="debug-mode-toggle" ${localStorage.getItem('mocia_debug_mode') === 'true' ? 'checked' : ''}
+                 style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+          <span>Debug Modus</span>
+        </label>
+        <p style="margin: var(--spacing-sm) 0 0 calc(30px + var(--spacing-md)); font-size: var(--font-size-md); color: var(--color-text-secondary);">
+          Toon console logs op het scherm (voor probleemoplossing)
+        </p>
+      </div>
     `;
 
     const modal = UIComponents.createModal(
@@ -154,6 +167,24 @@ const SettingsModal = {
     // Update app button
     modal.querySelector('#update-app-btn').addEventListener('click', () => {
       this.updateApp(modal);
+    });
+
+    // Debug mode toggle
+    modal.querySelector('#debug-mode-toggle').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (window.MobileDebug) {
+          window.MobileDebug.enable();
+        } else {
+          localStorage.setItem('mocia_debug_mode', 'true');
+          alert('Debug modus ingeschakeld. Herlaad de pagina om te activeren.');
+        }
+      } else {
+        if (window.MobileDebug) {
+          window.MobileDebug.disable();
+        } else {
+          localStorage.setItem('mocia_debug_mode', 'false');
+        }
+      }
     });
   },
 

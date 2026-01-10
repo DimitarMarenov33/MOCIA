@@ -3,7 +3,7 @@
  * Handles offline functionality and caching
  */
 
-const CACHE_VERSION = 'mocia-v1.5.0';
+const CACHE_VERSION = 'mocia-v1.6.0';
 const CACHE_NAME = `mocia-cache-${CACHE_VERSION}`;
 
 // Files to cache for offline use
@@ -35,6 +35,7 @@ const ASSETS_TO_CACHE = [
   '/MOCIA/shared/js/personalization-form.js',
   '/MOCIA/shared/js/settings-modal.js',
   '/MOCIA/shared/js/feedback-modal.js',
+  '/MOCIA/shared/js/mobile-debug.js',
   '/MOCIA/shared/utils/statistics.js',
 
   // Exercise: Word Pair
