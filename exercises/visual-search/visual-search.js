@@ -137,71 +137,101 @@ class VisualSearchExercise {
   }
 
   async startExercise() {
+    console.log('[VS] startExercise() entered');
+
     // Initialize state
     this.totalTrials = this.config.parameters.totalTrials || 20;
     this.currentTrial = 0;
     this.trials = [];
     this.score = 0;
+    console.log('[VS] State initialized, totalTrials:', this.totalTrials);
 
     // Initialize adaptive difficulty
     this.gridSize = 3;
     this.consecutiveCorrect = 0;
     this.timeLimit = this.config.parameters.startTimeLimit || 3000;
+    console.log('[VS] Difficulty initialized, gridSize:', this.gridSize);
 
     // Start data tracking
     if (!this.isPractice) {
+      console.log('[VS] Starting data tracking session...');
       window.DataTracker.startSession(this.config.exerciseId, {
         initialDifficulty: this.gridSize,
         initialGridSize: this.gridSize,
       });
+      console.log('[VS] Data tracking session started');
     }
 
     // Speak instructions
     if (window.AudioManager && window.AudioManager.isEnabled()) {
       try {
+        console.log('[VS] Attempting to speak instructions...');
         await window.AudioManager.speak('Zoek het juiste object. De oefening begint.');
+        console.log('[VS] Instructions spoken');
       } catch (error) {
-        console.log('Speech unavailable:', error);
+        console.log('[VS] Speech unavailable:', error);
       }
     }
 
     // Start first trial
+    console.log('[VS] Scheduling first trial in 1500ms...');
     setTimeout(() => {
+      console.log('[VS] setTimeout fired, calling startTrial()');
       this.startTrial();
     }, 1500);
+    console.log('[VS] startExercise() completed, waiting for setTimeout');
   }
 
   async startTrial() {
-    this.currentTrial++;
+    console.log('[VS] startTrial() entered, currentTrial will be:', this.currentTrial + 1);
+    try {
+      this.currentTrial++;
 
-    // Update trial counter
-    this.elements.trialCounter.textContent = `Poging ${this.currentTrial}/${this.totalTrials}`;
+      // Update trial counter
+      console.log('[VS] Updating trial counter...');
+      this.elements.trialCounter.textContent = `Poging ${this.currentTrial}/${this.totalTrials}`;
+      console.log('[VS] Trial counter updated');
 
-    // Clear previous trial's search matrix to prevent cognitive load
-    UIComponents.clearElement(this.elements.searchDisplay);
+      // Clear previous trial's search matrix to prevent cognitive load
+      console.log('[VS] Clearing search display...');
+      UIComponents.clearElement(this.elements.searchDisplay);
+      console.log('[VS] Search display cleared');
 
-    // Hide instruction prompt from previous trial
-    this.elements.instructionPrompt.classList.add('hidden');
+      // Hide instruction prompt from previous trial
+      this.elements.instructionPrompt.classList.add('hidden');
 
-    // Clear feedback
-    UIComponents.clearElement(this.elements.feedbackArea);
+      // Clear feedback
+      UIComponents.clearElement(this.elements.feedbackArea);
 
-    // Generate trial
-    this.generateTrial();
+      // Generate trial
+      console.log('[VS] Generating trial...');
+      this.generateTrial();
+      console.log('[VS] Trial generated, target:', this.targetAnimal, 'gridSize:', this.gridSize);
 
-    // Show target preview
-    await this.showTargetPreview();
+      // Show target preview
+      console.log('[VS] Showing target preview...');
+      await this.showTargetPreview();
+      console.log('[VS] Target preview done');
 
-    // Hide target preview, show search items
-    this.elements.targetPreview.classList.add('hidden');
-    this.elements.instructionPrompt.classList.remove('hidden');
+      // Hide target preview, show search items
+      console.log('[VS] Hiding preview, preparing to display items...');
+      this.elements.targetPreview.classList.add('hidden');
+      this.elements.instructionPrompt.classList.remove('hidden');
 
-    // Display search items
-    this.displaySearchItems();
+      // Display search items
+      console.log('[VS] Displaying search items...');
+      this.displaySearchItems();
+      console.log('[VS] Search items displayed');
 
-    // Start timer and trial timing
-    this.trialStartTime = Date.now();
-    this.startTimer();
+      // Start timer and trial timing
+      console.log('[VS] Starting timer...');
+      this.trialStartTime = Date.now();
+      this.startTimer();
+      console.log('[VS] Timer started, trial active');
+    } catch (error) {
+      console.error('[VS] ERROR in startTrial:', error);
+      console.error('[VS] Error stack:', error.stack);
+    }
   }
 
   generateTrial() {
@@ -232,9 +262,17 @@ class VisualSearchExercise {
   }
 
   async showTargetPreview() {
+    console.log('[VS] showTargetPreview() entered');
+    console.log('[VS] targetPreview element:', this.elements.targetPreview);
+    console.log('[VS] targetPreviewIcon element:', this.elements.targetPreviewIcon);
+
     // Show target preview
     this.elements.targetPreview.classList.remove('hidden');
+    console.log('[VS] targetPreview hidden class removed, classList:', this.elements.targetPreview.classList.toString());
+
     this.elements.targetPreviewIcon.textContent = this.targetAnimal;
+    console.log('[VS] targetPreviewIcon textContent set to:', this.targetAnimal);
+
     this.elements.instructionPrompt.classList.add('hidden');
 
     // Speak target animal
@@ -242,19 +280,27 @@ class VisualSearchExercise {
       try {
         await window.AudioManager.speak('Onthoud dit dier');
       } catch (error) {
-        console.log('Speech unavailable:', error);
+        console.log('[VS] Speech unavailable:', error);
       }
     }
 
     // Wait for preview duration
-    await this.sleep(this.config.parameters.targetPreviewDuration || 2000);
+    const duration = this.config.parameters.targetPreviewDuration || 2000;
+    console.log('[VS] Waiting for preview duration:', duration, 'ms');
+    await this.sleep(duration);
+    console.log('[VS] Preview duration complete');
   }
 
   displaySearchItems() {
+    console.log('[VS] displaySearchItems() entered');
+    console.log('[VS] searchDisplay element:', this.elements.searchDisplay);
+    console.log('[VS] items to display:', this.items.length);
+
     UIComponents.clearElement(this.elements.searchDisplay);
 
     // Update grid template columns dynamically based on gridSize
     this.elements.searchDisplay.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+    console.log('[VS] Grid template set:', this.elements.searchDisplay.style.gridTemplateColumns);
 
     // Adjust font size based on grid size for better scaling
     let fontSize = 64;
@@ -263,6 +309,7 @@ class VisualSearchExercise {
     } else if (this.gridSize > 4) {
       fontSize = 56;
     }
+    console.log('[VS] Font size:', fontSize);
 
     // Display items in grid (CSS handles the layout)
     this.items.forEach((item, index) => {
@@ -280,6 +327,10 @@ class VisualSearchExercise {
 
       this.elements.searchDisplay.appendChild(itemEl);
     });
+
+    console.log('[VS] All items appended. searchDisplay childCount:', this.elements.searchDisplay.childElementCount);
+    console.log('[VS] searchDisplay visibility:', window.getComputedStyle(this.elements.searchDisplay).display);
+    console.log('[VS] searchDisplay dimensions:', this.elements.searchDisplay.offsetWidth, 'x', this.elements.searchDisplay.offsetHeight);
   }
 
   startTimer() {
