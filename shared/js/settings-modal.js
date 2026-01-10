@@ -70,6 +70,18 @@ const SettingsModal = {
           Wis Alle Gegevens
         </button>
       </div>
+
+      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
+
+      <div style="text-align: center;">
+        <p style="margin-bottom: var(--spacing-md);">App Versie</p>
+        <button id="update-app-btn" class="btn btn-primary" style="width: 100%;">
+          Controleer op Updates
+        </button>
+        <p style="margin-top: var(--spacing-sm); font-size: var(--font-size-sm); color: var(--color-text-secondary);">
+          Vernieuw de app om de nieuwste versie te laden
+        </p>
+      </div>
     `;
 
     const modal = UIComponents.createModal(
@@ -137,6 +149,11 @@ const SettingsModal = {
       } else {
         alert('Personalisatie module niet beschikbaar op deze pagina.');
       }
+    });
+
+    // Update app button
+    modal.querySelector('#update-app-btn').addEventListener('click', () => {
+      this.updateApp(modal);
     });
   },
 
@@ -238,6 +255,62 @@ const SettingsModal = {
     );
 
     UIComponents.showModal(confirmModal);
+  },
+
+  /**
+   * Update the app by clearing caches and reloading
+   */
+  async updateApp(modal) {
+    const btn = modal.querySelector('#update-app-btn');
+    btn.disabled = true;
+    btn.textContent = 'Bezig met updaten...';
+
+    try {
+      // Clear all caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+        console.log('[Settings] All caches cleared');
+      }
+
+      // Unregister service worker
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(
+          registrations.map(registration => registration.unregister())
+        );
+        console.log('[Settings] Service worker unregistered');
+      }
+
+      // Show success message
+      btn.textContent = 'Update voltooid!';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-success');
+
+      if (window.AudioManager?.isEnabled()) {
+        await window.AudioManager.speak('App wordt bijgewerkt');
+      }
+
+      // Reload after short delay
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 1000);
+
+    } catch (error) {
+      console.error('[Settings] Update failed:', error);
+      btn.textContent = 'Update mislukt';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-error');
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = 'Controleer op Updates';
+        btn.classList.remove('btn-error');
+        btn.classList.add('btn-primary');
+      }, 2000);
+    }
   },
 
   /**
