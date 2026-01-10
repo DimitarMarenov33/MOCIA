@@ -3,7 +3,7 @@
  * Handles offline functionality and caching
  */
 
-const CACHE_VERSION = 'mocia-v1.12.0';
+const CACHE_VERSION = 'mocia-v1.13.0';
 const CACHE_NAME = `mocia-cache-${CACHE_VERSION}`;
 
 // Files to cache for offline use

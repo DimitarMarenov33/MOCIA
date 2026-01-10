@@ -185,19 +185,10 @@ class StroopExercise {
       });
     }
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Stroop taak. Kies wat je ZIET, niet wat je HOORT.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
-    }
-
-    // Start first trial
+    // Start first trial immediately (no intro speech to avoid overlap)
     setTimeout(() => {
       this.startTrial();
-    }, 1500);
+    }, 500);
   }
 
   async startTrial() {
