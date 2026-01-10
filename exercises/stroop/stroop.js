@@ -126,6 +126,7 @@ class StroopExercise {
     this.elements = {
       trialCounter: document.getElementById('trial-counter'),
       timerDisplay: document.getElementById('timer-display'),
+      stimulusContainer: document.getElementById('stimulus-display'),
       stimulusDisplay: document.getElementById('color-word'),
       responseButtons: document.getElementById('response-buttons'),
       feedbackArea: document.getElementById('feedback-area'),
@@ -512,7 +513,22 @@ class StroopExercise {
   }
 
   async showFeedback(correct, responseTime) {
-    // Just audio feedback, no visual feedback panel
+    let message, type;
+
+    if (correct) {
+      const messages = this.config.feedback?.correct || ['Correct!'];
+      message = messages[Math.floor(Math.random() * messages.length)];
+      type = 'success';
+    } else {
+      const messages = this.config.feedback?.incorrect || ['Niet juist'];
+      message = messages[Math.floor(Math.random() * messages.length)];
+      type = 'error';
+    }
+
+    // Show overlay feedback on stimulus container
+    UIComponents.showOverlayFeedback(this.elements.stimulusContainer, message, type);
+
+    // Audio feedback
     if (window.AudioManager) {
       if (correct) {
         window.AudioManager.hapticSuccess();
@@ -521,7 +537,7 @@ class StroopExercise {
       }
     }
 
-    await this.sleep(400);
+    await this.sleep(1500);
   }
 
   showTimeAdjustmentIndicator(wasCorrect) {
@@ -548,12 +564,18 @@ class StroopExercise {
   }
 
   async showTimeoutFeedback() {
-    // Just audio feedback for timeout
+    const messages = this.config.feedback?.timeout || ['Te langzaam!'];
+    const message = messages[Math.floor(Math.random() * messages.length)];
+
+    // Show overlay feedback on stimulus container
+    UIComponents.showOverlayFeedback(this.elements.stimulusContainer, message, 'error');
+
+    // Audio feedback
     if (window.AudioManager) {
       window.AudioManager.hapticError();
     }
 
-    await this.sleep(800);
+    await this.sleep(1500);
   }
 
   endExercise() {

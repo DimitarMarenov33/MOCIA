@@ -109,6 +109,7 @@ class TaskSwitchingExercise {
       trialCounter: document.getElementById('trial-counter'),
       cueDisplay: document.getElementById('cue-display'),
       cueText: document.getElementById('cue-text'),
+      stimulusDisplay: document.getElementById('stimulus-display'),
       numberDisplay: document.getElementById('number-display'),
       buttonLeft: document.getElementById('button-left'),
       buttonRight: document.getElementById('button-right'),
@@ -343,13 +344,19 @@ class TaskSwitchingExercise {
     // Determine if correct
     const correct = this.isResponseCorrect(side);
 
-    // Visual feedback
+    // Visual feedback on button
     const clickedButton = side === 'left' ? this.elements.buttonLeft : this.elements.buttonRight;
     if (correct) {
       clickedButton.classList.add('correct');
     } else {
       clickedButton.classList.add('incorrect');
     }
+
+    // Show overlay feedback on stimulus display
+    const message = correct
+      ? (this.config.feedback?.correct?.[Math.floor(Math.random() * this.config.feedback.correct.length)] || 'Correct!')
+      : (this.config.feedback?.incorrect?.[Math.floor(Math.random() * this.config.feedback.incorrect.length)] || 'Niet juist');
+    UIComponents.showOverlayFeedback(this.elements.stimulusDisplay, message, correct ? 'success' : 'error');
 
     // Calculate score
     let trialScore = 0;

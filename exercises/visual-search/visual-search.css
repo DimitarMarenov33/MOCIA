@@ -99,6 +99,7 @@
 
 /* Search Display Area */
 .search-display {
+  position: relative;
   width: min(90vw, 90vh, 500px);
   max-width: 500px;
   aspect-ratio: 1;
@@ -172,11 +173,36 @@
   75% { transform: translateX(10px); }
 }
 
-/* Feedback Area */
+/* Feedback Area (legacy, kept for compatibility) */
 #feedback-area {
-  text-align: center;
-  margin-top: var(--spacing-xl);
-  min-height: 60px;
+  display: none;
+}
+
+/* Grid Feedback Overlay */
+.grid-feedback-overlay {
+  pointer-events: none;
+}
+
+@keyframes feedbackFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes feedbackFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
 /* Utility Classes */

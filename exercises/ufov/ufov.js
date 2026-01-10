@@ -576,21 +576,21 @@ class UFOVExercise {
       const messages = this.config.feedback?.centralCorrect || ['Midden juist, maar rand gemist'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'info';
-      detail = `Het ${this.currentStimulusSet.peripheralLabel} was op positie ${this.currentPeripheralPosition + 1}`;
+      detail = `Positie ${this.currentPeripheralPosition + 1}`;
     } else if (peripheralCorrect) {
       const messages = this.config.feedback?.peripheralCorrect || ['Rand juist, maar midden gemist'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'info';
-      detail = `Het was een ${centralTargetLabel} in het midden`;
+      detail = `Was: ${centralTargetLabel}`;
     } else {
       const messages = this.config.feedback?.bothIncorrect || ['Probeer het nog eens'];
       message = messages[Math.floor(Math.random() * messages.length)];
       type = 'error';
-      detail = `Midden: ${centralTargetLabel}, Rand: positie ${this.currentPeripheralPosition + 1}`;
+      detail = `${centralTargetLabel}, positie ${this.currentPeripheralPosition + 1}`;
     }
 
-    // Create centered overlay feedback
-    this.showCenteredFeedback(message, detail, type);
+    // Show overlay feedback on display area
+    UIComponents.showOverlayFeedback(this.elements.displayArea, message, type, { detail });
 
     // Audio feedback
     if (window.AudioManager) {

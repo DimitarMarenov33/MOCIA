@@ -540,6 +540,92 @@ const UIComponents = {
   },
 
   /**
+   * Show overlay feedback on a container element
+   * @param {HTMLElement} container - Container element to show feedback on
+   * @param {string} message - Feedback message
+   * @param {string} type - Feedback type ('success', 'error', 'info')
+   * @param {Object} options - Additional options
+   * @param {string} options.detail - Additional detail text
+   * @param {number} options.duration - How long to show (default 1200ms)
+   */
+  showOverlayFeedback(container, message, type, options = {}) {
+    // Remove any existing overlay
+    const existingOverlay = container.querySelector('.overlay-feedback');
+    if (existingOverlay) {
+      existingOverlay.remove();
+    }
+
+    // Create overlay element
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay-feedback';
+
+    // Set colors and icon based on type
+    let bgColor, iconColor, icon;
+    if (type === 'success') {
+      bgColor = 'rgba(76, 175, 80, 0.95)';
+      iconColor = 'white';
+      icon = '\u2713'; // checkmark
+    } else if (type === 'error') {
+      bgColor = 'rgba(244, 67, 54, 0.95)';
+      iconColor = 'white';
+      icon = '\u2717'; // X mark
+    } else {
+      bgColor = 'rgba(25, 118, 210, 0.95)';
+      iconColor = 'white';
+      icon = 'i';
+    }
+
+    overlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: ${bgColor};
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      border-radius: inherit;
+      animation: overlayFeedbackFadeIn 0.2s ease;
+      pointer-events: none;
+    `;
+
+    let detailHtml = '';
+    if (options.detail) {
+      detailHtml = `<div style="font-size: 16px; color: ${iconColor}; opacity: 0.9; text-align: center; padding: 0 16px; margin-top: 8px;">${options.detail}</div>`;
+    }
+
+    overlay.innerHTML = `
+      <div style="font-size: 64px; color: ${iconColor}; margin-bottom: 8px; line-height: 1;">${icon}</div>
+      <div style="font-size: 24px; font-weight: 600; color: ${iconColor}; text-align: center; padding: 0 16px;">
+        ${message}
+      </div>
+      ${detailHtml}
+    `;
+
+    // Ensure container has position relative for absolute positioning
+    const originalPosition = container.style.position;
+    if (!originalPosition || originalPosition === 'static') {
+      container.style.position = 'relative';
+    }
+
+    container.appendChild(overlay);
+
+    // Auto-remove after delay
+    const duration = options.duration || 1200;
+    setTimeout(() => {
+      if (overlay.parentNode) {
+        overlay.style.animation = 'overlayFeedbackFadeOut 0.2s ease forwards';
+        setTimeout(() => overlay.remove(), 200);
+      }
+    }, duration);
+
+    return overlay;
+  },
+
+  /**
    * Clear all children from an element
    * @param {HTMLElement} element - Element to clear
    */

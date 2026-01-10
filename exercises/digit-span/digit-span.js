@@ -782,7 +782,6 @@ class DigitSpanExercise {
 
   async showFeedback(correct, difficultyAdjusted) {
     UIComponents.clearElement(this.elements.sequenceDisplay);
-    UIComponents.clearElement(this.elements.feedbackArea);
 
     const feedbackMessages = correct ? this.config.feedback?.correct : this.config.feedback?.incorrect;
     const message = feedbackMessages
@@ -793,16 +792,16 @@ class DigitSpanExercise {
     if (!correct) {
       // Show formatted sequence in feedback
       const formattedSequence = this.formatSequenceForDisplay(this.currentSequence, this.currentSequenceType);
-      detailMessage = `De juiste ${this.getSequenceTypeLabel().toLowerCase()} was: ${formattedSequence}`;
+      detailMessage = `Juist: ${formattedSequence}`;
     }
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(
+    // Show overlay feedback on sequence display
+    UIComponents.showOverlayFeedback(
+      this.elements.sequenceDisplay,
       message,
       correct ? 'success' : 'error',
-      { detail: detailMessage }
+      { detail: detailMessage, duration: 1500 }
     );
-
-    this.elements.feedbackArea.appendChild(feedbackPanel);
 
     // Audio feedback
     if (window.AudioManager) {
@@ -813,14 +812,9 @@ class DigitSpanExercise {
       }
 
       await window.AudioManager.speak(message);
-
-      if (detailMessage) {
-        await this.sleep(500);
-        await window.AudioManager.speak(detailMessage);
-      }
     }
 
-    await this.sleep(this.config.parameters.feedbackDuration || CONSTANTS.TIMING.FEEDBACK_DISPLAY);
+    await this.sleep(1800);
   }
 
   // Removed - no longer showing progress bar in simplified UI

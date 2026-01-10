@@ -509,8 +509,6 @@ class VisualSearchExercise {
   }
 
   async showFeedback(correct, responseTime, difficultyAdjusted) {
-    UIComponents.clearElement(this.elements.feedbackArea);
-
     let message, type;
 
     if (correct) {
@@ -523,8 +521,8 @@ class VisualSearchExercise {
       type = 'error';
     }
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, type);
-    this.elements.feedbackArea.appendChild(feedbackPanel);
+    // Show feedback as overlay on the grid
+    this.showGridOverlayFeedback(message, type);
 
     // Audio feedback
     if (window.AudioManager) {
@@ -541,17 +539,15 @@ class VisualSearchExercise {
       }
     }
 
-    await this.sleep(2000);
+    await this.sleep(1500);
   }
 
   async showTimeoutFeedback(difficultyAdjusted) {
-    UIComponents.clearElement(this.elements.feedbackArea);
-
     const messages = this.config.feedback?.timeout || ['Te langzaam!'];
     const message = messages[Math.floor(Math.random() * messages.length)];
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, 'error');
-    this.elements.feedbackArea.appendChild(feedbackPanel);
+    // Show feedback as overlay on the grid
+    this.showGridOverlayFeedback(message, 'error');
 
     // Audio feedback
     if (window.AudioManager) {
@@ -563,7 +559,12 @@ class VisualSearchExercise {
       }
     }
 
-    await this.sleep(2000);
+    await this.sleep(1500);
+  }
+
+  showGridOverlayFeedback(message, type) {
+    // Use the shared UIComponents overlay feedback
+    UIComponents.showOverlayFeedback(this.elements.searchDisplay, message, type);
   }
 
   endExercise() {

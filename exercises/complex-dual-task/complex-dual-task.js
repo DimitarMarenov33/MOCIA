@@ -394,13 +394,10 @@ class ComplexDualTaskExercise {
   }
 
   async showBriefFeedback(message, type) {
-    UIComponents.clearElement(this.elements.feedbackArea);
+    // Show overlay feedback on search display
+    UIComponents.showOverlayFeedback(this.elements.searchDisplay, message, type, { duration: 800 });
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, type);
-    this.elements.feedbackArea.appendChild(feedbackPanel);
-
-    await this.sleep(800);
-    UIComponents.clearElement(this.elements.feedbackArea);
+    await this.sleep(1000);
   }
 
   async completeTrialSuccess(finalResponseTime) {
@@ -501,8 +498,6 @@ class ComplexDualTaskExercise {
   }
 
   async showTrialFeedback(correct, difficultyAdjusted, trialScore) {
-    UIComponents.clearElement(this.elements.feedbackArea);
-
     let message, type;
 
     if (correct) {
@@ -515,8 +510,8 @@ class ComplexDualTaskExercise {
       type = 'error';
     }
 
-    const feedbackPanel = UIComponents.createFeedbackPanel(message, type);
-    this.elements.feedbackArea.appendChild(feedbackPanel);
+    // Show overlay feedback on search display
+    UIComponents.showOverlayFeedback(this.elements.searchDisplay, message, type);
 
     // Audio feedback
     if (window.AudioManager && window.AudioManager.isEnabled()) {
@@ -527,7 +522,7 @@ class ComplexDualTaskExercise {
       }
     }
 
-    await this.sleep(2000);
+    await this.sleep(1500);
   }
 
   endExercise() {
