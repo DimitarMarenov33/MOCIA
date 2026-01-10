@@ -94,6 +94,9 @@ const SettingsModal = {
         <p style="margin: var(--spacing-sm) 0 0 calc(30px + var(--spacing-md)); font-size: var(--font-size-md); color: var(--color-text-secondary);">
           Toon console logs op het scherm (voor probleemoplossing)
         </p>
+        <button id="show-compat-btn" class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-sm);">
+          Toon Compatibiliteitsinfo
+        </button>
       </div>
     `;
 
@@ -184,6 +187,17 @@ const SettingsModal = {
         } else {
           localStorage.setItem('mocia_debug_mode', 'false');
         }
+      }
+    });
+
+    // Show compatibility info button
+    modal.querySelector('#show-compat-btn').addEventListener('click', () => {
+      modal.remove();
+      if (window.CompatibilityCheck) {
+        window.CompatibilityCheck.run();
+        window.CompatibilityCheck.showResults();
+      } else {
+        alert('Compatibiliteitscheck niet beschikbaar. Herlaad de pagina.');
       }
     });
   },

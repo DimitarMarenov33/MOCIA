@@ -3,8 +3,11 @@
  * Attention training through target identification
  */
 
+console.log('[VS] Script loaded');
+
 class VisualSearchExercise {
   constructor() {
+    console.log('[VS] Constructor started');
     this.config = null;
     this.isPractice = false;
 
@@ -43,16 +46,31 @@ class VisualSearchExercise {
   }
 
   async init() {
+    console.log('[VS] init() started');
     try {
+      console.log('[VS] Loading config...');
       await this.loadConfig();
+      console.log('[VS] Config loaded:', this.config?.exerciseId);
+
+      console.log('[VS] Caching elements...');
       this.cacheElements();
+      console.log('[VS] Elements cached:', Object.keys(this.elements));
+
+      console.log('[VS] Setting up event listeners...');
       this.setupEventListeners();
+      console.log('[VS] Event listeners set up');
+
+      console.log('[VS] Loading settings...');
       this.loadSettings();
+      console.log('[VS] Settings loaded');
 
       // Auto-start exercise immediately (no welcome screen)
+      console.log('[VS] Starting exercise...');
       this.startExercise();
+      console.log('[VS] Exercise started');
     } catch (error) {
-      console.error('Initialization error:', error);
+      console.error('[VS] Initialization error:', error);
+      console.error('[VS] Error stack:', error.stack);
       alert('Er is een fout opgetreden bij het laden van de oefening.');
     }
   }
@@ -563,16 +581,24 @@ class VisualSearchExercise {
 }
 
 // Initialize exercise when DOM is ready (with guard against double initialization)
+console.log('[VS] Setting up initialization, readyState:', document.readyState);
 let exerciseInstance = null;
 
 function initializeExercise() {
+  console.log('[VS] initializeExercise() called');
   if (exerciseInstance === null) {
+    console.log('[VS] Creating new VisualSearchExercise instance');
     exerciseInstance = new VisualSearchExercise();
+    console.log('[VS] Instance created:', exerciseInstance ? 'success' : 'failed');
+  } else {
+    console.log('[VS] Instance already exists, skipping');
   }
 }
 
 if (document.readyState === 'loading') {
+  console.log('[VS] DOM still loading, adding DOMContentLoaded listener');
   document.addEventListener('DOMContentLoaded', initializeExercise);
 } else {
+  console.log('[VS] DOM already loaded, initializing immediately');
   initializeExercise();
 }
