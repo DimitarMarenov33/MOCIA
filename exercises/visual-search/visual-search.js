@@ -302,14 +302,20 @@ class VisualSearchExercise {
     this.elements.searchDisplay.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
     console.log('[VS] Grid template set:', this.elements.searchDisplay.style.gridTemplateColumns);
 
-    // Adjust font size based on grid size for better scaling
-    let fontSize = 64;
-    if (this.gridSize > 5) {
-      fontSize = 48;
-    } else if (this.gridSize > 4) {
-      fontSize = 56;
-    }
-    console.log('[VS] Font size:', fontSize);
+    // Calculate font size dynamically based on container size and grid
+    // Get the container's actual width
+    const containerWidth = this.elements.searchDisplay.offsetWidth;
+    const padding = 16; // Account for container padding
+    const gap = 4 * (this.gridSize - 1); // Account for gaps between items
+    const availableWidth = containerWidth - padding - gap;
+    const cellSize = availableWidth / this.gridSize;
+
+    // Font size should be roughly 70% of cell size for good fit
+    let fontSize = Math.floor(cellSize * 0.65);
+    // Clamp font size between 20px and 64px
+    fontSize = Math.max(20, Math.min(64, fontSize));
+
+    console.log('[VS] Container width:', containerWidth, 'Cell size:', cellSize, 'Font size:', fontSize);
 
     // Display items in grid (CSS handles the layout)
     this.items.forEach((item, index) => {
