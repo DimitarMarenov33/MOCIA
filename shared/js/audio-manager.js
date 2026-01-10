@@ -137,7 +137,8 @@ class AudioManager {
    * @param {boolean} options.priority - If true, interrupt current speech
    * @param {number} options.rate - Speech rate override
    * @param {Function} options.onEnd - Callback when speech ends
-   * @returns {Promise} Resolves when speech completes
+   * @param {number} options.timeout - Max time to wait in ms (default: 5000)
+   * @returns {Promise} Resolves when speech completes or times out
    */
   speak(text, options = {}) {
     return new Promise((resolve, reject) => {
@@ -152,6 +153,30 @@ class AudioManager {
       if (options.priority && this.speaking) {
         this.stop();
       }
+
+      // Timeout to prevent hanging on iOS (Safari/Opera often don't fire events)
+      // Use short default (2s) to prevent blocking app startup
+      const timeoutMs = options.timeout || 2000;
+      let resolved = false;
+      let timeoutId = null;
+
+      const safeResolve = () => {
+        if (!resolved) {
+          resolved = true;
+          if (timeoutId) clearTimeout(timeoutId);
+          resolve();
+        }
+      };
+
+      // Set timeout to prevent infinite hang on iOS
+      timeoutId = setTimeout(() => {
+        if (!resolved) {
+          console.log('[AudioManager] Speech timed out after', timeoutMs, 'ms:', text);
+          this.speaking = false;
+          this.currentUtterance = null;
+          safeResolve();
+        }
+      }, timeoutMs);
 
       try {
         const utterance = new SpeechSynthesisUtterance(text);
@@ -184,7 +209,7 @@ class AudioManager {
           // Process next in queue
           this.processQueue();
 
-          resolve();
+          safeResolve();
         };
 
         utterance.onerror = (event) => {
@@ -196,13 +221,8 @@ class AudioManager {
           // Continue with queue even on error
           this.processQueue();
 
-          // Don't reject on browser security restrictions (expected behavior)
-          // These errors occur when speech is attempted without user interaction
-          if (event.error === 'not-allowed' || event.error === 'not-supported') {
-            resolve(); // Silently continue
-          } else {
-            reject(event); // Reject on unexpected errors
-          }
+          // Always resolve (don't reject) to prevent blocking app
+          safeResolve();
         };
 
         // Add to queue or speak immediately
@@ -213,7 +233,7 @@ class AudioManager {
         }
       } catch (error) {
         console.error('Error creating speech utterance:', error);
-        reject(error);
+        safeResolve(); // Resolve anyway to prevent blocking
       }
     });
   }
