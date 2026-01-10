@@ -250,14 +250,26 @@ class DataTracker {
     this.currentSession.status = status;
     this.currentSession.statistics = finalStats;
 
+    // For abandoned sessions, record the exit point
+    if (status === 'abandoned') {
+      this.currentSession.exitInfo = {
+        trialsCompleted: this.currentSession.trials.length,
+        lastTrialNumber: this.currentSession.trials.length > 0
+          ? this.currentSession.trials[this.currentSession.trials.length - 1].trialNumber
+          : 0,
+        exitTime: new Date().toISOString(),
+        reason: finalStats.exitReason || 'user_exit'
+      };
+    }
+
     // Calculate session duration
     const startTime = new Date(this.currentSession.startTime);
     const endTime = new Date(this.currentSession.endTime);
     this.currentSession.duration = endTime - startTime;
 
-    // Save to user data
+    // Save to user data - save ALL sessions (completed AND abandoned)
     const userData = this.getUserData();
-    if (userData && this.currentSession.status === 'completed') {
+    if (userData) {
       const exerciseType = this.currentSession.exerciseType;
 
       // Ensure exercise type exists in userData (defensive check for new exercise types)
@@ -266,6 +278,8 @@ class DataTracker {
         userData.exercises[exerciseType] = {
           sessions: [],
           totalSessions: 0,
+          completedSessions: 0,
+          abandonedSessions: 0,
           bestPerformance: null,
           averageAccuracy: 0,
           lastPlayed: null,
@@ -280,13 +294,22 @@ class DataTracker {
       exerciseData.totalSessions++;
       exerciseData.lastPlayed = this.currentSession.endTime;
 
+      // Track completed vs abandoned sessions separately
+      if (status === 'completed') {
+        exerciseData.completedSessions = (exerciseData.completedSessions || 0) + 1;
+      } else if (status === 'abandoned') {
+        exerciseData.abandonedSessions = (exerciseData.abandonedSessions || 0) + 1;
+      }
+
       // Limit number of stored sessions
       if (exerciseData.sessions.length > CONSTANTS.DATA.MAX_SESSIONS_STORED) {
         exerciseData.sessions = exerciseData.sessions.slice(-CONSTANTS.DATA.MAX_SESSIONS_STORED);
       }
 
-      // Update statistics
-      this.updateExerciseStats(exerciseData, this.currentSession);
+      // Update statistics (only for completed sessions)
+      if (status === 'completed') {
+        this.updateExerciseStats(exerciseData, this.currentSession);
+      }
 
       // Save updated data
       this.saveUserData(userData);
@@ -296,6 +319,94 @@ class DataTracker {
     this.currentSession = null;
 
     return completedSession;
+  }
+
+  /**
+   * Abandon current session (convenience method for premature exit)
+   * @param {Object} exitInfo - Additional exit information
+   */
+  abandonSession(exitInfo = {}) {
+    if (!this.currentSession) {
+      return;
+    }
+
+    const stats = {
+      ...exitInfo,
+      exitReason: exitInfo.reason || 'user_exit',
+      trialsAtExit: this.currentSession.trials.length,
+      partialAccuracy: this.calculatePartialAccuracy()
+    };
+
+    return this.endSession(stats, 'abandoned');
+  }
+
+  /**
+   * Calculate accuracy from trials completed so far
+   * @returns {number} Partial accuracy (0-1)
+   */
+  calculatePartialAccuracy() {
+    if (!this.currentSession || this.currentSession.trials.length === 0) {
+      return 0;
+    }
+
+    const correctTrials = this.currentSession.trials.filter(t => t.correct).length;
+    return correctTrials / this.currentSession.trials.length;
+  }
+
+  /**
+   * Save current session state without ending it (for recovery)
+   * Called periodically or before potential page unload
+   */
+  saveSessionSnapshot() {
+    if (!this.currentSession) return;
+
+    try {
+      const snapshot = {
+        ...this.currentSession,
+        snapshotTime: new Date().toISOString(),
+        trialsCompleted: this.currentSession.trials.length
+      };
+
+      localStorage.setItem('mocia_session_snapshot', JSON.stringify(snapshot));
+    } catch (error) {
+      console.error('Error saving session snapshot:', error);
+    }
+  }
+
+  /**
+   * Clear session snapshot
+   */
+  clearSessionSnapshot() {
+    try {
+      localStorage.removeItem('mocia_session_snapshot');
+    } catch (error) {
+      console.error('Error clearing session snapshot:', error);
+    }
+  }
+
+  /**
+   * Recover abandoned session from snapshot (if exists)
+   * @returns {Object|null} Recovered session or null
+   */
+  recoverAbandonedSession() {
+    try {
+      const snapshot = localStorage.getItem('mocia_session_snapshot');
+      if (!snapshot) return null;
+
+      const session = JSON.parse(snapshot);
+
+      // Save recovered session as abandoned
+      this.currentSession = session;
+      this.abandonSession({ reason: 'page_unload_recovery' });
+
+      // Clear the snapshot
+      this.clearSessionSnapshot();
+
+      return session;
+    } catch (error) {
+      console.error('Error recovering session:', error);
+      return null;
+    }
   }
 
   /**
@@ -602,4 +713,24 @@ const dataTracker = new DataTracker();
 // Make available globally
 if (typeof window !== 'undefined') {
   window.DataTracker = dataTracker;
+
+  // Handle page unload - save any active session as abandoned
+  window.addEventListener('beforeunload', () => {
+    if (dataTracker.hasActiveSession()) {
+      // Save session snapshot for potential recovery
+      dataTracker.saveSessionSnapshot();
+    }
+  });
+
+  // Handle visibility change (tab hidden/closed on mobile)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && dataTracker.hasActiveSession()) {
+      dataTracker.saveSessionSnapshot();
+    }
+  });
+
+  // On page load, recover any abandoned sessions from previous visits
+  window.addEventListener('load', () => {
+    dataTracker.recoverAbandonedSession();
+  });
 }

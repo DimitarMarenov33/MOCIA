@@ -717,9 +717,19 @@ class DualNBackExercise {
 
     if (inProgress) {
       const confirmed = confirm(
-        'Je bent nog bezig met de oefening. Wil je echt stoppen? Je voortgang gaat verloren.'
+        'Je bent nog bezig met de oefening. Wil je echt stoppen?'
       );
       if (!confirmed) return;
+
+      // Save abandoned session with exit info
+      window.DataTracker.abandonSession({
+        reason: 'user_exit',
+        currentTrial: this.currentTrial,
+        currentBlock: this.currentBlock,
+        totalBlocks: this.totalBlocks,
+        currentN: this.currentN,
+        score: this.score
+      });
     }
 
     window.location.href = '../../index.html';

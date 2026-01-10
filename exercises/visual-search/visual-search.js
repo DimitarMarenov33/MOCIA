@@ -625,9 +625,17 @@ class VisualSearchExercise {
 
     if (inProgress && !this.isPractice) {
       const confirmed = confirm(
-        'Je bent nog bezig met de oefening. Wil je echt stoppen? Je voortgang gaat verloren.'
+        'Je bent nog bezig met de oefening. Wil je echt stoppen?'
       );
       if (!confirmed) return;
+
+      // Save abandoned session with exit info
+      window.DataTracker.abandonSession({
+        reason: 'user_exit',
+        currentTrial: this.currentTrial,
+        totalTrials: this.totalTrials,
+        score: this.score
+      });
     }
 
     history.back();

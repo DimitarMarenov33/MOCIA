@@ -896,8 +896,17 @@ class DigitSpanExercise {
     const inProgress = !this.screens.exercise.classList.contains('hidden') && this.currentTrial > 0;
 
     if (inProgress && !this.isPractice) {
-      const confirmed = confirm('Je bent nog bezig met de oefening. Wil je echt stoppen? Je voortgang gaat verloren.');
+      const confirmed = confirm('Je bent nog bezig met de oefening. Wil je echt stoppen?');
       if (!confirmed) return;
+
+      // Save abandoned session with exit info
+      window.DataTracker.abandonSession({
+        reason: 'user_exit',
+        currentTrial: this.currentTrial,
+        totalTrials: this.totalTrials,
+        currentSpan: this.currentSpan,
+        score: this.score
+      });
     }
 
     history.back();
