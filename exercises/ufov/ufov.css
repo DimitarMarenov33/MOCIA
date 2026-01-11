@@ -48,18 +48,20 @@
   opacity: 0.8;
 }
 
-/* Display area */
+/* Display area - fixed size taking most of screen */
 .ufov-display-area {
   position: relative;
-  width: 100%;
-  max-width: 800px;
-  height: 600px;
-  margin: var(--spacing-xl) auto;
+  width: calc(100vw - 32px);
+  max-width: 600px;
+  height: calc(100vw - 32px);
+  max-height: 600px;
+  margin: var(--spacing-md) auto;
   background-color: var(--color-background);
   border: 3px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
+  flex-shrink: 0;
 }
 
 /* Fixation cross */
@@ -188,13 +190,24 @@
 }
 
 .response-icon {
+  width: 60px;
+  height: 60px;
   font-size: 48px;
-  line-height: 1;
+  line-height: 60px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .response-label {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Peripheral response zones */
@@ -370,43 +383,49 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .ufov-display-area {
-    height: 500px;
+    width: calc(100vw - 24px);
+    height: calc(100vw - 24px);
+    max-width: none;
+    max-height: 65vh;
   }
 
   .central-stimulus-icon {
-    width: 100px;
-    height: 100px;
-    font-size: 60px;
+    width: 80px;
+    height: 80px;
+    font-size: 50px;
   }
 
   .peripheral-item {
-    width: 50px;
-    height: 50px;
-    font-size: 32px;
+    width: 40px;
+    height: 40px;
+    font-size: 28px;
   }
 
   .response-zone {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
   }
 
   .response-buttons {
-    max-width: 320px;
+    max-width: 300px;
     gap: var(--spacing-md);
   }
 
   .response-btn {
-    min-height: 100px;
-    max-width: 150px;
+    min-height: 90px;
+    max-width: 140px;
     padding: var(--spacing-sm);
   }
 
   .response-icon {
+    width: 50px;
+    height: 50px;
     font-size: 36px;
+    line-height: 50px;
   }
 
   .response-label {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
   }
 
   .threshold-display {

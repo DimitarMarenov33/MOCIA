@@ -51,19 +51,22 @@
   display: none;
 }
 
-/* Display Area */
+/* Display Area - fixed size taking most of screen */
 .ufov-display-area {
   position: relative;
-  width: min(90vmin, 700px);
-  height: min(90vmin, 700px);
+  width: calc(100vw - 32px);
+  max-width: 600px;
+  height: calc(100vw - 32px);
+  max-height: 600px;
   background: var(--color-background-alt);
   border: 3px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: var(--spacing-xl) auto;
+  margin: var(--spacing-md) auto;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 /* Fixation Cross */
@@ -256,13 +259,24 @@
 }
 
 .response-icon {
+  width: 60px;
+  height: 60px;
   font-size: 48px;
-  line-height: 1;
+  line-height: 60px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .response-label {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Feedback Area */
@@ -314,12 +328,14 @@
 /* Responsive */
 @media (max-width: 768px) {
   .ufov-display-area {
-    width: 95vmin;
-    height: 95vmin;
+    width: calc(100vw - 24px);
+    height: calc(100vw - 24px);
+    max-width: none;
+    max-height: 65vh;
   }
 
   .central-stimulus-icon {
-    font-size: 60px;
+    font-size: 50px;
   }
 
   .peripheral-item {
@@ -332,22 +348,25 @@
   }
 
   .response-buttons {
-    max-width: 320px;
+    max-width: 300px;
     gap: var(--spacing-md);
   }
 
   .response-btn {
-    min-height: 100px;
-    max-width: 150px;
+    min-height: 90px;
+    max-width: 140px;
     padding: var(--spacing-sm);
   }
 
   .response-icon {
+    width: 50px;
+    height: 50px;
     font-size: 36px;
+    line-height: 50px;
   }
 
   .response-label {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
   }
 }
 
