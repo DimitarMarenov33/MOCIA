@@ -260,7 +260,7 @@ class DigitSpanExercise {
 
   /**
    * Speak a sequence as a single utterance (for iOS gesture context)
-   * Uses lead-in phrase and slow speech rate to match visual presentation timing
+   * Uses lead-in phrase and very slow speech rate to match visual presentation timing
    */
   speakSequence(sequence) {
     if (!window.AudioManager || !window.AudioManager.isEnabled()) return;
@@ -275,10 +275,11 @@ class DigitSpanExercise {
       return char.toString();
     });
 
-    // Add "Klaar?" lead-in to fill the visual delay, then the sequence
-    // Rate 0.35 creates ~1.5-2s per item which matches the visual timing
-    const speechText = 'Klaar?,   ' + spokenParts.join(',   ');
-    window.AudioManager.speak(speechText, { rate: 0.35 });
+    // Add "Klaar?" lead-in, then each digit as a separate "sentence" using semicolons
+    // Semicolons create longer pauses than commas without being pronounced
+    // Rate 0.25 with semicolons creates ~1.8s per digit to match visual timing
+    const speechText = 'Klaar?;   ' + spokenParts.join(';   ');
+    window.AudioManager.speak(speechText, { rate: 0.25 });
   }
 
   async startTrial() {
