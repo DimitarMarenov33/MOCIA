@@ -33,6 +33,11 @@ class WordPairExercise {
   }
 
   async init() {
+    // Prime audio system for iOS (user just navigated here)
+    if (window.AudioManager) {
+      window.AudioManager.prime();
+    }
+
     try {
       // Load saved state
       this.loadState();

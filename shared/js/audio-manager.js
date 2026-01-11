@@ -131,13 +131,37 @@ class AudioManager {
   }
 
   /**
+   * Prime the audio system on iOS by speaking a silent utterance
+   * Call this on user interaction (button tap) before speech is needed
+   * This helps iOS "wake up" the speech synthesis system
+   */
+  prime() {
+    if (!this.speechSupported) return;
+
+    try {
+      // Cancel any pending speech first
+      this.speechSynthesis.cancel();
+
+      // Create a silent/empty utterance to "unlock" iOS audio
+      const silentUtterance = new SpeechSynthesisUtterance('');
+      silentUtterance.volume = 0;
+      silentUtterance.rate = 10; // Fastest possible
+      this.speechSynthesis.speak(silentUtterance);
+
+      console.log('[AudioManager] Audio system primed');
+    } catch (error) {
+      console.log('[AudioManager] Prime failed:', error);
+    }
+  }
+
+  /**
    * Speak text using text-to-speech
    * @param {string} text - Text to speak
    * @param {Object} options - Optional settings
    * @param {boolean} options.priority - If true, interrupt current speech
    * @param {number} options.rate - Speech rate override
    * @param {Function} options.onEnd - Callback when speech ends
-   * @param {number} options.timeout - Max time to wait in ms (default: 5000)
+   * @param {number} options.timeout - Max time to wait in ms (default: 10000)
    * @returns {Promise} Resolves when speech completes or times out
    */
   speak(text, options = {}) {
@@ -155,8 +179,10 @@ class AudioManager {
       }
 
       // Timeout to prevent hanging on iOS (Safari/Opera often don't fire events)
-      // Use short default (2s) to prevent blocking app startup
-      const timeoutMs = options.timeout || 2000;
+      // Use longer default (10s) to give iOS time to actually play the speech
+      // Short text gets shorter timeout, long text gets longer
+      const estimatedDuration = Math.max(3000, text.length * 100); // ~100ms per character
+      const timeoutMs = options.timeout || Math.min(estimatedDuration, 10000);
       let resolved = false;
       let timeoutId = null;
 
@@ -179,6 +205,9 @@ class AudioManager {
       }, timeoutMs);
 
       try {
+        // On iOS, cancel and resume can help "wake up" a stuck synthesis
+        this.speechSynthesis.cancel();
+
         const utterance = new SpeechSynthesisUtterance(text);
 
         // Set speech parameters

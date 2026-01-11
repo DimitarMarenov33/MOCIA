@@ -232,6 +232,11 @@ class DualNBackExercise {
   }
 
   async startExercise() {
+    // Prime audio system for iOS (user just navigated here)
+    if (window.AudioManager) {
+      window.AudioManager.prime();
+    }
+
     // Initialize state
     this.currentN = this.config.parameters.startN || CONSTANTS.DUAL_N_BACK.START_N;
     this.trialsPerBlock = this.config.parameters.trialsPerBlock || CONSTANTS.DUAL_N_BACK.TRIALS_PER_BLOCK;

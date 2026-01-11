@@ -158,6 +158,11 @@ class TaskSwitchingExercise {
   }
 
   async startExercise() {
+    // Prime audio system for iOS (user just navigated here)
+    if (window.AudioManager) {
+      window.AudioManager.prime();
+    }
+
     // Calculate total trials
     const singleTaskSize = this.config.parameters.singleTaskBlockSize;
     const mixedTaskSize = this.config.parameters.mixedTaskTrials;

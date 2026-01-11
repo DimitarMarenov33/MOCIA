@@ -226,6 +226,11 @@ class UFOVComplexExercise {
   }
 
   async startExercise() {
+    // Prime audio system for iOS (user just navigated here)
+    if (window.AudioManager) {
+      window.AudioManager.prime();
+    }
+
     // Initialize state
     this.totalTrials = this.config.parameters.totalTrials || 20;
     this.currentTrial = 0;

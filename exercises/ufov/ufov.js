@@ -213,6 +213,11 @@ class UFOVExercise {
   }
 
   async startExercise() {
+    // Prime audio system for iOS (user just navigated here)
+    if (window.AudioManager) {
+      window.AudioManager.prime();
+    }
+
     // Show exercise screen
     this.screens.exercise.classList.remove('hidden');
 
