@@ -260,11 +260,14 @@ class DigitSpanExercise {
 
   /**
    * Speak a sequence as a single utterance (for iOS gesture context)
+   * Adds pauses to match visual presentation timing
    */
   speakSequence(sequence) {
     if (!window.AudioManager || !window.AudioManager.isEnabled()) return;
 
-    // Build speech text from sequence
+    // Build speech text from sequence with pauses to match visual timing
+    // Visual timing: 1000ms display + 800ms gap = ~1.8s per character
+    // We add pause markers (periods and ellipsis) to slow down speech
     const spokenParts = sequence.map(char => {
       if (char === '+') return 'plus';
       if (char === '-') return 'streepje';
@@ -273,8 +276,11 @@ class DigitSpanExercise {
       return char.toString();
     });
 
-    const speechText = spokenParts.join(', ');
-    window.AudioManager.speak(speechText, { rate: 0.8 });
+    // Add pauses between each element to sync with visual presentation
+    // Using periods and ellipsis creates natural speech pauses
+    // Start with a pause, then each number followed by a long pause
+    const speechText = '. . . ' + spokenParts.join(' . . . . . ');
+    window.AudioManager.speak(speechText, { rate: 0.7 });
   }
 
   async startTrial() {
