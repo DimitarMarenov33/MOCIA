@@ -491,12 +491,11 @@ class StroopExercise {
       this.generateTrial();
       nextSpokenWord = this.currentSpoken.label;
 
-      // Speak next trial's word with a leading pause
-      // The visual appears ~2.3s later (1.5s feedback + 0.8s delay)
-      // Adding pause so word is heard when visual appears
+      // Speak next trial's word at slow rate
+      // Note: Word is spoken during feedback period, visual appears ~2.3s later
+      // Using slow rate to extend the speech closer to when visual appears
       if (window.AudioManager && window.AudioManager.isEnabled()) {
-        const speechWithPause = '. . . . . . . . . . ' + nextSpokenWord;
-        window.AudioManager.speak(speechWithPause, { rate: 0.9 });
+        window.AudioManager.speak(nextSpokenWord, { rate: 0.5 });
       }
     }
 
