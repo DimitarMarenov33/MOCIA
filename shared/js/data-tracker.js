@@ -591,6 +591,9 @@ class DataTracker {
       feedbackHistory = window.FeedbackModal.getAllFeedback();
     }
 
+    // Deep clone exercise data for redaction
+    const redactedExercises = this.redactPersonalData(JSON.parse(JSON.stringify(userData.exercises)));
+
     // Build export object with all required data points
     const exportObject = {
       version: userData.version,
@@ -603,13 +606,151 @@ class DataTracker {
       personalizationPreference: personalizationData,
 
       // All exercise data with sessions, trials, feedback, and content modes
-      exercises: userData.exercises,
+      // IMPORTANT: Personal data has been REDACTED
+      exercises: redactedExercises,
 
       // Dedicated feedback history for easy analysis
-      feedbackHistory: feedbackHistory
+      feedbackHistory: feedbackHistory,
+
+      // Notice about redacted data
+      _dataNotice: 'Personal data from personalization settings has been redacted for privacy.'
     };
 
     return JSON.stringify(exportObject, null, 2);
+  }
+
+  /**
+   * Redact personal data from exercise data
+   * Replaces actual personal content with redaction notice
+   * @param {Object} exercises - Exercise data to redact
+   * @returns {Object} Redacted exercise data
+   */
+  redactPersonalData(exercises) {
+    const REDACTED = 'REDACTED BY SYSTEM/PERSONAL DATA';
+
+    // Get personal data values to redact
+    const personalValues = this.getPersonalDataValues();
+
+    // Recursively redact personal values from the data
+    const redactValue = (value) => {
+      if (typeof value === 'string') {
+        // Check if this string matches any personal data
+        for (const personalValue of personalValues) {
+          if (value === personalValue || value.includes(personalValue)) {
+            return REDACTED;
+          }
+        }
+        return value;
+      }
+      if (Array.isArray(value)) {
+        return value.map(item => redactValue(item));
+      }
+      if (typeof value === 'object' && value !== null) {
+        const redactedObj = {};
+        for (const [key, val] of Object.entries(value)) {
+          // Always redact these specific keys that contain personal data
+          if (this.isPersonalDataKey(key)) {
+            redactedObj[key] = REDACTED;
+          } else {
+            redactedObj[key] = redactValue(val);
+          }
+        }
+        return redactedObj;
+      }
+      return value;
+    };
+
+    return redactValue(exercises);
+  }
+
+  /**
+   * Get all personal data values for redaction matching
+   * @returns {Array} Array of personal data strings to redact
+   */
+  getPersonalDataValues() {
+    const values = [];
+
+    if (!window.PersonalizationService) return values;
+
+    const data = window.PersonalizationService.getData();
+    if (!data) return values;
+
+    // Collect phone numbers
+    if (data.phoneNumbers) {
+      data.phoneNumbers.forEach(item => {
+        if (item.label) values.push(item.label);
+        if (item.number) values.push(item.number);
+      });
+    }
+
+    // Collect postcodes
+    if (data.postcodes) {
+      data.postcodes.forEach(item => {
+        if (item.label) values.push(item.label);
+        if (item.code) values.push(item.code);
+      });
+    }
+
+    // Collect important dates
+    if (data.importantDates) {
+      data.importantDates.forEach(item => {
+        if (item.label) values.push(item.label);
+        if (item.date) values.push(item.date);
+      });
+    }
+
+    // Collect family members
+    if (data.familyMembers) {
+      data.familyMembers.forEach(item => {
+        if (item.name) values.push(item.name);
+        if (item.relation) values.push(item.relation);
+        if (item.city) values.push(item.city);
+      });
+    }
+
+    // Collect weekly activities
+    if (data.weeklyActivities) {
+      data.weeklyActivities.forEach(item => {
+        if (item.activity) values.push(item.activity);
+      });
+    }
+
+    // Collect appointments
+    if (data.regularAppointments) {
+      data.regularAppointments.forEach(item => {
+        if (item.location) values.push(item.location);
+        if (item.time) values.push(item.time);
+      });
+    }
+
+    return values.filter(v => v && v.length > 0);
+  }
+
+  /**
+   * Check if a key name typically contains personal data
+   * @param {string} key - Key name to check
+   * @returns {boolean} True if key typically contains personal data
+   */
+  isPersonalDataKey(key) {
+    const personalKeys = [
+      'targetSequence',      // Contains actual phone/postcode sequences
+      'userSequence',        // User's input of personal data
+      'sequenceFormatted',   // Formatted personal sequence
+      'currentSequence',     // Current sequence being shown
+      'currentWord',         // May contain personal names
+      'currentPair',         // May contain personal word pairs
+      'familyMember',        // Family member data
+      'personName',          // Person's name
+      'phoneNumber',         // Phone number
+      'postcode',            // Postal code
+      'importantDate',       // Important date
+      'appointmentLocation', // Appointment location
+      'activityName',        // Activity name
+    ];
+
+    return personalKeys.some(pk =>
+      key.toLowerCase().includes(pk.toLowerCase())
+    );
   }
 
   /**

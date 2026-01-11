@@ -3,10 +3,11 @@
  * Manages the A/B testing timeline for personalized vs generic content.
  *
  * Timeline:
- * - Days 0-2: Generic/random data (baseline phase)
- * - Day 3+: Personalized data
- * - Day 3+: Show preference popup (once)
- * - After choice: Permanent preference (cannot be changed)
+ * - Days 0-1: Generic/random data (Phase A - baseline)
+ * - Day 2: Personalized data (Phase B - exposure)
+ * - Day 3+: User makes ONE permanent choice (Phase C - preference)
+ *
+ * The Phase C choice is made once and stored permanently.
  */
 
 const PersonalizationCounter = {
@@ -24,7 +25,7 @@ const PersonalizationCounter = {
     return {
       startDate: null,              // Date when personalization was first configured
       hasShownPreferencePopup: false,
-      userPreference: null,         // 'generic' | 'personalized' | null
+      userPreference: null,         // 'generic' | 'personalized' | null (permanent choice)
       preferenceSetAt: null         // Timestamp when choice was made
     };
   },
@@ -113,7 +114,7 @@ const PersonalizationCounter = {
 
     const data = this.getData();
 
-    // If user has made a permanent choice, use that
+    // If user has made a permanent choice (Day 3+), use that
     if (data.userPreference) {
       return data.userPreference;
     }
@@ -121,12 +122,17 @@ const PersonalizationCounter = {
     // Check days elapsed
     const days = this.getDaysElapsed();
 
-    // Days 0-2: Generic data (baseline)
-    if (days < 3) {
+    // Days 0-1: Generic data (Phase A - baseline)
+    if (days < 2) {
       return this.MODE_GENERIC;
     }
 
-    // Day 3+: Personalized data (until user makes choice)
+    // Day 2: Personalized data (Phase B - exposure)
+    if (days === 2) {
+      return this.MODE_PERSONALIZED;
+    }
+
+    // Day 3+: No choice made yet - default to personalized until popup shown
     return this.MODE_PERSONALIZED;
   },
 
@@ -134,9 +140,8 @@ const PersonalizationCounter = {
    * Check if the preference popup should be shown
    * Conditions:
    * - Personalization is configured
-   * - At least 3 days have passed
-   * - Popup hasn't been shown before
-   * - User hasn't made a choice yet
+   * - At least 3 days have passed (Phase C)
+   * - User hasn't made their permanent choice yet
    * @returns {boolean} True if popup should show
    */
   shouldShowPreferencePopup() {
@@ -147,12 +152,12 @@ const PersonalizationCounter = {
 
     const data = this.getData();
 
-    // Already shown or already chose
-    if (data.hasShownPreferencePopup || data.userPreference) {
+    // Already made permanent choice
+    if (data.userPreference) {
       return false;
     }
 
-    // Must be at least day 3
+    // Must be at least day 3 (Phase C)
     const days = this.getDaysElapsed();
     return days >= 3;
   },
@@ -168,7 +173,7 @@ const PersonalizationCounter = {
 
   /**
    * Set the user's permanent preference
-   * This cannot be changed once set
+   * This is a one-time choice that persists forever
    * @param {string} preference - 'generic' or 'personalized'
    * @returns {boolean} Success status
    */
@@ -204,7 +209,7 @@ const PersonalizationCounter = {
   },
 
   /**
-   * Check if user has made their preference choice
+   * Check if user has made their permanent preference choice
    * @returns {boolean} True if preference is set
    */
   hasUserChosen() {
@@ -225,11 +230,13 @@ const PersonalizationCounter = {
     if (!window.PersonalizationService?.isConfigured()) {
       phase = 'not_configured';
     } else if (data.userPreference) {
-      phase = 'preference_set';
-    } else if (days < 3) {
-      phase = 'baseline';
+      phase = 'preference_set';    // User has made their permanent choice
+    } else if (days < 2) {
+      phase = 'phase_a_baseline';  // Days 0-1: Generic
+    } else if (days === 2) {
+      phase = 'phase_b_exposure';  // Day 2: Personalized
     } else {
-      phase = 'personalized_trial';
+      phase = 'phase_c_choice';    // Day 3+: Awaiting user choice
     }
 
     return {
@@ -237,6 +244,7 @@ const PersonalizationCounter = {
       daysElapsed: days,
       contentMode: mode,
       userPreference: data.userPreference,
+      preferenceSetAt: data.preferenceSetAt,
       canShowPopup: this.shouldShowPreferencePopup()
     };
   },
@@ -249,9 +257,11 @@ const PersonalizationCounter = {
   getExportData() {
     const data = this.getData();
     return {
-      contentModePreference: data.userPreference,  // 'generic' | 'personalized' | null
-      preferenceSetAt: data.preferenceSetAt,
-      personalizationStartDate: data.startDate
+      personalizationStartDate: data.startDate,
+      daysElapsed: this.getDaysElapsed(),
+      currentPhase: this.getPhaseInfo().phase,
+      userPreference: data.userPreference,        // 'generic' | 'personalized' | null
+      preferenceSetAt: data.preferenceSetAt       // When the choice was made
     };
   },
 

@@ -551,7 +551,21 @@ class TaskSwitchingExercise {
       })
     });
 
-    window.location.href = `../../results.html?${params.toString()}`;
+    const resultsUrl = `../../results.html?${params.toString()}`;
+
+    // Show feedback modal before navigating to results
+    if (window.FeedbackModal && !this.isPractice) {
+      const sessionId = window.DataTracker?.getLastSessionId(this.config.exerciseId);
+      window.FeedbackModal.show({
+        exerciseType: this.config.exerciseId,
+        sessionId: sessionId,
+        onComplete: () => {
+          window.location.href = resultsUrl;
+        }
+      });
+    } else {
+      window.location.href = resultsUrl;
+    }
   }
 
   confirmExit() {
