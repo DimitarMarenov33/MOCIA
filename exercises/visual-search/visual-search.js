@@ -139,9 +139,15 @@ class VisualSearchExercise {
   async startExercise() {
     console.log('[VS] startExercise() entered');
 
-    // Prime audio system for iOS (user just navigated here)
-    if (window.AudioManager) {
-      window.AudioManager.prime();
+    // Speak instructions (keeps audio system active for iOS)
+    if (window.AudioManager && window.AudioManager.isEnabled()) {
+      try {
+        console.log('[VS] Attempting to speak instructions...');
+        await window.AudioManager.speak('Zoek het juiste object. De oefening begint.');
+        console.log('[VS] Instructions spoken');
+      } catch (error) {
+        console.log('[VS] Speech unavailable:', error);
+      }
     }
 
     // Initialize state

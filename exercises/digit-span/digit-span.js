@@ -173,11 +173,6 @@ class DigitSpanExercise {
   }
 
   async startExercise() {
-    // Prime audio system for iOS (user just navigated here)
-    if (window.AudioManager) {
-      window.AudioManager.prime();
-    }
-
     // Show exercise screen
     this.screens.exercise.classList.remove('hidden');
 
@@ -205,6 +200,11 @@ class DigitSpanExercise {
 
     // Create input field (keyboard-based)
     this.createInputField();
+
+    // Speak instructions (keeps audio system active for iOS)
+    if (window.AudioManager && window.AudioManager.isEnabled()) {
+      await window.AudioManager.speak('We gaan beginnen. Let goed op de telefoonnummers, postcodes en datums.');
+    }
 
     // Start first trial
     setTimeout(() => {

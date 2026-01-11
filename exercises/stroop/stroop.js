@@ -167,9 +167,13 @@ class StroopExercise {
   }
 
   async startExercise() {
-    // Prime audio system for iOS (user just navigated here)
-    if (window.AudioManager) {
-      window.AudioManager.prime();
+    // Speak instructions (keeps audio system active for iOS)
+    if (window.AudioManager && window.AudioManager.isEnabled()) {
+      try {
+        await window.AudioManager.speak('Stroop taak. Kies de kleur van de tekst, niet het woord.');
+      } catch (error) {
+        console.log('Speech unavailable:', error);
+      }
     }
 
     // Initialize state

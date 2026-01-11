@@ -213,13 +213,15 @@ class UFOVExercise {
   }
 
   async startExercise() {
-    // Prime audio system for iOS (user just navigated here)
-    if (window.AudioManager) {
-      window.AudioManager.prime();
-    }
-
     // Show exercise screen
     this.screens.exercise.classList.remove('hidden');
+
+    // Speak instructions (keeps audio system active for iOS)
+    if (window.AudioManager && window.AudioManager.isEnabled()) {
+      await window.AudioManager.speak(
+        'Let goed op het midden en de randen. De oefening begint.'
+      );
+    }
 
     // Initialize state
     if (!this.isPractice) {

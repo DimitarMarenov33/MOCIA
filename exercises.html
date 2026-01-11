@@ -458,9 +458,8 @@
       startSelectedExercise() {
         if (!this.selectedExercise) return;
 
-        // Prime audio system on user tap (helps iOS)
+        // Haptic feedback
         if (window.AudioManager) {
-          window.AudioManager.prime();
           window.AudioManager.hapticPress();
         }
 
