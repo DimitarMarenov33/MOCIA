@@ -147,16 +147,22 @@
 /* Response buttons */
 .response-buttons {
   display: flex;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-lg);
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: var(--spacing-lg);
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .response-btn {
-  min-width: var(--touch-target-min);
+  flex: 1;
+  min-width: 0;
+  max-width: 180px;
   min-height: 120px;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   background: var(--color-background-alt);
   border: 3px solid var(--color-border);
   border-radius: var(--border-radius-lg);
@@ -384,12 +390,23 @@
     height: 80px;
   }
 
+  .response-buttons {
+    max-width: 320px;
+    gap: var(--spacing-md);
+  }
+
   .response-btn {
     min-height: 100px;
+    max-width: 150px;
+    padding: var(--spacing-sm);
   }
 
   .response-icon {
     font-size: 36px;
+  }
+
+  .response-label {
+    font-size: var(--font-size-md);
   }
 
   .threshold-display {
