@@ -275,10 +275,10 @@ class DigitSpanExercise {
       return char.toString();
     });
 
-    // Add "Klaar?" lead-in, then each digit as a separate "sentence" using semicolons
-    // Semicolons create longer pauses than commas without being pronounced
+    // Add longer lead-in phrase to fill the visual delay between trials
+    // Similar to stroop which uses "Klaar? Volgende:"
     // Very slow rate (0.15) with semicolons to match visual timing of ~1.8s per digit
-    const speechText = 'Klaar?;   ' + spokenParts.join(';   ');
+    const speechText = 'Klaar? Volgende reeks:;   ' + spokenParts.join(';   ');
     window.AudioManager.speak(speechText, { rate: 0.15 });
   }
 
