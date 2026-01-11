@@ -188,7 +188,12 @@ class WordPairExercise {
           </div>
         </div>
 
-        <div class="simple-screen__actions">
+        <div class="simple-screen__actions" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+          ${window.AudioManager && window.AudioManager.isEnabled() ? `
+            <button id="speak-pairs-btn" class="btn btn-secondary btn-large" style="width: 100%;">
+              Tik om de paren te horen
+            </button>
+          ` : ''}
           <button id="remembered-btn" class="btn btn-success btn-large" style="width: 100%;">
             Ik heb ze onthouden
           </button>
@@ -206,9 +211,12 @@ class WordPairExercise {
       this.startLockPhase();
     });
 
-    // Speak the pairs
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      this.speakWordPairs();
+    // Event listener for speak button (iOS requires user gesture for speech)
+    const speakBtn = document.getElementById('speak-pairs-btn');
+    if (speakBtn) {
+      speakBtn.addEventListener('click', () => {
+        this.speakWordPairs();
+      });
     }
   }
 
@@ -411,7 +419,12 @@ class WordPairExercise {
           ${this.renderRecallInputs()}
         </form>
 
-        <div class="simple-screen__actions">
+        <div class="simple-screen__actions" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+          ${window.AudioManager && window.AudioManager.isEnabled() ? `
+            <button type="button" id="speak-instruction-btn" class="btn btn-secondary btn-large" style="width: 100%;">
+              Tik om instructie te horen
+            </button>
+          ` : ''}
           <button id="submit-recall-btn" class="btn btn-success btn-large" style="width: 100%;">
             Controleer Antwoorden
           </button>
@@ -425,9 +438,14 @@ class WordPairExercise {
       this.checkRecall();
     });
 
-    // Speak instruction
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      window.AudioManager.speak('Vul de woordparen in die je hebt onthouden.');
+    // Event listener for speak instruction button (iOS requires user gesture for speech)
+    const speakInstructionBtn = document.getElementById('speak-instruction-btn');
+    if (speakInstructionBtn) {
+      speakInstructionBtn.addEventListener('click', () => {
+        if (window.AudioManager && window.AudioManager.isEnabled()) {
+          window.AudioManager.speak('Vul de woordparen in die je hebt onthouden.');
+        }
+      });
     }
   }
 

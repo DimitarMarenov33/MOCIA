@@ -201,15 +201,80 @@ class DigitSpanExercise {
     // Create input field (keyboard-based)
     this.createInputField();
 
-    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      window.AudioManager.speak('We gaan beginnen. Let goed op de cijfers.');
+    // Show "Ready" button for first trial (iOS requires user gesture for speech)
+    this.showReadyButton();
+  }
+
+  /**
+   * Show a "Klaar?" button that user must tap to start first trial
+   * This provides the user gesture needed for iOS speech
+   */
+  showReadyButton() {
+    UIComponents.clearElement(this.elements.sequenceDisplay);
+
+    const container = document.createElement('div');
+    container.className = 'ready-button-container';
+    container.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: var(--spacing-lg);';
+
+    const readyBtn = document.createElement('button');
+    readyBtn.className = 'btn btn-primary btn-large';
+    readyBtn.textContent = 'Klaar? Tik om te beginnen';
+    readyBtn.style.cssText = 'font-size: var(--font-size-xl); padding: var(--spacing-lg) var(--spacing-xl);';
+
+    readyBtn.addEventListener('click', () => {
+      // This tap provides gesture context for speech
+      this.startFirstTrial();
+    });
+
+    container.appendChild(readyBtn);
+    this.elements.sequenceDisplay.appendChild(container);
+  }
+
+  /**
+   * Start the first trial - called from Ready button tap (has gesture context)
+   */
+  async startFirstTrial() {
+    this.currentTrial++;
+    this.trialStartTime = Date.now();
+
+    // Update trial counter
+    if (this.elements.trialCounter) {
+      this.elements.trialCounter.textContent = `${this.currentTrial}/${this.totalTrials}`;
     }
 
-    // Start first trial
-    setTimeout(() => {
-      this.startTrial();
-    }, 1000);
+    // Generate sequence
+    const sequenceLength = this.difficultyAdapter.getCurrentDifficulty();
+    this.currentSequence = this.generateSequence(sequenceLength);
+    this.userSequence = [];
+
+    // Speak the sequence NOW (we have gesture context from the tap)
+    this.speakSequence(this.currentSequence);
+
+    // Clear and show visual presentation
+    UIComponents.clearElement(this.elements.sequenceDisplay);
+    await this.presentSequence();
+
+    // Show input area
+    this.showInputArea();
+  }
+
+  /**
+   * Speak a sequence as a single utterance (for iOS gesture context)
+   */
+  speakSequence(sequence) {
+    if (!window.AudioManager || !window.AudioManager.isEnabled()) return;
+
+    // Build speech text from sequence
+    const spokenParts = sequence.map(char => {
+      if (char === '+') return 'plus';
+      if (char === '-') return 'streepje';
+      if (char === ':') return 'dubbele punt';
+      if (/[A-Za-z]/.test(char)) return char.toUpperCase();
+      return char.toString();
+    });
+
+    const speechText = spokenParts.join(', ');
+    window.AudioManager.speak(speechText, { rate: 0.8 });
   }
 
   async startTrial() {
@@ -540,6 +605,11 @@ class DigitSpanExercise {
   }
 
   async presentSequence() {
+    // Visual-only presentation (speech was already triggered by user tap)
+    await this.presentSequenceVisualOnly();
+  }
+
+  async presentSequenceVisualOnly() {
     // Block input while showing sequence
     this.isShowingSequence = true;
 
@@ -558,24 +628,6 @@ class DigitSpanExercise {
 
       UIComponents.clearElement(this.elements.sequenceDisplay);
       this.elements.sequenceDisplay.appendChild(charEl);
-
-      // Speak character (slower and clearer)
-      if (window.AudioManager) {
-        // Handle special characters and letters
-        let spokenText;
-        if (char === '+') {
-          spokenText = 'plus';
-        } else if (char === '-') {
-          spokenText = 'streepje';
-        } else if (char === ':') {
-          spokenText = 'dubbele punt';
-        } else if (/[A-Za-z]/.test(char)) {
-          spokenText = char.toUpperCase();
-        } else {
-          spokenText = char.toString();
-        }
-        window.AudioManager.speak(spokenText, { rate: 0.8 });
-      }
 
       // Display character for specified time
       await this.sleep(displayTime);
@@ -741,6 +793,16 @@ class DigitSpanExercise {
     // Update difficulty
     const difficultyResult = this.difficultyAdapter.processResult(correct);
 
+    // Check if there are more trials - if so, generate and speak NEXT sequence NOW
+    // (we have gesture context from the submit button tap)
+    let nextSequence = null;
+    if (this.currentTrial < this.totalTrials) {
+      const nextLength = this.difficultyAdapter.getCurrentDifficulty();
+      nextSequence = this.generateSequence(nextLength);
+      // Speak next sequence immediately (iOS gesture context)
+      this.speakSequence(nextSequence);
+    }
+
     // Show feedback
     await this.showFeedback(correct, difficultyResult.adjusted);
 
@@ -749,14 +811,51 @@ class DigitSpanExercise {
       await this.sleep(500);
       this.endExercise();
     } else {
-      // Continue to next trial
+      // Continue to next trial with pre-generated sequence
       this.elements.inputArea.classList.add('hidden');
       this.elements.clearBtn.disabled = false;
       this.elements.inputArea.classList.remove('input-disabled');
 
       await this.sleep(1000);
-      this.startTrial();
+      this.startNextTrial(nextSequence);
     }
+  }
+
+  /**
+   * Start next trial with a pre-generated sequence (already spoken)
+   */
+  async startNextTrial(sequence) {
+    this.currentTrial++;
+    this.trialStartTime = Date.now();
+
+    // Update trial counter
+    if (this.elements.trialCounter) {
+      this.elements.trialCounter.textContent = `${this.currentTrial}/${this.totalTrials}`;
+    }
+
+    // Hide input area
+    this.elements.inputArea.classList.add('hidden');
+
+    // Disable text input while sequence is being shown
+    if (this.elements.textInput) {
+      this.elements.textInput.disabled = true;
+    }
+
+    // Clear previous user input display
+    UIComponents.clearElement(this.elements.userSequence);
+
+    // Use the pre-generated sequence (already spoken)
+    this.currentSequence = sequence;
+    this.userSequence = [];
+
+    // Clear previous feedback
+    UIComponents.clearElement(this.elements.feedbackArea);
+
+    // Present sequence visually (already spoken)
+    await this.presentSequenceVisualOnly();
+
+    // Show input area
+    this.showInputArea();
   }
 
   checkResponse() {

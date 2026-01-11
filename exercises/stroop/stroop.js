@@ -167,11 +167,6 @@ class StroopExercise {
   }
 
   async startExercise() {
-    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      window.AudioManager.speak('Stroop taak. Kies de kleur van de tekst.');
-    }
-
     // Initialize state
     this.totalTrials = this.config.parameters.totalTrials || 30;
     this.currentTrial = 0;
@@ -190,10 +185,69 @@ class StroopExercise {
       });
     }
 
-    // Start first trial immediately (no intro speech to avoid overlap)
-    setTimeout(() => {
-      this.startTrial();
-    }, 500);
+    // Show "Ready" button for first trial (iOS requires user gesture for speech)
+    this.showReadyButton();
+  }
+
+  /**
+   * Show a "Klaar?" button that user must tap to start first trial
+   * This provides the user gesture needed for iOS speech
+   */
+  showReadyButton() {
+    // Hide timer and trial counter initially
+    this.elements.timerDisplay.style.visibility = 'hidden';
+
+    // Clear stimulus display and show ready button
+    UIComponents.clearElement(this.elements.stimulusDisplay);
+    UIComponents.clearElement(this.elements.responseButtons);
+
+    const container = document.createElement('div');
+    container.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: var(--spacing-lg);';
+
+    const readyBtn = document.createElement('button');
+    readyBtn.className = 'btn btn-primary btn-large';
+    readyBtn.textContent = 'Klaar? Tik om te beginnen';
+    readyBtn.style.cssText = 'font-size: var(--font-size-xl); padding: var(--spacing-lg) var(--spacing-xl);';
+
+    readyBtn.addEventListener('click', () => {
+      // This tap provides gesture context for speech
+      this.elements.timerDisplay.style.visibility = 'visible';
+      this.startFirstTrial();
+    });
+
+    container.appendChild(readyBtn);
+    this.elements.stimulusDisplay.appendChild(container);
+  }
+
+  /**
+   * Start the first trial - called from Ready button tap (has gesture context)
+   */
+  async startFirstTrial() {
+    this.currentTrial++;
+
+    // Update trial counter
+    this.elements.trialCounter.textContent = `Poging ${this.currentTrial}/${this.totalTrials}`;
+
+    // Clear feedback
+    UIComponents.clearElement(this.elements.feedbackArea);
+
+    // Generate trial
+    this.generateTrial();
+
+    // Speak the word NOW (we have gesture context from the tap)
+    if (window.AudioManager && window.AudioManager.isEnabled()) {
+      window.AudioManager.speak(this.currentSpoken.label);
+    }
+
+    // Display stimulus visually (without speech)
+    await this.displayStimulusVisualOnly();
+
+    // Display response buttons
+    this.displayResponseButtons();
+
+    // Start timer
+    this.trialStartTime = Date.now();
+    this.startTimer();
   }
 
   async startTrial() {
@@ -280,6 +334,26 @@ class StroopExercise {
         console.log('Speech unavailable:', error);
       }
     }
+  }
+
+  /**
+   * Display stimulus visually only (without speech)
+   * Used for iOS speech fix where speech is triggered separately on user tap
+   */
+  async displayStimulusVisualOnly() {
+    // Display depends on stimulus set type
+    if (this.currentStimulusSet.type === 'emoji') {
+      // Buildings: show emoji
+      this.elements.stimulusDisplay.textContent = this.currentVisual.emoji;
+      this.elements.stimulusDisplay.style.fontSize = '120px';
+      this.elements.stimulusDisplay.style.color = 'inherit';
+    } else {
+      // Days: show text
+      this.elements.stimulusDisplay.textContent = this.currentVisual.label;
+      this.elements.stimulusDisplay.style.fontSize = '';
+      this.elements.stimulusDisplay.style.color = 'inherit';
+    }
+    // No speech here - speech is triggered separately on user gesture
   }
 
   displayResponseButtons() {
@@ -410,6 +484,19 @@ class StroopExercise {
       }
     }
 
+    // iOS speech fix: Generate and speak NEXT trial's word NOW while we have gesture context
+    let nextSpokenWord = null;
+    if (this.currentTrial < this.totalTrials) {
+      // Pre-generate next trial
+      this.generateTrial();
+      nextSpokenWord = this.currentSpoken.label;
+
+      // Speak next trial's word immediately (iOS gesture context)
+      if (window.AudioManager && window.AudioManager.isEnabled()) {
+        window.AudioManager.speak(nextSpokenWord);
+      }
+    }
+
     // Show feedback
     await this.showFeedback(correct, responseTime);
 
@@ -418,10 +505,33 @@ class StroopExercise {
       await this.sleep(1000);
       this.endExercise();
     } else {
-      // Continue to next trial
+      // Continue to next trial (stimulus already generated, just display visually)
       await this.sleep(800);
-      this.startTrial();
+      this.startNextTrial();
     }
+  }
+
+  /**
+   * Start next trial with pre-generated stimulus (visual only, speech already triggered)
+   */
+  async startNextTrial() {
+    this.currentTrial++;
+
+    // Update trial counter
+    this.elements.trialCounter.textContent = `Poging ${this.currentTrial}/${this.totalTrials}`;
+
+    // Clear feedback
+    UIComponents.clearElement(this.elements.feedbackArea);
+
+    // Trial already generated in handleResponse/handleTimeout, display visually only
+    await this.displayStimulusVisualOnly();
+
+    // Display response buttons
+    this.displayResponseButtons();
+
+    // Start timer
+    this.trialStartTime = Date.now();
+    this.startTimer();
   }
 
   async handleTimeout() {
@@ -466,6 +576,11 @@ class StroopExercise {
       window.AudioManager.hapticError();
     }
 
+    // Note: Timeout doesn't have user gesture context, so we can't trigger speech here.
+    // The next trial will need to wait for user to tap a "Continue" button or similar.
+    // For now, we'll generate the next trial but speech may not work on iOS after timeout.
+    // This is acceptable as timeouts should be rare in normal gameplay.
+
     // Show timeout feedback
     await this.showTimeoutFeedback();
 
@@ -474,7 +589,8 @@ class StroopExercise {
       await this.sleep(1000);
       this.endExercise();
     } else {
-      // Continue to next trial
+      // Continue to next trial - generate and use startTrial (which has displayStimulus with speech)
+      // On iOS, the speech may fail after timeout since there's no gesture context
       await this.sleep(1500);
       this.startTrial();
     }

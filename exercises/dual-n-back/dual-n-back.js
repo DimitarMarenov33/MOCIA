@@ -232,11 +232,6 @@ class DualNBackExercise {
   }
 
   async startExercise() {
-    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      window.AudioManager.speak(`We beginnen met ${this.config.parameters.startN || 2}-back. Let goed op.`);
-    }
-
     // Initialize state
     this.currentN = this.config.parameters.startN || CONSTANTS.DUAL_N_BACK.START_N;
     this.trialsPerBlock = this.config.parameters.trialsPerBlock || CONSTANTS.DUAL_N_BACK.TRIALS_PER_BLOCK;
@@ -262,10 +257,65 @@ class DualNBackExercise {
     // Show exercise screen
     window.ScreenManager.navigate('exercise-screen');
 
-    // Start first block
-    setTimeout(() => {
-      this.startBlock();
-    }, 2000);
+    // Show "Ready" button for first trial (iOS requires user gesture for speech)
+    this.showReadyButton();
+  }
+
+  /**
+   * Show a "Klaar?" button that user must tap to start first block
+   * This provides the user gesture needed for iOS speech
+   */
+  showReadyButton() {
+    // Disable response buttons during ready screen
+    this.elements.positionButton.disabled = true;
+    this.elements.soundButton.disabled = true;
+
+    // Clear grid and show ready button in center
+    const cells = this.elements.grid.querySelectorAll('.grid-cell');
+    cells.forEach(cell => cell.classList.remove('active'));
+
+    // Create overlay for ready button
+    const readyOverlay = document.createElement('div');
+    readyOverlay.id = 'ready-overlay';
+    readyOverlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.95);
+      z-index: 10;
+    `;
+
+    const readyBtn = document.createElement('button');
+    readyBtn.className = 'btn btn-primary btn-large';
+    readyBtn.textContent = 'Klaar? Tik om te beginnen';
+    readyBtn.style.cssText = 'font-size: var(--font-size-xl); padding: var(--spacing-lg) var(--spacing-xl);';
+
+    readyBtn.addEventListener('click', () => {
+      // Remove overlay
+      readyOverlay.remove();
+
+      // Speak instructions NOW (we have gesture context from the tap)
+      if (window.AudioManager && window.AudioManager.isEnabled()) {
+        window.AudioManager.speak(`We beginnen met ${this.currentN}-back. Let goed op.`);
+      }
+
+      // Start first block after short delay
+      setTimeout(() => {
+        this.startBlock();
+      }, 2000);
+    });
+
+    readyOverlay.appendChild(readyBtn);
+
+    // Add to grid container
+    this.elements.grid.style.position = 'relative';
+    this.elements.grid.appendChild(readyOverlay);
   }
 
   async startBlock() {
