@@ -136,15 +136,6 @@ class ComplexDualTaskExercise {
       });
     }
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Complex niveau. Onthoud de volgorde en zoek de emojis. De oefening begint.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
-    }
-
     // Start first trial
     setTimeout(() => {
       this.startTrial();

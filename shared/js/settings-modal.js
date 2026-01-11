@@ -62,40 +62,8 @@ const SettingsModal = {
       <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
 
       <div style="text-align: center;">
-        <p style="margin-bottom: var(--spacing-md);">Gegevensbeheer</p>
-        <button id="export-data-btn" class="btn btn-secondary" style="margin-bottom: var(--spacing-sm); width: 100%;">
-          Exporteer Gegevens
-        </button>
-        <button id="clear-data-btn" class="btn btn-error" style="width: 100%;">
-          Wis Alle Gegevens
-        </button>
-      </div>
-
-      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
-
-      <div style="text-align: center;">
-        <p style="margin-bottom: var(--spacing-md);">App Versie</p>
-        <button id="update-app-btn" class="btn btn-primary" style="width: 100%;">
-          Controleer op Updates
-        </button>
-        <p style="margin-top: var(--spacing-sm); font-size: var(--font-size-sm); color: var(--color-text-secondary);">
-          Vernieuw de app om de nieuwste versie te laden
-        </p>
-      </div>
-
-      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
-
-      <div style="margin-bottom: var(--spacing-lg);">
-        <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
-          <input type="checkbox" id="debug-mode-toggle" ${localStorage.getItem('mocia_debug_mode') === 'true' ? 'checked' : ''}
-                 style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
-          <span>Debug Modus</span>
-        </label>
-        <p style="margin: var(--spacing-sm) 0 0 calc(30px + var(--spacing-md)); font-size: var(--font-size-md); color: var(--color-text-secondary);">
-          Toon console logs op het scherm (voor probleemoplossing)
-        </p>
-        <button id="show-compat-btn" class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-sm);">
-          Toon Compatibiliteitsinfo
+        <button id="open-developer-btn" class="btn btn-secondary" style="width: 100%;">
+          Developer Instellingen
         </button>
       </div>
     `;
@@ -119,52 +87,89 @@ const SettingsModal = {
   },
 
   /**
-   * Set up all event listeners for the modal
+   * Show the developer settings modal
    */
-  setupEventListeners(modal) {
-    // Audio toggle
-    modal.querySelector('#audio-toggle').addEventListener('change', (e) => {
-      if (e.target.checked) {
-        window.AudioManager?.enable();
-        window.AudioManager?.speak('Voice-over ingeschakeld. Instructies worden nu hardop voorgelezen.');
-      } else {
-        window.AudioManager?.speak('Voice-over uitgeschakeld');
-        setTimeout(() => {
-          window.AudioManager?.disable();
-        }, 2000);
-      }
-    });
+  showDeveloperSettings() {
+    const content = document.createElement('div');
+    content.innerHTML = `
+      <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+        <h3 style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md);">Gegevens Exporteren</h3>
+        <p style="font-size: var(--font-size-md); color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">
+          Download alle trainingsgegevens als JSON bestand
+        </p>
+        <button id="export-data-btn" class="btn btn-primary" style="width: 100%;">
+          Exporteer Gegevens
+        </button>
+      </div>
 
-    // Large text toggle
-    modal.querySelector('#large-text-toggle').addEventListener('change', (e) => {
-      document.body.classList.toggle('large-text', e.target.checked);
-      this.saveSetting('largeText', e.target.checked);
-    });
+      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
 
-    // High contrast toggle
-    modal.querySelector('#high-contrast-toggle').addEventListener('change', (e) => {
-      document.body.classList.toggle('high-contrast', e.target.checked);
-      this.saveSetting('highContrast', e.target.checked);
-    });
+      <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+        <h3 style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md);">App Versie</h3>
+        <p style="font-size: var(--font-size-md); color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">
+          Vernieuw de app om de nieuwste versie te laden
+        </p>
+        <button id="update-app-btn" class="btn btn-secondary" style="width: 100%;">
+          Controleer op Updates
+        </button>
+      </div>
 
+      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
+
+      <div style="margin-bottom: var(--spacing-lg);">
+        <label style="display: flex; align-items: center; font-size: var(--font-size-lg); cursor: pointer;">
+          <input type="checkbox" id="debug-mode-toggle" ${localStorage.getItem('mocia_debug_mode') === 'true' ? 'checked' : ''}
+                 style="width: 30px; height: 30px; margin-right: var(--spacing-md); cursor: pointer;">
+          <span>Debug Modus</span>
+        </label>
+        <p style="margin: var(--spacing-sm) 0 0 calc(30px + var(--spacing-md)); font-size: var(--font-size-md); color: var(--color-text-secondary);">
+          Toon console logs op het scherm (voor probleemoplossing)
+        </p>
+      </div>
+
+      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--color-border-light);">
+
+      <div style="text-align: center;">
+        <h3 style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md);">Compatibiliteit</h3>
+        <button id="show-compat-btn" class="btn btn-secondary" style="width: 100%;">
+          Toon Compatibiliteitsinfo
+        </button>
+      </div>
+    `;
+
+    const modal = UIComponents.createModal(
+      'Developer Instellingen',
+      content,
+      [
+        {
+          text: 'Terug',
+          onClick: (e, modalEl) => {
+            modalEl.remove();
+            this.show(); // Return to main settings
+          },
+          options: { variant: 'secondary' },
+        },
+        {
+          text: 'Sluiten',
+          onClick: (e, modalEl) => modalEl.remove(),
+          options: { variant: 'primary' },
+        },
+      ]
+    );
+
+    // Set up developer settings event listeners
+    this.setupDeveloperEventListeners(modal);
+
+    UIComponents.showModal(modal);
+  },
+
+  /**
+   * Set up event listeners for developer settings modal
+   */
+  setupDeveloperEventListeners(modal) {
     // Export data button
     modal.querySelector('#export-data-btn').addEventListener('click', () => {
       this.exportData();
-    });
-
-    // Clear data button
-    modal.querySelector('#clear-data-btn').addEventListener('click', () => {
-      this.confirmClearData(modal);
-    });
-
-    // Personalization button
-    modal.querySelector('#open-personalization-btn').addEventListener('click', () => {
-      modal.remove();
-      if (window.PersonalizationForm) {
-        window.PersonalizationForm.open();
-      } else {
-        alert('Personalisatie module niet beschikbaar op deze pagina.');
-      }
     });
 
     // Update app button
@@ -199,6 +204,52 @@ const SettingsModal = {
       } else {
         alert('Compatibiliteitscheck niet beschikbaar. Herlaad de pagina.');
       }
+    });
+  },
+
+  /**
+   * Set up all event listeners for the modal
+   */
+  setupEventListeners(modal) {
+    // Audio toggle
+    modal.querySelector('#audio-toggle').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        window.AudioManager?.enable();
+        window.AudioManager?.speak('Voice-over ingeschakeld. Instructies worden nu hardop voorgelezen.');
+      } else {
+        window.AudioManager?.speak('Voice-over uitgeschakeld');
+        setTimeout(() => {
+          window.AudioManager?.disable();
+        }, 2000);
+      }
+    });
+
+    // Large text toggle
+    modal.querySelector('#large-text-toggle').addEventListener('change', (e) => {
+      document.body.classList.toggle('large-text', e.target.checked);
+      this.saveSetting('largeText', e.target.checked);
+    });
+
+    // High contrast toggle
+    modal.querySelector('#high-contrast-toggle').addEventListener('change', (e) => {
+      document.body.classList.toggle('high-contrast', e.target.checked);
+      this.saveSetting('highContrast', e.target.checked);
+    });
+
+    // Personalization button
+    modal.querySelector('#open-personalization-btn').addEventListener('click', () => {
+      modal.remove();
+      if (window.PersonalizationForm) {
+        window.PersonalizationForm.open();
+      } else {
+        alert('Personalisatie module niet beschikbaar op deze pagina.');
+      }
+    });
+
+    // Developer settings button
+    modal.querySelector('#open-developer-btn').addEventListener('click', () => {
+      modal.remove();
+      this.showDeveloperSettings();
     });
   },
 
@@ -262,44 +313,6 @@ const SettingsModal = {
     if (window.AudioManager) {
       window.AudioManager.speak('Gegevens geëxporteerd');
     }
-  },
-
-  /**
-   * Show confirmation dialog for clearing all data
-   */
-  confirmClearData(parentModal) {
-    const confirmModal = UIComponents.createModal(
-      'Wis Alle Gegevens',
-      '<p style="font-size: var(--font-size-lg);">Weet u zeker dat u alle gegevens wilt wissen? Dit kan niet ongedaan worden gemaakt.</p>',
-      [
-        {
-          text: 'Annuleren',
-          onClick: (e, modalEl) => modalEl.remove(),
-          options: { variant: 'secondary' },
-        },
-        {
-          text: 'Ja, Wis Alles',
-          onClick: (e, modalEl) => {
-            window.DataTracker?.clearAllData();
-            window.PersonalizationService?.clearData();
-            window.PersonalizationCounter?.clearData();
-            window.FeedbackModal?.clearFeedback();
-            modalEl.remove();
-            parentModal.remove();
-
-            if (window.AudioManager) {
-              window.AudioManager.speak('Alle gegevens gewist');
-            }
-
-            alert('Alle gegevens zijn gewist.');
-            window.location.reload();
-          },
-          options: { variant: 'error' },
-        },
-      ]
-    );
-
-    UIComponents.showModal(confirmModal);
   },
 
   /**

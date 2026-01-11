@@ -254,11 +254,6 @@ class DualNBackExercise {
     // Update UI
     this.updateNLevelDisplay();
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak(`We beginnen met ${this.currentN}-back. Let goed op.`);
-    }
-
     // Show exercise screen
     window.ScreenManager.navigate('exercise-screen');
 

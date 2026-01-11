@@ -121,6 +121,7 @@ class UFOVExercise {
 
     this.elements = {
       // Trial info
+      trialCounter: document.getElementById('trial-counter'),
       currentTrial: document.getElementById('current-trial'),
       totalTrials: document.getElementById('total-trials'),
       currentDuration: document.getElementById('current-duration'),
@@ -253,13 +254,6 @@ class UFOVExercise {
       );
     }
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak(
-        'Let goed op het midden en de randen. De oefening begint.'
-      );
-    }
-
     // Start first trial
     setTimeout(() => {
       this.startTrial();
@@ -269,6 +263,11 @@ class UFOVExercise {
   async startTrial() {
     this.currentTrial++;
     this.trialStartTime = Date.now();
+
+    // Update trial counter
+    if (this.elements.trialCounter) {
+      this.elements.trialCounter.textContent = `${this.currentTrial}/${this.totalTrials}`;
+    }
 
     // Reset responses
     this.centralResponse = null;

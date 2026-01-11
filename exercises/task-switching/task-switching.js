@@ -180,15 +180,6 @@ class TaskSwitchingExercise {
       });
     }
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Taak-wissel oefening. Let op de dag en tijd. Wissel tussen taken.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
-    }
-
     // Start first trial
     setTimeout(() => {
       this.startTrial();

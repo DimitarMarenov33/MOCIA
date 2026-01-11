@@ -162,17 +162,6 @@ class VisualSearchExercise {
       console.log('[VS] Data tracking session started');
     }
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        console.log('[VS] Attempting to speak instructions...');
-        await window.AudioManager.speak('Zoek het juiste object. De oefening begint.');
-        console.log('[VS] Instructions spoken');
-      } catch (error) {
-        console.log('[VS] Speech unavailable:', error);
-      }
-    }
-
     // Start first trial
     console.log('[VS] Scheduling first trial in 1500ms...');
     setTimeout(() => {

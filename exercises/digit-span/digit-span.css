@@ -13,6 +13,23 @@
   justify-content: center;
 }
 
+/* Trial Counter (minimal, top right) */
+.trial-counter {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--color-background-alt);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  z-index: var(--z-elevated);
+  text-align: center;
+  opacity: 0.8;
+}
+
 /* Timer Display (minimal) */
 .timer-display {
   position: fixed;

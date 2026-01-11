@@ -107,6 +107,7 @@ class DigitSpanExercise {
 
     // Exercise screen elements
     this.elements = {
+      trialCounter: document.getElementById('trial-counter'),
       sequenceDisplay: document.getElementById('sequence-display'),
       inputArea: document.getElementById('input-area'),
       userSequence: document.getElementById('user-sequence'),
@@ -200,11 +201,6 @@ class DigitSpanExercise {
     // Create input field (keyboard-based)
     this.createInputField();
 
-    // Speak instructions
-    if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak('We gaan beginnen. Let goed op de telefoonnummers, postcodes en datums.');
-    }
-
     // Start first trial
     setTimeout(() => {
       this.startTrial();
@@ -214,6 +210,11 @@ class DigitSpanExercise {
   async startTrial() {
     this.currentTrial++;
     this.trialStartTime = Date.now();
+
+    // Update trial counter
+    if (this.elements.trialCounter) {
+      this.elements.trialCounter.textContent = `${this.currentTrial}/${this.totalTrials}`;
+    }
 
     // Hide input area from previous trial to prevent cognitive load
     this.elements.inputArea.classList.add('hidden');
@@ -530,10 +531,6 @@ class DigitSpanExercise {
 
     this.elements.sequenceDisplay.appendChild(container);
 
-    if (window.AudioManager) {
-      await window.AudioManager.speak(`${this.getSequenceTypeLabel()}. Klaar?`);
-    }
-
     await this.sleep(1000);
   }
 
@@ -609,11 +606,6 @@ class DigitSpanExercise {
     messageContainer.appendChild(message);
 
     this.elements.sequenceDisplay.appendChild(messageContainer);
-
-    const typeHint = this.getSequenceTypeLabel().toLowerCase();
-    if (window.AudioManager) {
-      window.AudioManager.speak(`Uw beurt. Typ de ${typeHint} in`);
-    }
 
     // Show input area
     this.elements.inputArea.classList.remove('hidden');
@@ -695,7 +687,6 @@ class DigitSpanExercise {
 
     if (window.AudioManager) {
       window.AudioManager.hapticPress();
-      window.AudioManager.speak('Gewist');
     }
   }
 
@@ -810,8 +801,6 @@ class DigitSpanExercise {
       } else {
         window.AudioManager.hapticError();
       }
-
-      await window.AudioManager.speak(message);
     }
 
     await this.sleep(1800);

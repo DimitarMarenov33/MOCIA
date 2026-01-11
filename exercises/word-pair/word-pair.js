@@ -43,10 +43,6 @@ class WordPairExercise {
       // Render appropriate UI
       this.render();
 
-      // Speak welcome
-      if (window.AudioManager && window.AudioManager.isEnabled()) {
-        await window.AudioManager.speak('Woord Paar Associatie');
-      }
     } catch (error) {
       console.error('Initialization error:', error);
       this.showError('Er is een fout opgetreden bij het laden van de oefening.');
