@@ -491,11 +491,11 @@ class StroopExercise {
       this.generateTrial();
       nextSpokenWord = this.currentSpoken.label;
 
-      // Speak next trial's word at slow rate
-      // Note: Word is spoken during feedback period, visual appears ~2.3s later
-      // Using slow rate to extend the speech closer to when visual appears
+      // Speak with lead-in phrase to fill the ~2.3s delay before visual appears
+      // "Klaar? Volgende:" fills time during feedback, then word is spoken when visual appears
       if (window.AudioManager && window.AudioManager.isEnabled()) {
-        window.AudioManager.speak(nextSpokenWord, { rate: 0.5 });
+        const speechWithLeadIn = 'Klaar? Volgende:, ' + nextSpokenWord;
+        window.AudioManager.speak(speechWithLeadIn, { rate: 0.5 });
       }
     }
 

@@ -260,7 +260,7 @@ class DigitSpanExercise {
 
   /**
    * Speak a sequence as a single utterance (for iOS gesture context)
-   * Uses very slow speech rate to match visual presentation timing
+   * Uses lead-in phrase and slow speech rate to match visual presentation timing
    */
   speakSequence(sequence) {
     if (!window.AudioManager || !window.AudioManager.isEnabled()) return;
@@ -275,9 +275,9 @@ class DigitSpanExercise {
       return char.toString();
     });
 
-    // Use very slow speech rate to sync with visual presentation
+    // Add "Klaar?" lead-in to fill the visual delay, then the sequence
     // Rate 0.35 creates ~1.5-2s per item which matches the visual timing
-    const speechText = spokenParts.join(',   ');
+    const speechText = 'Klaar?,   ' + spokenParts.join(',   ');
     window.AudioManager.speak(speechText, { rate: 0.35 });
   }
 
