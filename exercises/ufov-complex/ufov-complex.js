@@ -226,13 +226,9 @@ class UFOVComplexExercise {
   }
 
   async startExercise() {
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Complex niveau. Let goed op het midden en de randen. De oefening begint.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
+      window.AudioManager.speak('Complex niveau. Let goed op het midden en de randen.');
     }
 
     // Initialize state

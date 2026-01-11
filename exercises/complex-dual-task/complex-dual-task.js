@@ -116,13 +116,9 @@ class ComplexDualTaskExercise {
   }
 
   async startExercise() {
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Complex niveau. Onthoud de volgorde en zoek de emojis. De oefening begint.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
+      window.AudioManager.speak('Onthoud de volgorde en zoek de emojis.');
     }
 
     // Initialize state

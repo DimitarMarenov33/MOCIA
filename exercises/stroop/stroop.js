@@ -167,13 +167,9 @@ class StroopExercise {
   }
 
   async startExercise() {
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Stroop taak. Kies de kleur van de tekst, niet het woord.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
+      window.AudioManager.speak('Stroop taak. Kies de kleur van de tekst.');
     }
 
     // Initialize state

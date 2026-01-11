@@ -201,9 +201,9 @@ class DigitSpanExercise {
     // Create input field (keyboard-based)
     this.createInputField();
 
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak('We gaan beginnen. Let goed op de telefoonnummers, postcodes en datums.');
+      window.AudioManager.speak('We gaan beginnen. Let goed op de cijfers.');
     }
 
     // Start first trial

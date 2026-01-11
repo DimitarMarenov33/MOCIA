@@ -139,15 +139,9 @@ class VisualSearchExercise {
   async startExercise() {
     console.log('[VS] startExercise() entered');
 
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        console.log('[VS] Attempting to speak instructions...');
-        await window.AudioManager.speak('Zoek het juiste object. De oefening begint.');
-        console.log('[VS] Instructions spoken');
-      } catch (error) {
-        console.log('[VS] Speech unavailable:', error);
-      }
+      window.AudioManager.speak('Zoek het juiste object. De oefening begint.');
     }
 
     // Initialize state

@@ -158,13 +158,9 @@ class TaskSwitchingExercise {
   }
 
   async startExercise() {
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      try {
-        await window.AudioManager.speak('Taak-wissel oefening. Let op de dag en tijd. Wissel tussen taken.');
-      } catch (error) {
-        console.log('Speech unavailable:', error);
-      }
+      window.AudioManager.speak('Taak-wissel oefening. Wissel tussen taken.');
     }
 
     // Calculate total trials

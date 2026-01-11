@@ -232,9 +232,9 @@ class DualNBackExercise {
   }
 
   async startExercise() {
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak(`We beginnen met ${this.config.parameters.startN || 2}-back. Let goed op.`);
+      window.AudioManager.speak(`We beginnen met ${this.config.parameters.startN || 2}-back. Let goed op.`);
     }
 
     // Initialize state

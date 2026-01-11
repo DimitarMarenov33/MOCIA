@@ -31,13 +31,65 @@ class AudioManager {
     this.dutchVoice = null;
     this.voicesLoaded = false;
 
+    // iOS audio unlock state
+    this.audioUnlocked = false;
+
     // Load saved settings
     this.loadSettings();
 
     // Initialize Dutch voice
     this.initializeDutchVoice();
 
+    // Set up iOS audio unlock on first user interaction
+    this.setupIOSAudioUnlock();
+
     AudioManager.instance = this;
+  }
+
+  /**
+   * Set up automatic audio unlock on first user interaction (for iOS)
+   */
+  setupIOSAudioUnlock() {
+    const unlockAudio = () => {
+      if (this.audioUnlocked) return;
+
+      // Try to unlock Web Audio API
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const buffer = audioContext.createBuffer(1, 1, 22050);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start(0);
+        console.log('[AudioManager] Web Audio unlocked');
+      } catch (e) {
+        console.log('[AudioManager] Web Audio unlock failed:', e);
+      }
+
+      // Try to unlock Speech Synthesis by speaking empty string
+      if (this.speechSupported) {
+        try {
+          const utterance = new SpeechSynthesisUtterance('');
+          utterance.volume = 0;
+          this.speechSynthesis.speak(utterance);
+          console.log('[AudioManager] Speech Synthesis unlocked');
+        } catch (e) {
+          console.log('[AudioManager] Speech unlock failed:', e);
+        }
+      }
+
+      this.audioUnlocked = true;
+
+      // Remove listeners after first unlock
+      document.removeEventListener('touchstart', unlockAudio, true);
+      document.removeEventListener('touchend', unlockAudio, true);
+      document.removeEventListener('click', unlockAudio, true);
+    };
+
+    // Listen for first user interaction
+    document.addEventListener('touchstart', unlockAudio, true);
+    document.addEventListener('touchend', unlockAudio, true);
+    document.addEventListener('click', unlockAudio, true);
   }
 
   /**

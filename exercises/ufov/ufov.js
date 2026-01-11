@@ -216,11 +216,9 @@ class UFOVExercise {
     // Show exercise screen
     this.screens.exercise.classList.remove('hidden');
 
-    // Speak instructions (keeps audio system active for iOS)
+    // Speak instructions (fire and forget - don't await to match iOS gesture pattern)
     if (window.AudioManager && window.AudioManager.isEnabled()) {
-      await window.AudioManager.speak(
-        'Let goed op het midden en de randen. De oefening begint.'
-      );
+      window.AudioManager.speak('Let goed op het midden en de randen. De oefening begint.');
     }
 
     // Initialize state
