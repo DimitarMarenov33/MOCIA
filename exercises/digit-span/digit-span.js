@@ -277,9 +277,9 @@ class DigitSpanExercise {
 
     // Add "Klaar?" lead-in, then each digit as a separate "sentence" using semicolons
     // Semicolons create longer pauses than commas without being pronounced
-    // Rate 0.25 with semicolons creates ~1.8s per digit to match visual timing
+    // Very slow rate (0.15) with semicolons to match visual timing of ~1.8s per digit
     const speechText = 'Klaar?;   ' + spokenParts.join(';   ');
-    window.AudioManager.speak(speechText, { rate: 0.25 });
+    window.AudioManager.speak(speechText, { rate: 0.15 });
   }
 
   async startTrial() {
