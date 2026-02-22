@@ -178,6 +178,11 @@ class StroopExercise {
     this.consecutiveCorrect = 0;
     this.consecutiveIncorrect = 0;
 
+    // Detect first session for ramp-up phase
+    const history = window.DataTracker.getExerciseHistory(this.config.exerciseId);
+    const isFirstSession = !history || !history.completedSessions;
+    this.rampUpTrials = isFirstSession ? 5 : 0;
+
     // Start data tracking
     if (!this.isPractice) {
       window.DataTracker.startSession(this.config.exerciseId, {
@@ -599,6 +604,11 @@ class StroopExercise {
   }
 
   updateAdaptiveTiming(correct) {
+    // During ramp-up phase, don't adjust timing
+    if (this.rampUpTrials > 0 && this.currentTrial <= this.rampUpTrials) {
+      return;
+    }
+
     const adjustment = this.config.parameters.timeAdjustment || 200;
     const previousTimeLimit = this.timeLimit;
 

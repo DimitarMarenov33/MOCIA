@@ -180,11 +180,16 @@ class DigitSpanExercise {
     this.currentTrial = 0;
     this.score = 0;
 
+    // Detect first session for ramp-up phase
+    const history = window.DataTracker.getExerciseHistory(this.config.exerciseId);
+    const isFirstSession = !history || !history.completedSessions;
+
     // Initialize difficulty adapter
     this.difficultyAdapter.initialize({
       initial: this.config.parameters.startLength || CONSTANTS.DIGIT_SPAN.START_LENGTH,
       min: this.config.parameters.minLength || CONSTANTS.DIGIT_SPAN.MIN_LENGTH,
       max: this.config.parameters.maxLength || CONSTANTS.DIGIT_SPAN.MAX_LENGTH,
+      rampUpTrials: isFirstSession ? 5 : 0,
     });
 
     // Start data tracking session

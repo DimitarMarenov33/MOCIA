@@ -233,6 +233,14 @@ class UFOVExercise {
     // Initialize difficulty adapter
     const variant = this.config.parameters.variant || 'basic';
     this.difficultyAdapter = new UFOVAdapter(variant);
+
+    // Detect first session for ramp-up phase
+    const history = window.DataTracker.getExerciseHistory(this.config.exerciseId);
+    const isFirstSession = !history || !history.completedSessions;
+    if (isFirstSession) {
+      this.difficultyAdapter.rampUpTrials = 5;
+    }
+
     this.currentDuration = this.difficultyAdapter.getCurrentDifficulty();
 
     // Start data tracking

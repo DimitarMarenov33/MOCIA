@@ -597,23 +597,31 @@ class WordPairExercise {
       word2: p.word2.toLowerCase()
     }));
 
-    // Check each user answer
+    // Check each user answer — find best fuzzy match among remaining correct pairs
     userAnswers.forEach((userPair, index) => {
-      const userWord1 = userPair.word1.toLowerCase();
-      const userWord2 = userPair.word2.toLowerCase();
+      let bestMatchIndex = -1;
+      let bestMatchResult = null;
 
-      // Find if this pair matches any remaining correct pair (in either direction)
-      const matchIndex = remainingCorrectPairs.findIndex(correctPair => {
-        return (correctPair.word1 === userWord1 && correctPair.word2 === userWord2) ||
-               (correctPair.word1 === userWord2 && correctPair.word2 === userWord1);
+      // Search all remaining correct pairs for the best match
+      remainingCorrectPairs.forEach((correctPair, i) => {
+        const result = window.FuzzyMatch.matchWordPair(userPair, correctPair);
+
+        if (result.isMatch) {
+          // Prefer exact over fuzzy, then lower total distance
+          if (!bestMatchResult ||
+              (result.matchType === 'exact' && bestMatchResult.matchType !== 'exact') ||
+              (result.matchType === bestMatchResult.matchType && result.totalDistance < bestMatchResult.totalDistance)) {
+            bestMatchIndex = i;
+            bestMatchResult = result;
+          }
+        }
       });
 
-      const isCorrect = matchIndex !== -1;
+      const isCorrect = bestMatchIndex !== -1;
 
       if (isCorrect) {
         correctPairs++;
-        // Remove this pair so it can't be matched again
-        remainingCorrectPairs.splice(matchIndex, 1);
+        remainingCorrectPairs.splice(bestMatchIndex, 1);
       }
 
       pairResults.push({
@@ -623,6 +631,8 @@ class WordPairExercise {
           word2: userPair.word2
         },
         correct: isCorrect,
+        matchType: isCorrect ? bestMatchResult.matchType : 'none',
+        matchDetails: bestMatchResult,
         correctPair: this.currentPairs[index]
       });
     });
@@ -675,8 +685,16 @@ class WordPairExercise {
       userAnswers: results.pairResults.map(r => ({
         word1: r.userAnswer.word1,
         word2: r.userAnswer.word2,
-        correct: r.correct
-      }))
+        correct: r.correct,
+        matchType: r.matchType,
+        matchDetails: r.matchDetails ? {
+          totalDistance: r.matchDetails.totalDistance,
+          word1Distance: r.matchDetails.word1Result?.distance,
+          word2Distance: r.matchDetails.word2Result?.distance,
+        } : null
+      })),
+      exactMatchCount: results.pairResults.filter(r => r.matchType === 'exact').length,
+      fuzzyMatchCount: results.pairResults.filter(r => r.matchType === 'fuzzy').length
     });
 
     // Update difficulty based on performance
@@ -782,8 +800,11 @@ class WordPairExercise {
    */
   renderResultsDetails(pairResults) {
     return pairResults.map(result => {
+      const isFuzzy = result.matchType === 'fuzzy';
       const icon = result.correct ? '✅' : '❌';
-      const color = result.correct ? 'var(--color-success)' : 'var(--color-error)';
+      const color = result.correct
+        ? (isFuzzy ? 'var(--color-warning)' : 'var(--color-success)')
+        : 'var(--color-error)';
 
       return `
         <div style="margin-bottom: var(--spacing-md); padding: var(--spacing-md); background: var(--color-background-alt); border-radius: var(--border-radius-md); border-left: 4px solid ${color};">
@@ -793,6 +814,11 @@ class WordPairExercise {
               <div style="margin-bottom: var(--spacing-xs);">
                 <strong>Jouw antwoord:</strong> ${result.userAnswer.word1} ↔️ ${result.userAnswer.word2}
               </div>
+              ${isFuzzy ? `
+                <div style="color: var(--color-warning); font-size: var(--font-size-sm);">
+                  (bijna goed geschreven)
+                </div>
+              ` : ''}
               ${!result.correct ? `
                 <div style="color: var(--color-text-secondary); font-size: var(--font-size-md);">
                   <strong>Correct was:</strong> ${result.correctPair.word1} ↔️ ${result.correctPair.word2}

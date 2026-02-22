@@ -25,6 +25,7 @@ class DifficultyAdapter {
     this.currentDifficulty = config.initial;
     this.minDifficulty = config.min;
     this.maxDifficulty = config.max;
+    this.rampUpTrials = config.rampUpTrials || 0;
     this.consecutiveCorrect = 0;
     this.consecutiveIncorrect = 0;
     this.history = [];
@@ -48,6 +49,25 @@ class DifficultyAdapter {
 
     let adjusted = false;
     let previousDifficulty = this.currentDifficulty;
+
+    // During ramp-up phase, record trial but don't adjust difficulty
+    if (this.rampUpTrials > 0 && this.history.length < this.rampUpTrials) {
+      this.history.push({
+        correct,
+        difficulty: this.currentDifficulty,
+        adjustedTo: null,
+      });
+      // Reset consecutive counters so they don't carry over past ramp-up
+      this.consecutiveCorrect = 0;
+      this.consecutiveIncorrect = 0;
+      return {
+        currentDifficulty: this.currentDifficulty,
+        adjusted: false,
+        previousDifficulty: this.currentDifficulty,
+        consecutiveCorrect: 0,
+        consecutiveIncorrect: 0,
+      };
+    }
 
     // Update consecutive counters
     if (correct) {
@@ -360,6 +380,25 @@ class UFOVAdapter extends DifficultyAdapter {
 
     let adjusted = false;
     let previousDifficulty = this.currentDifficulty;
+
+    // During ramp-up phase, record trial but don't adjust difficulty
+    if (this.rampUpTrials > 0 && this.history.length < this.rampUpTrials) {
+      this.history.push({
+        correct,
+        difficulty: this.currentDifficulty,
+        adjustedTo: null,
+      });
+      // Reset consecutive counters so they don't carry over past ramp-up
+      this.consecutiveCorrect = 0;
+      this.consecutiveIncorrect = 0;
+      return {
+        currentDifficulty: this.currentDifficulty,
+        adjusted: false,
+        previousDifficulty: this.currentDifficulty,
+        consecutiveCorrect: 0,
+        consecutiveIncorrect: 0,
+      };
+    }
 
     // Update consecutive counters
     if (correct) {

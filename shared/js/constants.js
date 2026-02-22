@@ -189,6 +189,19 @@ const CONSTANTS = {
     MAX_SESSIONS_STORED: 100,     // Maximum sessions per exercise
     MAX_STORAGE_SIZE: 5242880,    // 5MB in bytes
   },
+
+  // Fuzzy matching for typed recall exercises (Word Pair)
+  FUZZY_MATCH: {
+    THRESHOLDS: [
+      { maxLength: 3, maxDistance: 0 },
+      { maxLength: 5, maxDistance: 1 },
+      { maxLength: 8, maxDistance: 1 },
+      { maxLength: 12, maxDistance: 2 },
+      { maxLength: Infinity, maxDistance: 3 },
+    ],
+    STRIP_PUNCTUATION_REGEX: /^[.,!?;:]+|[.,!?;:]+$/g,
+    TIME_FORMAT_REGEX: /^(\d{1,2})\.(\d{2})$/,
+  },
 };
 
 // Make constants immutable
