@@ -12,13 +12,13 @@ class DigitSpanExercise {
     // Exercise state
     this.currentTrial = 0;
     this.totalTrials = 0;
-    this.currentSequence = []; // Array of characters (digits and letters)
+    this.currentSequence = []; // Array of characters (digits, +, -)
     this.userSequence = [];
     this.score = 0;
     this.isShowingSequence = false; // Flag to block input during sequence display
 
     // Real-world sequence types
-    this.sequenceTypes = ['phone', 'postcode', 'date'];
+    this.sequenceTypes = ['phone', 'date'];
     this.currentSequenceType = null;
     this.currentSequenceFormatted = ''; // For display purposes
     this.currentContentMode = 'generic'; // 'generic' or 'personalized'
@@ -33,9 +33,6 @@ class DigitSpanExercise {
       { prefix: '+33', name: 'France' },
       { prefix: '+44', name: 'UK' },
     ];
-
-    // Valid postcode letters (Dutch postcodes don't use SA, SD, SS)
-    this.postcodeLetters = 'ABCDEFGHJKLMNPRSTUVWXYZ'.split('');
 
     // Difficulty adapter
     this.difficultyAdapter = new DigitSpanAdapter();
@@ -134,7 +131,6 @@ class DigitSpanExercise {
     });
 
     // Keyboard support for global shortcuts only
-    // Note: Main input is handled by the text input field
     document.addEventListener('keydown', (e) => {
       if (this.screens.exercise.classList.contains('hidden')) return;
       if (this.isShowingSequence) return;
@@ -198,7 +194,7 @@ class DigitSpanExercise {
       });
     }
 
-    // Create input field (keyboard-based)
+    // Create number pad
     this.createInputField();
 
     // Show "Ready" button for first trial (iOS requires user gesture for speech)
@@ -270,8 +266,6 @@ class DigitSpanExercise {
     const spokenParts = sequence.map(char => {
       if (char === '+') return 'plus';
       if (char === '-') return 'streepje';
-      if (char === ':') return 'dubbele punt';
-      if (/[A-Za-z]/.test(char)) return char.toUpperCase();
       return char.toString();
     });
 
@@ -293,11 +287,6 @@ class DigitSpanExercise {
 
     // Hide input area from previous trial to prevent cognitive load
     this.elements.inputArea.classList.add('hidden');
-
-    // Disable text input while sequence is being shown
-    if (this.elements.textInput) {
-      this.elements.textInput.disabled = true;
-    }
 
     // Clear previous user input display
     UIComponents.clearElement(this.elements.userSequence);
@@ -343,9 +332,6 @@ class DigitSpanExercise {
       case 'phone':
         sequence = this.generatePhoneSequence(length);
         break;
-      case 'postcode':
-        sequence = this.generatePostcodeSequence(length);
-        break;
       case 'date':
         sequence = this.generateDateSequence(length);
         break;
@@ -382,30 +368,6 @@ class DigitSpanExercise {
         return null;
       }
 
-      case 'postcode': {
-        const postcodes = service.getPostcodes();
-        if (postcodes.length > 0) {
-          const postcode = service.getRandomItem(postcodes);
-          if (postcode?.code) {
-            const parsed = service.parsePostcodeToSequence(postcode.code);
-            // Adjust to requested length
-            if (parsed.length >= length) {
-              return parsed.slice(0, length);
-            }
-            // If too short, add more characters
-            while (parsed.length < length) {
-              if (parsed.length % 2 === 0) {
-                parsed.push(Math.floor(Math.random() * 10).toString());
-              } else {
-                parsed.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
-              }
-            }
-            return parsed;
-          }
-        }
-        return null;
-      }
-
       case 'date': {
         const dates = service.getImportantDates();
         if (dates.length > 0) {
@@ -416,12 +378,9 @@ class DigitSpanExercise {
             if (parsed.length >= length) {
               return parsed.slice(0, length);
             }
-            // If too short, add time component
-            const hour = Math.floor(Math.random() * 24);
-            const minute = Math.floor(Math.random() * 60);
-            const timeStr = ' ' + hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
-            for (let i = 0; i < timeStr.length && parsed.length < length; i++) {
-              parsed.push(timeStr[i]);
+            // If too short, pad with random digits
+            while (parsed.length < length) {
+              parsed.push(Math.floor(Math.random() * 10).toString());
             }
             return parsed;
           }
@@ -469,44 +428,6 @@ class DigitSpanExercise {
     return sequence;
   }
 
-  // Generate Dutch postcode sequence (4 digits + 2 letters)
-  generatePostcodeSequence(length) {
-    const sequence = [];
-
-    // Dutch postcodes: 4 digits (1000-9999) + 2 letters
-    // We build progressively based on length
-
-    // First digit: 1-9 (no 0 prefix in Dutch postcodes)
-    if (length >= 1) {
-      sequence.push((Math.floor(Math.random() * 9) + 1).toString());
-    }
-
-    // Next 3 digits: 0-9
-    for (let i = 1; i < Math.min(length, 4); i++) {
-      sequence.push(Math.floor(Math.random() * 10).toString());
-    }
-
-    // Letters (positions 5 and 6)
-    if (length >= 5) {
-      sequence.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
-    }
-    if (length >= 6) {
-      sequence.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
-    }
-
-    // If length > 6, we're doing a "longer postcode" scenario - add more digits/letters
-    // This could represent multiple postcodes or extended codes
-    for (let i = 6; i < length; i++) {
-      if (i % 2 === 0) {
-        sequence.push(Math.floor(Math.random() * 10).toString());
-      } else {
-        sequence.push(this.postcodeLetters[Math.floor(Math.random() * this.postcodeLetters.length)]);
-      }
-    }
-
-    return sequence;
-  }
-
   // Generate date sequence (DD-MM-YY format with dashes included)
   generateDateSequence(length) {
     const sequence = [];
@@ -528,15 +449,9 @@ class DigitSpanExercise {
       sequence.push(fullDate[i]);
     }
 
-    // If length > 8, generate additional time content (HH:MM)
-    if (length > 8) {
-      const hour = Math.floor(Math.random() * 24);
-      const minute = Math.floor(Math.random() * 60);
-      const timeStr = ' ' + hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
-
-      for (let i = 8; i < length && (i - 8) < timeStr.length; i++) {
-        sequence.push(timeStr[i - 8]);
-      }
+    // If length > 8, pad with random digits
+    while (sequence.length < length) {
+      sequence.push(Math.floor(Math.random() * 10).toString());
     }
 
     return sequence;
@@ -559,11 +474,6 @@ class DigitSpanExercise {
         if (chars.length <= 2) return chars;
         return chars.slice(0, 2) + ' ' + chars.slice(2);
 
-      case 'postcode':
-        // Format as Dutch postcode: 4 digits + space + 2 letters
-        if (chars.length <= 4) return chars;
-        return chars.slice(0, 4) + ' ' + chars.slice(4);
-
       case 'date':
         // Dates already include dashes in sequence, display as-is
         return chars;
@@ -578,8 +488,6 @@ class DigitSpanExercise {
     switch (this.currentSequenceType) {
       case 'phone':
         return 'Telefoonnummer';
-      case 'postcode':
-        return 'Postcode';
       case 'date':
         return 'Datum';
       default:
@@ -672,13 +580,8 @@ class DigitSpanExercise {
     // Show input area
     this.elements.inputArea.classList.remove('hidden');
 
-    // Clear user sequence display and input field
+    // Clear user sequence display
     UIComponents.clearElement(this.elements.userSequence);
-    if (this.elements.textInput) {
-      this.elements.textInput.value = '';
-      this.elements.textInput.disabled = false; // Enable input now that it's user's turn
-      this.elements.textInput.focus();
-    }
 
     // Enable submit button (initially disabled until sequence entered)
     this.elements.submitBtn.disabled = true;
@@ -687,65 +590,69 @@ class DigitSpanExercise {
   createInputField() {
     UIComponents.clearElement(this.elements.numberPadContainer);
 
-    // Create text input container
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'keyboard-input-container';
+    // Create number pad grid
+    const grid = document.createElement('div');
+    grid.className = 'number-pad-grid';
 
-    // Create the text input field
-    const textInput = document.createElement('input');
-    textInput.type = 'text';
-    textInput.id = 'sequence-input';
-    textInput.className = 'sequence-input-field';
-    textInput.placeholder = 'Typ hier...';
-    textInput.autocomplete = 'off';
-    textInput.autocapitalize = 'characters';
-    textInput.spellcheck = false;
-    textInput.disabled = true; // Start disabled, enable when it's user's turn
+    // Button layout: 0-9, +, -, backspace
+    const rows = [
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['7', '8', '9'],
+      ['+', '0', '-'],
+    ];
 
-    // Handle input changes
-    textInput.addEventListener('input', (e) => {
-      // Convert to uppercase for letters
-      const value = e.target.value.toUpperCase();
-      e.target.value = value;
+    rows.forEach(row => {
+      row.forEach(char => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'number-pad-btn';
+        btn.textContent = char;
+        btn.dataset.char = char;
 
-      // Update user sequence
-      this.userSequence = value.split('');
-      this.updateUserSequenceDisplay();
+        btn.addEventListener('click', () => {
+          if (this.isShowingSequence) return;
+          this.userSequence.push(char);
+          this.updateUserSequenceDisplay();
+          this.elements.submitBtn.disabled = this.userSequence.length !== this.currentSequence.length;
 
-      // Enable submit button when sequence is complete
-      this.elements.submitBtn.disabled = this.userSequence.length !== this.currentSequence.length;
+          if (window.AudioManager) {
+            window.AudioManager.hapticPress();
+          }
+        });
 
-      // Haptic feedback
-      if (window.AudioManager) {
-        window.AudioManager.hapticPress();
+        grid.appendChild(btn);
+      });
+    });
+
+    // Backspace button (full width)
+    const backspaceBtn = document.createElement('button');
+    backspaceBtn.type = 'button';
+    backspaceBtn.className = 'number-pad-btn number-pad-backspace';
+    backspaceBtn.innerHTML = '&#9003;'; // ⌫
+    backspaceBtn.setAttribute('aria-label', 'Wissen');
+
+    backspaceBtn.addEventListener('click', () => {
+      if (this.isShowingSequence) return;
+      if (this.userSequence.length > 0) {
+        this.userSequence.pop();
+        this.updateUserSequenceDisplay();
+        this.elements.submitBtn.disabled = this.userSequence.length !== this.currentSequence.length;
+
+        if (window.AudioManager) {
+          window.AudioManager.hapticPress();
+        }
       }
     });
 
-    // Handle enter key
-    textInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !this.elements.submitBtn.disabled) {
-        e.preventDefault();
-        this.submitResponse();
-      }
-    });
-
-    inputContainer.appendChild(textInput);
-    this.elements.numberPadContainer.appendChild(inputContainer);
-
-    // Store reference to input field
-    this.elements.textInput = textInput;
+    grid.appendChild(backspaceBtn);
+    this.elements.numberPadContainer.appendChild(grid);
   }
 
   clearInput() {
     this.userSequence = [];
     this.updateUserSequenceDisplay();
     this.elements.submitBtn.disabled = true;
-
-    // Clear text input field
-    if (this.elements.textInput) {
-      this.elements.textInput.value = '';
-      this.elements.textInput.focus();
-    }
 
     if (window.AudioManager) {
       window.AudioManager.hapticPress();
@@ -840,11 +747,6 @@ class DigitSpanExercise {
 
     // Hide input area
     this.elements.inputArea.classList.add('hidden');
-
-    // Disable text input while sequence is being shown
-    if (this.elements.textInput) {
-      this.elements.textInput.disabled = true;
-    }
 
     // Clear previous user input display
     UIComponents.clearElement(this.elements.userSequence);
